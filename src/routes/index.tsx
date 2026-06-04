@@ -6,11 +6,18 @@ import { Footer } from "@/components/Footer";
 import { CategoryCard } from "@/components/CategoryCard";
 import { ProductCard } from "@/components/ProductCard";
 import { ContactDialog } from "@/components/ContactDialog";
-import { categories, bestsellers, advantages, heroFeatures, reviews } from "@/lib/data";
+import { bestsellers, advantages, heroFeatures, reviews } from "@/lib/data";
 import hero from "@/assets/hero-living.jpg";
 import apartmentImg from "@/assets/apartment.jpg";
 import factory from "@/assets/factory.jpg";
 import showroom from "@/assets/showroom.jpg";
+import catSofa from "@/assets/cat-sofa.jpg";
+import catBed from "@/assets/cat-bed.jpg";
+import catMattress from "@/assets/cat-mattress.jpg";
+import catWardrobe from "@/assets/cat-wardrobe.jpg";
+import catHallway from "@/assets/cat-hallway.jpg";
+import catDining from "@/assets/cat-dining.jpg";
+import catKids from "@/assets/cat-kids.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
