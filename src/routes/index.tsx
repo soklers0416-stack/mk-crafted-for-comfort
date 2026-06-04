@@ -57,12 +57,13 @@ function HomePage() {
                     Производство в Краснодаре
                   </span>
                   <h1 className="mt-5 font-display text-4xl font-bold leading-[1.05] tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-7xl">
-                    Ваш дом.<br />
-                    Ваш стиль.<br />
-                    <span className="text-primary">Наша мебель.</span>
+                    Ваш дом<br />
+                    Ваш стиль<br />
+                    <span className="text-primary">Наша мебель</span>
                   </h1>
-                  <p className="mt-5 max-w-lg text-base text-foreground/75 md:text-lg">
-                    Собственное производство в Краснодаре. Стильная мебель без наценок.
+                  <p className="mt-5 max-w-lg text-base text-foreground/75 md:text-lg shadow">
+                    Собственное производство в Краснодаре<br />
+                    Стильная мебель без наценок
                   </p>
                   <div className="mt-7 flex flex-wrap gap-3">
                     <Link
