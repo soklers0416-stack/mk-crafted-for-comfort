@@ -63,7 +63,7 @@ function HomePage() {
                   </h1>
                   <p className="mt-5 max-w-lg text-base text-foreground/75 md:text-lg shadow">
                     Собственное производство в Краснодаре<br />
-                    Стильная мебель без наценок.
+                    Стильная мебель без наценок
                   </p>
                   <div className="mt-7 flex flex-wrap gap-3">
                     <Link
