@@ -6,11 +6,18 @@ import { Footer } from "@/components/Footer";
 import { CategoryCard } from "@/components/CategoryCard";
 import { ProductCard } from "@/components/ProductCard";
 import { ContactDialog } from "@/components/ContactDialog";
-import { categories, bestsellers, advantages, heroFeatures, reviews } from "@/lib/data";
+import { bestsellers, advantages, heroFeatures, reviews } from "@/lib/data";
 import hero from "@/assets/hero-living.jpg";
 import apartmentImg from "@/assets/apartment.jpg";
 import factory from "@/assets/factory.jpg";
 import showroom from "@/assets/showroom.jpg";
+import catSofa from "@/assets/cat-sofa.jpg";
+import catBed from "@/assets/cat-bed.jpg";
+import catMattress from "@/assets/cat-mattress.jpg";
+import catWardrobe from "@/assets/cat-wardrobe.jpg";
+import catHallway from "@/assets/cat-hallway.jpg";
+import catDining from "@/assets/cat-dining.jpg";
+import catKids from "@/assets/cat-kids.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -105,9 +112,13 @@ function HomePage() {
           </Link>
         </div>
         <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-5 lg:grid-cols-4">
-          {categories.map((c, i) => (
-            <CategoryCard key={c.slug} category={c} large={i === 0} />
-          ))}
+          <CategoryCard slug="sofas" title="Диваны" image={catSofa} large />
+          <CategoryCard slug="beds" title="Кровати" image={catBed} />
+          <CategoryCard slug="mattresses" title="Матрасы" image={catMattress} />
+          <CategoryCard slug="wardrobes" title="Шкафы" image={catWardrobe} />
+          <CategoryCard slug="hallways" title="Прихожие" image={catHallway} />
+          <CategoryCard slug="dining" title="Столы и стулья" image={catDining} />
+          <CategoryCard slug="kids" title="Детские кровати" image={catKids} />
         </div>
       </section>
 
