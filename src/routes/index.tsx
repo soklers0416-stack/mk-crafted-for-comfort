@@ -112,9 +112,13 @@ function HomePage() {
           </Link>
         </div>
         <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-5 lg:grid-cols-4">
-          {categories.map((c, i) => (
-            <CategoryCard key={c.slug} category={c} large={i === 0} />
-          ))}
+          <CategoryCard slug="sofas" title="Диваны" image={catSofa} large />
+          <CategoryCard slug="beds" title="Кровати" image={catBed} />
+          <CategoryCard slug="mattresses" title="Матрасы" image={catMattress} />
+          <CategoryCard slug="wardrobes" title="Шкафы" image={catWardrobe} />
+          <CategoryCard slug="hallways" title="Прихожие" image={catHallway} />
+          <CategoryCard slug="dining" title="Столы и стулья" image={catDining} />
+          <CategoryCard slug="kids" title="Детские кровати" image={catKids} />
         </div>
       </section>
 
