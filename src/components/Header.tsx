@@ -6,6 +6,7 @@ import { ContactDialog } from "./ContactDialog";
 
 const nav = [
   { to: "/catalog", label: "Каталог" },
+  { to: "/promotions", label: "Акции" },
   { to: "/apartment", label: "Квартира под ключ" },
   { to: "/reviews", label: "Отзывы" },
   { to: "/about", label: "О компании" },

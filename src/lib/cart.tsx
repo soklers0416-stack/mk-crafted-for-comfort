@@ -49,7 +49,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
     .filter(Boolean) as (CartItem & { product: Product })[];
 
   const count = items.reduce((s, x) => s + x.qty, 0);
-  const total = detailed.reduce((s, x) => s + x.product.price * x.qty, 0);
+  const total = detailed.reduce((s, x) => {
+    const price = x.product.sale?.enabled && x.product.sale.newPrice
+      ? x.product.sale.newPrice
+      : x.product.price;
+    return s + price * x.qty;
+  }, 0);
 
   return (
     <Ctx.Provider value={{ items, add, remove, setQty, clear, count, total, detailed }}>
