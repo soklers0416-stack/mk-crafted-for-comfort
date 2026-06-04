@@ -49,10 +49,10 @@ export const Route = createFileRoute("/product/$id")({
 });
 
 function ProductPage() {
-  const { product } = Route.useLoaderData();
+  const { product } = Route.useLoaderData() as { product: import("@/lib/data").Product };
   const { add } = useCart();
-  const gallery = product.gallery && product.gallery.length > 0 ? product.gallery : [product.image];
-  const [activeImg, setActiveImg] = useState(gallery[0]);
+  const gallery: string[] = product.gallery && product.gallery.length > 0 ? product.gallery : [product.image];
+  const [activeImg, setActiveImg] = useState<string>(gallery[0]);
   const [contactOpen, setContactOpen] = useState(false);
   const [questionOpen, setQuestionOpen] = useState(false);
   const [colorOpen, setColorOpen] = useState(false);
