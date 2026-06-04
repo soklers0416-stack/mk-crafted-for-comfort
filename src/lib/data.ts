@@ -8,6 +8,7 @@ import kids from "@/assets/cat-kids.jpg";
 
 import psofa1 from "@/assets/prod-sofa1.jpg";
 import psofa2 from "@/assets/prod-sofa2.jpg";
+import psofaMain from "@/assets/prod-sofa-main.jpg";
 import pbed1 from "@/assets/prod-bed1.jpg";
 import pmat1 from "@/assets/prod-mattress1.jpg";
 import pward1 from "@/assets/prod-wardrobe1.jpg";
@@ -94,7 +95,7 @@ export const products: Product[] = [
     price: 64900,
     priceFrom: true,
     image: psofa1,
-    gallery: [psofa1, psofa2],
+    gallery: [psofa1, psofaMain, psofa2],
     description: "Мягкий 3-местный диван из букле, скандинавский стиль, ножки светлый дуб.",
     stock: "В наличии",
     sizes: defaultSofaSizes,
@@ -107,8 +108,8 @@ export const products: Product[] = [
     category: "sofas",
     price: 78500,
     priceFrom: true,
-    image: psofa2,
-    gallery: [psofa2, psofa1],
+    image: psofaMain,
+    gallery: [psofaMain, psofa1, psofa2],
     description: "Глубокий бархатный 3-местный диван с деревянными ножками.",
     stock: "Под заказ от 2 недель",
     sizes: defaultSofaSizes,
