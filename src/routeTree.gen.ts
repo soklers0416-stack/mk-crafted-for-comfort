@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ReviewsRouteImport } from './routes/reviews'
+import { Route as PromotionsRouteImport } from './routes/promotions'
 import { Route as DeliveryRouteImport } from './routes/delivery'
 import { Route as ContactsRouteImport } from './routes/contacts'
 import { Route as CatalogRouteImport } from './routes/catalog'
@@ -17,10 +18,16 @@ import { Route as CartRouteImport } from './routes/cart'
 import { Route as ApartmentRouteImport } from './routes/apartment'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProductIdRouteImport } from './routes/product.$id'
 
 const ReviewsRoute = ReviewsRouteImport.update({
   id: '/reviews',
   path: '/reviews',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PromotionsRoute = PromotionsRouteImport.update({
+  id: '/promotions',
+  path: '/promotions',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DeliveryRoute = DeliveryRouteImport.update({
@@ -58,6 +65,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProductIdRoute = ProductIdRouteImport.update({
+  id: '/product/$id',
+  path: '/product/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -67,7 +79,9 @@ export interface FileRoutesByFullPath {
   '/catalog': typeof CatalogRoute
   '/contacts': typeof ContactsRoute
   '/delivery': typeof DeliveryRoute
+  '/promotions': typeof PromotionsRoute
   '/reviews': typeof ReviewsRoute
+  '/product/$id': typeof ProductIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -77,7 +91,9 @@ export interface FileRoutesByTo {
   '/catalog': typeof CatalogRoute
   '/contacts': typeof ContactsRoute
   '/delivery': typeof DeliveryRoute
+  '/promotions': typeof PromotionsRoute
   '/reviews': typeof ReviewsRoute
+  '/product/$id': typeof ProductIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -88,7 +104,9 @@ export interface FileRoutesById {
   '/catalog': typeof CatalogRoute
   '/contacts': typeof ContactsRoute
   '/delivery': typeof DeliveryRoute
+  '/promotions': typeof PromotionsRoute
   '/reviews': typeof ReviewsRoute
+  '/product/$id': typeof ProductIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -100,7 +118,9 @@ export interface FileRouteTypes {
     | '/catalog'
     | '/contacts'
     | '/delivery'
+    | '/promotions'
     | '/reviews'
+    | '/product/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -110,7 +130,9 @@ export interface FileRouteTypes {
     | '/catalog'
     | '/contacts'
     | '/delivery'
+    | '/promotions'
     | '/reviews'
+    | '/product/$id'
   id:
     | '__root__'
     | '/'
@@ -120,7 +142,9 @@ export interface FileRouteTypes {
     | '/catalog'
     | '/contacts'
     | '/delivery'
+    | '/promotions'
     | '/reviews'
+    | '/product/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -131,7 +155,9 @@ export interface RootRouteChildren {
   CatalogRoute: typeof CatalogRoute
   ContactsRoute: typeof ContactsRoute
   DeliveryRoute: typeof DeliveryRoute
+  PromotionsRoute: typeof PromotionsRoute
   ReviewsRoute: typeof ReviewsRoute
+  ProductIdRoute: typeof ProductIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -141,6 +167,13 @@ declare module '@tanstack/react-router' {
       path: '/reviews'
       fullPath: '/reviews'
       preLoaderRoute: typeof ReviewsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/promotions': {
+      id: '/promotions'
+      path: '/promotions'
+      fullPath: '/promotions'
+      preLoaderRoute: typeof PromotionsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/delivery': {
@@ -192,6 +225,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/product/$id': {
+      id: '/product/$id'
+      path: '/product/$id'
+      fullPath: '/product/$id'
+      preLoaderRoute: typeof ProductIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -203,8 +243,20 @@ const rootRouteChildren: RootRouteChildren = {
   CatalogRoute: CatalogRoute,
   ContactsRoute: ContactsRoute,
   DeliveryRoute: DeliveryRoute,
+  PromotionsRoute: PromotionsRoute,
   ReviewsRoute: ReviewsRoute,
+  ProductIdRoute: ProductIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
