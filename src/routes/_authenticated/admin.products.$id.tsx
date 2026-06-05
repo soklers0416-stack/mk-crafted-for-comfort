@@ -62,12 +62,11 @@ function EditProduct() {
   }
 
   async function uploadPhoto(slot: 1 | 2 | 3 | 4 | 5 | 6, file: File) {
-    const ext = file.name.split(".").pop() || "jpg";
+    const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
     const path = `${crypto.randomUUID()}.${ext}`;
-    const { error } = await supabase.storage.from("product-photos").upload(path, file, { upsert: false });
+    const { error } = await supabase.storage.from("product-photos").upload(path, file, { upsert: false, contentType: file.type });
     if (error) { toast.error(error.message); return; }
-    const { data: pub } = supabase.storage.from("product-photos").getPublicUrl(path);
-    update(`photo${slot}` as any, pub.publicUrl);
+    update(`photo${slot}` as any, `/api/public/photo/${path}`);
   }
 
   async function save() {

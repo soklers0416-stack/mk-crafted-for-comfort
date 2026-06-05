@@ -45,12 +45,11 @@ function AdminCategories() {
   });
 
   async function uploadImage(catId: string, file: File) {
-    const ext = file.name.split(".").pop() || "jpg";
+    const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
     const path = `category-${catId}-${Date.now()}.${ext}`;
-    const { error } = await supabase.storage.from("product-photos").upload(path, file);
+    const { error } = await supabase.storage.from("product-photos").upload(path, file, { contentType: file.type });
     if (error) return toast.error(error.message);
-    const { data: pub } = supabase.storage.from("product-photos").getPublicUrl(path);
-    update.mutate({ id: catId, patch: { image_url: pub.publicUrl } });
+    update.mutate({ id: catId, patch: { image_url: `/api/public/photo/${path}` } });
   }
 
   return (
