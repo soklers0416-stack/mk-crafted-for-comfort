@@ -1,17 +1,12 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 type Field = { name: string; label: string; type?: string; required?: boolean };
 
 export function RequestDialog({
-  open,
-  onOpenChange,
-  title,
-  description,
-  fields,
-  submitLabel = "Отправить",
-  source,
+  open, onOpenChange, title, description, fields, submitLabel = "Отправить", source,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
@@ -23,8 +18,9 @@ export function RequestDialog({
 }) {
   const [values, setValues] = useState<Record<string, string>>({});
   const [sent, setSent] = useState(false);
+  const [busy, setBusy] = useState(false);
 
-  const submit = (e: React.FormEvent) => {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
     for (const f of fields) {
       if (f.required !== false && !(values[f.name] ?? "").trim()) {
@@ -32,9 +28,19 @@ export function RequestDialog({
         return;
       }
     }
-    // TODO: подключить отправку заявок { source, ...values }
-    setSent(true);
-  };
+    setBusy(true);
+    try {
+      const { error } = await (supabase as any).from("requests").insert({
+        source, title, data: values, status: "new",
+      });
+      if (error) throw error;
+      setSent(true);
+    } catch (err: any) {
+      toast.error(err?.message ?? "Не удалось отправить");
+    } finally {
+      setBusy(false);
+    }
+  }
 
   return (
     <Dialog
@@ -69,10 +75,10 @@ export function RequestDialog({
                 />
               ))}
               <button
-                type="submit"
-                className="w-full rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground transition hover:bg-primary/90"
+                type="submit" disabled={busy}
+                className="w-full rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground transition hover:bg-primary/90 disabled:opacity-50"
               >
-                {submitLabel}
+                {busy ? "Отправляем…" : submitLabel}
               </button>
             </form>
           </>

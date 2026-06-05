@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
-import { categories, products } from "@/lib/data";
+import { categoriesQuery, productsQuery } from "@/lib/queries";
 
 const search = z.object({ category: z.string().optional() });
 
@@ -23,8 +24,10 @@ export const Route = createFileRoute("/catalog")({
 function CatalogPage() {
   const { category } = Route.useSearch();
   const navigate = Route.useNavigate();
+  const { data: categories = [] } = useQuery(categoriesQuery);
+  const { data: products = [], isLoading } = useQuery(productsQuery);
 
-  const list = category ? products.filter((p) => p.category === category) : products;
+  const list = category ? products.filter((p) => p.category_slug === category) : products;
   const current = categories.find((c) => c.slug === category);
 
   return (
@@ -58,7 +61,9 @@ function CatalogPage() {
           ))}
         </div>
 
-        {list.length === 0 ? (
+        {isLoading ? (
+          <p className="mt-12 text-muted-foreground">Загрузка…</p>
+        ) : list.length === 0 ? (
           <p className="mt-12 text-muted-foreground">Скоро добавим товары в эту категорию.</p>
         ) : (
           <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

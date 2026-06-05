@@ -1,5 +1,4 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import { products, type Product } from "./data";
 
 export type CartItem = { id: string; qty: number };
 
@@ -10,8 +9,6 @@ type CartCtx = {
   setQty: (id: string, qty: number) => void;
   clear: () => void;
   count: number;
-  total: number;
-  detailed: (CartItem & { product: Product })[];
 };
 
 const Ctx = createContext<CartCtx | null>(null);
@@ -41,23 +38,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setItems((p) => p.map((x) => (x.id === id ? { ...x, qty: Math.max(1, qty) } : x)));
   const clear = () => setItems([]);
 
-  const detailed = items
-    .map((it) => {
-      const product = products.find((p) => p.id === it.id);
-      return product ? { ...it, product } : null;
-    })
-    .filter(Boolean) as (CartItem & { product: Product })[];
-
   const count = items.reduce((s, x) => s + x.qty, 0);
-  const total = detailed.reduce((s, x) => {
-    const price = x.product.sale?.enabled && x.product.sale.newPrice
-      ? x.product.sale.newPrice
-      : x.product.price;
-    return s + price * x.qty;
-  }, 0);
 
   return (
-    <Ctx.Provider value={{ items, add, remove, setQty, clear, count, total, detailed }}>
+    <Ctx.Provider value={{ items, add, remove, setQty, clear, count }}>
       {children}
     </Ctx.Provider>
   );
