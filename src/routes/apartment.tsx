@@ -113,7 +113,7 @@ function ApartmentPage() {
                       }`}
                     >
                       <div className="aspect-[5/4] overflow-hidden bg-surface-muted">
-                        <img src={p.image} alt={p.title} loading="lazy" className="h-full w-full object-cover transition group-hover:scale-105" />
+                        <img src={p.photo1} alt={p.title} loading="lazy" className="h-full w-full object-contain p-3 transition group-hover:scale-105" />
                       </div>
                       <div className="flex items-center justify-between gap-3 p-4">
                         <div>

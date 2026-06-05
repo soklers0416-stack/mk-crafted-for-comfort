@@ -1,11 +1,11 @@
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ShoppingBag } from "lucide-react";
-import { formatPrice, useCart } from "@/lib/cart";
+import { formatPrice } from "@/lib/cart";
 import type { Product } from "@/lib/data";
-import { toast } from "sonner";
+import { RequestDialog } from "@/components/RequestDialog";
 
 export function ProductCard({ product }: { product: Product }) {
-  const { add } = useCart();
+  const [requestOpen, setRequestOpen] = useState(false);
   const sale = product.sale?.enabled ? product.sale : null;
   const displayPrice = sale?.newPrice ?? product.price;
 
@@ -17,14 +17,14 @@ export function ProductCard({ product }: { product: Product }) {
         className="relative block aspect-[5/4] overflow-hidden bg-surface-muted"
       >
         <img
-          src={product.image}
+          src={product.photo1}
           alt={product.title}
           loading="lazy"
-          className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+          className="h-full w-full object-contain p-3 transition duration-700 group-hover:scale-[1.03]"
         />
         {sale && (
           <span className="absolute left-3 top-3 rounded-full bg-red-600 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-white shadow">
-            {sale.label}
+            {sale.label ?? "АКЦИЯ"}
           </span>
         )}
       </Link>
@@ -35,6 +35,20 @@ export function ProductCard({ product }: { product: Product }) {
           </Link>
           <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{product.description}</p>
         </div>
+
+        {/* Краткие характеристики */}
+        <ul className="space-y-1 text-xs text-muted-foreground">
+          {product.sleepingPlace && product.sleepingPlace !== "—" && (
+            <li>Спальное место: <span className="text-foreground">{product.sleepingPlace}</span></li>
+          )}
+          {product.mechanism && product.mechanism !== "—" && (
+            <li>Механизм: <span className="text-foreground">{product.mechanism}</span></li>
+          )}
+          {product.availability && (
+            <li>Наличие: <span className="text-foreground">{product.availability === "в наличии" ? "В наличии" : "Под заказ"}</span></li>
+          )}
+        </ul>
+
         <div className="mt-auto flex items-center justify-between gap-3">
           <div className="flex flex-col">
             {sale?.oldPrice && (
@@ -55,15 +69,26 @@ export function ProductCard({ product }: { product: Product }) {
             Подробнее
           </Link>
           <button
-            onClick={() => { add(product.id); toast.success("Добавлено в корзину"); }}
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition hover:bg-primary/90"
-            aria-label="В корзину"
+            onClick={() => setRequestOpen(true)}
+            className="rounded-full bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition hover:bg-primary/90"
           >
-            <ShoppingBag className="h-4 w-4" />
-            <span className="hidden sm:inline">В корзину</span>
+            Оставить заявку
           </button>
         </div>
       </div>
+
+      <RequestDialog
+        open={requestOpen}
+        onOpenChange={setRequestOpen}
+        title={`Заявка: ${product.title}`}
+        description="Оставьте контакты — менеджер свяжется с вами."
+        source={`card:${product.id}`}
+        fields={[
+          { name: "name", label: "Имя" },
+          { name: "phone", label: "Телефон", type: "tel" },
+          { name: "comment", label: "Комментарий", required: false },
+        ]}
+      />
     </article>
   );
 }

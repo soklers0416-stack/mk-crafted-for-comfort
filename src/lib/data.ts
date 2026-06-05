@@ -1,3 +1,31 @@
+// ============================================================================
+//  КАТАЛОГ ТОВАРОВ — редактируется вручную, без AI
+// ============================================================================
+//
+//  КАК ДОБАВИТЬ НОВЫЙ ТОВАР:
+//  1. Скопируйте любой объект из массива `products` ниже.
+//  2. Вставьте его в конец массива (перед закрывающей `]`).
+//  3. Измените поля:
+//     - id: уникальный идентификатор (любая строка, например "s5")
+//     - category: slug категории из массива `categories` ("sofas", "beds", ...)
+//     - title: название товара
+//     - price: цена числом (без пробелов)
+//     - description: краткое описание
+//     - photo1..photo5: фото товара (photo1 обязательно, остальные опционально)
+//     - sizes / specs / sleepingPlace / mechanism / filling / hasBox /
+//       availability / productionTime — характеристики
+//     - sale.enabled: true — показывать плашку «Акция» на карточке
+//
+//  КАК ЗАМЕНИТЬ ФОТО:
+//  - Через Visual Editor: кликните на фото на сайте и загрузите своё.
+//  - Через код: импортируйте изображение сверху файла и поставьте его
+//    в нужное поле photo1..photo5.
+//
+//  КАК УДАЛИТЬ ТОВАР: удалите его объект из массива `products`.
+//
+//  КАК ВКЛЮЧИТЬ/ВЫКЛЮЧИТЬ АКЦИЮ: измените sale.enabled на true/false.
+// ============================================================================
+
 import sofa from "@/assets/cat-sofa.jpg";
 import bed from "@/assets/cat-bed.jpg";
 import mattress from "@/assets/cat-mattress.jpg";
@@ -31,26 +59,47 @@ export type Spec = { label: string; value: string };
 
 export type Sale = {
   enabled: boolean;
-  label: string;           // "АКЦИЯ" / "СКИДКА" / "ХИТ ПРОДАЖ" / "ОСТАЛОСЬ 2 ШТУКИ"
-  oldPrice?: number;       // зачёркнутая
-  newPrice?: number;       // новая
-  text?: string;           // описание акции
+  label?: string;           // "АКЦИЯ" / "СКИДКА" / "ХИТ ПРОДАЖ"
+  oldPrice?: number;
+  newPrice?: number;
+  text?: string;
 };
 
 export type Product = {
   id: string;
+  category: string;          // slug из categories
   title: string;
-  category: string;
   price: number;
-  priceFrom?: boolean;     // отображать "от"
-  image: string;
-  gallery?: string[];      // дополнительные ракурсы (каталог/разложенный/интерьер/…)
+  priceFrom?: boolean;       // показывать "от"
   description: string;
-  stock?: string;          // "В наличии" / "Под заказ от 2 недель"
+
+  // Галерея — до 5 отдельных фото (photo1 обязательно)
+  photo1: string;
+  photo2?: string;
+  photo3?: string;
+  photo4?: string;
+  photo5?: string;
+
+  // Характеристики
   sizes?: SizeRow[];
-  specs?: Spec[];
+  sleepingPlace?: string;    // спальное место
+  mechanism?: string;        // механизм трансформации
+  filling?: string;          // наполнение
+  hasBox?: boolean;          // короб
+  availability?: "в наличии" | "под заказ";
+  productionTime?: string;   // срок изготовления
+  specs?: Spec[];            // доп. характеристики
+
+  // Акция
   sale?: Sale;
 };
+
+// Вспомогательные геттеры — НЕ ТРОГАТЬ
+export function getGallery(p: Product): string[] {
+  return [p.photo1, p.photo2, p.photo3, p.photo4, p.photo5].filter(
+    (x): x is string => Boolean(x),
+  );
+}
 
 export const categories: Category[] = [
   { slug: "sofas", title: "Диваны", image: sofa },
@@ -68,109 +117,128 @@ const defaultSofaSizes: SizeRow[] = [
   { size: "Индивидуальный размер", sleeping: "По запросу", box: "По запросу", price: "Рассчитать" },
 ];
 
-const defaultSofaSpecs: Spec[] = [
-  { label: "Габариты", value: "2400×1000×900 мм" },
-  { label: "Спальное место", value: "2000×1400 мм" },
-  { label: "Механизм трансформации", value: "Еврокнижка" },
-  { label: "Наполнение", value: "ППУ высокой плотности, независимый пружинный блок" },
-  { label: "Короб для хранения", value: "Есть" },
-  { label: "Каркас", value: "Брус хвойных пород, фанера" },
-  { label: "Гарантия", value: "18 месяцев" },
-];
-
-const defaultBedSpecs: Spec[] = [
-  { label: "Габариты", value: "1700×2100×1100 мм" },
-  { label: "Спальное место", value: "1600×2000 мм" },
-  { label: "Механизм", value: "Подъёмный с газлифтом" },
-  { label: "Короб для хранения", value: "Есть" },
-  { label: "Каркас", value: "ЛДСП, массив" },
-  { label: "Гарантия", value: "18 месяцев" },
-];
-
+// ============================================================================
+//  СПИСОК ТОВАРОВ
+// ============================================================================
 export const products: Product[] = [
   {
     id: "s1",
-    title: "Диван «Осло»",
     category: "sofas",
+    title: "Диван «Осло»",
     price: 64900,
     priceFrom: true,
-    image: psofa1,
-    gallery: [psofa1, psofaMain, psofa2],
     description: "Мягкий 3-местный диван из букле, скандинавский стиль, ножки светлый дуб.",
-    stock: "В наличии",
+    photo1: psofa1,
+    photo2: psofaMain,
+    photo3: psofa2,
     sizes: defaultSofaSizes,
-    specs: defaultSofaSpecs,
+    sleepingPlace: "2000×1400 мм",
+    mechanism: "Еврокнижка",
+    filling: "ППУ высокой плотности, независимый пружинный блок",
+    hasBox: true,
+    availability: "в наличии",
+    productionTime: "В наличии — отгрузка от 1 дня",
+    specs: [
+      { label: "Габариты", value: "2400×1000×900 мм" },
+      { label: "Каркас", value: "Брус хвойных пород, фанера" },
+      { label: "Гарантия", value: "18 месяцев" },
+    ],
     sale: { enabled: true, label: "ХИТ ПРОДАЖ", oldPrice: 78500, newPrice: 64900, text: "Лидер продаж этого сезона" },
   },
   {
     id: "s2",
-    title: "Диван «Берген»",
     category: "sofas",
+    title: "Диван «Берген»",
     price: 78500,
     priceFrom: true,
-    image: psofaMain,
-    gallery: [psofaMain, psofa1, psofa2],
     description: "Глубокий бархатный 3-местный диван с деревянными ножками.",
-    stock: "Под заказ от 2 недель",
+    photo1: psofaMain,
+    photo2: psofa1,
+    photo3: psofa2,
     sizes: defaultSofaSizes,
-    specs: defaultSofaSpecs,
-    sale: { enabled: false, label: "АКЦИЯ" },
+    sleepingPlace: "2000×1400 мм",
+    mechanism: "Еврокнижка",
+    filling: "ППУ, независимый пружинный блок",
+    hasBox: true,
+    availability: "под заказ",
+    productionTime: "От 2 недель",
+    specs: [
+      { label: "Габариты", value: "2400×1000×900 мм" },
+      { label: "Каркас", value: "Брус хвойных пород, фанера" },
+      { label: "Гарантия", value: "18 месяцев" },
+    ],
+    sale: { enabled: false },
   },
   {
     id: "b1",
-    title: "Кровать «Сторо» 160×200",
     category: "beds",
+    title: "Кровать «Сторо» 160×200",
     price: 42900,
     priceFrom: true,
-    image: pbed1,
-    gallery: [pbed1],
     description: "Кровать с мягким изголовьем и подъёмным механизмом.",
-    stock: "В наличии",
+    photo1: pbed1,
     sizes: [
       { size: "1600×2000", sleeping: "1600×2000", box: "Есть", price: "42 900 ₽" },
       { size: "1800×2000", sleeping: "1800×2000", box: "Есть", price: "47 900 ₽" },
       { size: "Индивидуальный размер", sleeping: "По запросу", box: "По запросу", price: "Рассчитать" },
     ],
-    specs: defaultBedSpecs,
+    sleepingPlace: "1600×2000 мм",
+    mechanism: "Подъёмный с газлифтом",
+    filling: "—",
+    hasBox: true,
+    availability: "в наличии",
+    productionTime: "В наличии",
+    specs: [
+      { label: "Габариты", value: "1700×2100×1100 мм" },
+      { label: "Каркас", value: "ЛДСП, массив" },
+      { label: "Гарантия", value: "18 месяцев" },
+    ],
     sale: { enabled: true, label: "СКИДКА", oldPrice: 52900, newPrice: 42900, text: "−19% до конца месяца" },
   },
   {
     id: "m1",
-    title: "Матрас «Комфорт Плюс»",
     category: "mattresses",
+    title: "Матрас «Комфорт Плюс»",
     price: 28900,
     priceFrom: true,
-    image: pmat1,
-    gallery: [pmat1],
     description: "Независимый пружинный блок, средняя жёсткость.",
-    stock: "В наличии",
+    photo1: pmat1,
     sizes: [
       { size: "1400×2000", sleeping: "1400×2000", box: "—", price: "28 900 ₽" },
       { size: "1600×2000", sleeping: "1600×2000", box: "—", price: "32 900 ₽" },
       { size: "1800×2000", sleeping: "1800×2000", box: "—", price: "36 900 ₽" },
     ],
+    sleepingPlace: "1400×2000 мм",
+    mechanism: "—",
+    filling: "Независимый пружинный блок, кокос, ППУ",
+    hasBox: false,
+    availability: "в наличии",
+    productionTime: "В наличии",
     specs: [
       { label: "Высота", value: "22 см" },
       { label: "Жёсткость", value: "Средняя" },
-      { label: "Наполнение", value: "Независимый пружинный блок, кокос, ППУ" },
       { label: "Чехол", value: "Жаккард" },
       { label: "Гарантия", value: "24 месяца" },
     ],
-    sale: { enabled: false, label: "АКЦИЯ" },
+    sale: { enabled: false },
   },
   {
     id: "w1",
-    title: "Шкаф «Орхус» 180",
     category: "wardrobes",
+    title: "Шкаф «Орхус» 180",
     price: 54900,
-    image: pward1,
-    gallery: [pward1],
     description: "Шкаф светлый дуб с распашными дверями.",
-    stock: "Под заказ от 2 недель",
+    photo1: pward1,
     sizes: [
       { size: "1800×2200×600", sleeping: "—", box: "—", price: "54 900 ₽" },
       { size: "Индивидуальный размер", sleeping: "—", box: "—", price: "Рассчитать" },
     ],
+    sleepingPlace: "—",
+    mechanism: "Распашные двери",
+    filling: "—",
+    hasBox: false,
+    availability: "под заказ",
+    productionTime: "От 2 недель",
     specs: [
       { label: "Габариты", value: "1800×2200×600 мм" },
       { label: "Материал корпуса", value: "ЛДСП Egger" },
@@ -178,22 +246,26 @@ export const products: Product[] = [
       { label: "Фурнитура", value: "Blum" },
       { label: "Гарантия", value: "24 месяца" },
     ],
-    sale: { enabled: false, label: "АКЦИЯ" },
+    sale: { enabled: false },
   },
   {
     id: "d1",
-    title: "Стол «Лунд» с 4 стульями",
     category: "dining",
+    title: "Стол «Лунд» с 4 стульями",
     price: 49900,
     priceFrom: true,
-    image: pdin1,
-    gallery: [pdin1],
     description: "Круглый обеденный стол со стульями.",
-    stock: "В наличии",
+    photo1: pdin1,
     sizes: [
       { size: "Ø1100 мм + 4 стула", sleeping: "—", box: "—", price: "49 900 ₽" },
       { size: "Ø1200 мм + 6 стульев", sleeping: "—", box: "—", price: "62 900 ₽" },
     ],
+    sleepingPlace: "—",
+    mechanism: "—",
+    filling: "—",
+    hasBox: false,
+    availability: "в наличии",
+    productionTime: "В наличии",
     specs: [
       { label: "Материал столешницы", value: "Массив дуба" },
       { label: "Основание", value: "Металл, порошковая окраска" },
@@ -204,45 +276,53 @@ export const products: Product[] = [
   },
   {
     id: "k1",
-    title: "Детская кровать «Мини»",
     category: "kids",
+    title: "Детская кровать «Мини»",
     price: 24900,
-    image: kids,
-    gallery: [kids],
     description: "Уютная детская кровать из массива.",
-    stock: "В наличии",
+    photo1: kids,
     sizes: [
       { size: "800×1600", sleeping: "800×1600", box: "Есть", price: "24 900 ₽" },
       { size: "900×1900", sleeping: "900×1900", box: "Есть", price: "28 900 ₽" },
     ],
+    sleepingPlace: "800×1600 мм",
+    mechanism: "—",
+    filling: "—",
+    hasBox: true,
+    availability: "в наличии",
+    productionTime: "В наличии",
     specs: [
       { label: "Материал", value: "Массив берёзы" },
       { label: "Покрытие", value: "Безопасный лак на водной основе" },
       { label: "Бортики", value: "Есть" },
       { label: "Гарантия", value: "18 месяцев" },
     ],
-    sale: { enabled: false, label: "АКЦИЯ" },
+    sale: { enabled: false },
   },
   {
     id: "h1",
-    title: "Прихожая «Норд»",
     category: "hallways",
+    title: "Прихожая «Норд»",
     price: 36500,
-    image: hallway,
-    gallery: [hallway],
     description: "Лаконичная прихожая со скамьёй и зеркалом.",
-    stock: "Под заказ от 2 недель",
+    photo1: hallway,
     sizes: [
       { size: "1200×2000×400", sleeping: "—", box: "—", price: "36 500 ₽" },
       { size: "Индивидуальный размер", sleeping: "—", box: "—", price: "Рассчитать" },
     ],
+    sleepingPlace: "—",
+    mechanism: "—",
+    filling: "—",
+    hasBox: false,
+    availability: "под заказ",
+    productionTime: "От 2 недель",
     specs: [
       { label: "Габариты", value: "1200×2000×400 мм" },
       { label: "Материал", value: "ЛДСП" },
       { label: "Состав", value: "Шкаф, скамья, зеркало, крючки" },
       { label: "Гарантия", value: "18 месяцев" },
     ],
-    sale: { enabled: false, label: "АКЦИЯ" },
+    sale: { enabled: false },
   },
 ];
 

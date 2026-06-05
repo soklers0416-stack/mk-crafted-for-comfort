@@ -1,13 +1,13 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
-import { Check, ShoppingBag, Truck, Palette, ChevronRight } from "lucide-react";
+import { Check, ShoppingBag, Truck, Palette, ChevronRight, CreditCard } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
 import { ContactDialog } from "@/components/ContactDialog";
 import { RequestDialog } from "@/components/RequestDialog";
 import { formatPrice, useCart } from "@/lib/cart";
-import { products, categories } from "@/lib/data";
+import { products, categories, getGallery } from "@/lib/data";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/product/$id")({
@@ -23,7 +23,7 @@ export const Route = createFileRoute("/product/$id")({
           { name: "description", content: loaderData.product.description },
           { property: "og:title", content: loaderData.product.title },
           { property: "og:description", content: loaderData.product.description },
-          { property: "og:image", content: loaderData.product.image },
+          { property: "og:image", content: loaderData.product.photo1 },
         ]
       : [],
   }),
@@ -51,12 +51,13 @@ export const Route = createFileRoute("/product/$id")({
 function ProductPage() {
   const { product } = Route.useLoaderData() as { product: import("@/lib/data").Product };
   const { add } = useCart();
-  const gallery: string[] = product.gallery && product.gallery.length > 0 ? product.gallery : [product.image];
+  const gallery: string[] = getGallery(product);
   const [activeImg, setActiveImg] = useState<string>(gallery[0]);
   const [contactOpen, setContactOpen] = useState(false);
   const [questionOpen, setQuestionOpen] = useState(false);
   const [colorOpen, setColorOpen] = useState(false);
   const [deliveryOpen, setDeliveryOpen] = useState(false);
+  const [installmentOpen, setInstallmentOpen] = useState(false);
 
   const sale = product.sale?.enabled ? product.sale : null;
   const displayPrice = sale?.newPrice ?? product.price;
@@ -89,10 +90,10 @@ function ProductPage() {
           {/* GALLERY */}
           <div>
             <div className="relative overflow-hidden rounded-3xl bg-surface-muted">
-              <img src={activeImg} alt={product.title} className="aspect-[5/4] w-full object-cover" />
+              <img src={activeImg} alt={product.title} className="aspect-[5/4] w-full object-contain p-4" />
               {sale && (
                 <span className="absolute left-4 top-4 rounded-full bg-red-600 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-white shadow">
-                  {sale.label}
+                  {sale.label ?? "АКЦИЯ"}
                 </span>
               )}
             </div>
@@ -102,11 +103,11 @@ function ProductPage() {
                   <button
                     key={i}
                     onClick={() => setActiveImg(g)}
-                    className={`overflow-hidden rounded-2xl border-2 transition ${
+                    className={`overflow-hidden rounded-2xl border-2 bg-surface-muted transition ${
                       activeImg === g ? "border-primary" : "border-transparent hover:border-border"
                     }`}
                   >
-                    <img src={g} alt="" className="aspect-square w-full object-cover" />
+                    <img src={g} alt="" className="aspect-square w-full object-contain p-2" />
                   </button>
                 ))}
               </div>
@@ -121,13 +122,42 @@ function ProductPage() {
             <h1 className="mt-2 font-display text-3xl font-bold tracking-tight md:text-4xl">{product.title}</h1>
             <p className="mt-3 text-base text-muted-foreground">{product.description}</p>
 
-            {/* Stock */}
-            {product.stock && (
+            {/* Наличие */}
+            {product.availability && (
               <div className="mt-5 inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary">
                 <span className="h-2 w-2 rounded-full bg-primary" />
-                {product.stock}
+                {product.availability === "в наличии" ? "В наличии" : "Под заказ"}
+                {product.productionTime && <span className="text-primary/70">· {product.productionTime}</span>}
               </div>
             )}
+
+            {/* Краткие характеристики */}
+            <dl className="mt-6 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
+              {product.sleepingPlace && product.sleepingPlace !== "—" && (
+                <div className="flex justify-between gap-3 border-b border-dashed border-border/60 py-2">
+                  <dt className="text-muted-foreground">Спальное место</dt>
+                  <dd className="text-right font-medium">{product.sleepingPlace}</dd>
+                </div>
+              )}
+              {product.mechanism && product.mechanism !== "—" && (
+                <div className="flex justify-between gap-3 border-b border-dashed border-border/60 py-2">
+                  <dt className="text-muted-foreground">Механизм</dt>
+                  <dd className="text-right font-medium">{product.mechanism}</dd>
+                </div>
+              )}
+              {product.filling && product.filling !== "—" && (
+                <div className="flex justify-between gap-3 border-b border-dashed border-border/60 py-2">
+                  <dt className="text-muted-foreground">Наполнение</dt>
+                  <dd className="text-right font-medium">{product.filling}</dd>
+                </div>
+              )}
+              {typeof product.hasBox === "boolean" && (
+                <div className="flex justify-between gap-3 border-b border-dashed border-border/60 py-2">
+                  <dt className="text-muted-foreground">Короб</dt>
+                  <dd className="text-right font-medium">{product.hasBox ? "Есть" : "Нет"}</dd>
+                </div>
+              )}
+            </dl>
 
             {/* Price */}
             <div className="mt-6 flex items-baseline gap-3">
@@ -148,19 +178,26 @@ function ProductPage() {
                 className="inline-flex h-12 items-center gap-2 rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground transition hover:bg-primary/90"
               >
                 <ShoppingBag className="h-4 w-4" />
-                Добавить в корзину
-              </button>
-              <button
-                onClick={() => setContactOpen(true)}
-                className="inline-flex h-12 items-center rounded-full border border-border bg-card px-6 text-sm font-medium transition hover:border-primary hover:text-primary"
-              >
-                Оформить заявку
+                Оформить заказ
               </button>
               <button
                 onClick={() => setQuestionOpen(true)}
                 className="inline-flex h-12 items-center rounded-full border border-border bg-card px-6 text-sm font-medium transition hover:border-primary hover:text-primary"
               >
                 Я просто спросить
+              </button>
+              <button
+                onClick={() => setDeliveryOpen(true)}
+                className="inline-flex h-12 items-center rounded-full border border-border bg-card px-6 text-sm font-medium transition hover:border-primary hover:text-primary"
+              >
+                Рассчитать доставку
+              </button>
+              <button
+                onClick={() => setInstallmentOpen(true)}
+                className="inline-flex h-12 items-center gap-2 rounded-full border border-border bg-card px-6 text-sm font-medium transition hover:border-primary hover:text-primary"
+              >
+                <CreditCard className="h-4 w-4" />
+                Рассрочка
               </button>
             </div>
 
@@ -325,6 +362,18 @@ function ProductPage() {
           { name: "name", label: "Имя" },
           { name: "phone", label: "Телефон", type: "tel" },
           { name: "city", label: "Город доставки" },
+        ]}
+      />
+      <RequestDialog
+        open={installmentOpen}
+        onOpenChange={setInstallmentOpen}
+        title="Рассрочка"
+        description="Расскажем об условиях рассрочки Т-Банк и Халва."
+        source={`installment:${product.id}`}
+        fields={[
+          { name: "name", label: "Имя" },
+          { name: "phone", label: "Телефон", type: "tel" },
+          { name: "term", label: "Желаемый срок (мес.)", required: false },
         ]}
       />
     </div>
