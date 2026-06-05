@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router";
-import { Menu, ShoppingBag, X } from "lucide-react";
+import { Menu, ShoppingBag, X, LayoutDashboard } from "lucide-react";
 import { useState } from "react";
 import { useCart } from "@/lib/cart";
+import { useAuth } from "@/lib/auth";
 import { ContactDialog } from "./ContactDialog";
 
 const nav = [
@@ -18,6 +19,7 @@ export function Header() {
   const [open, setOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
   const { count } = useCart();
+  const { isAdmin } = useAuth();
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur-md">
@@ -45,6 +47,12 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
+          {isAdmin && (
+            <Link to="/admin" aria-label="Админка"
+              className="grid h-10 w-10 place-items-center rounded-full hover:bg-surface-muted" title="Админка">
+              <LayoutDashboard className="h-5 w-5" />
+            </Link>
+          )}
           <Link
             to="/cart"
             aria-label="Корзина"
