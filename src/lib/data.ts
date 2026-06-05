@@ -79,6 +79,7 @@ export type Product = {
   photo3?: string;
   photo4?: string;
   photo5?: string;
+  photo6?: string;
 
   // Характеристики
   sizes?: SizeRow[];
@@ -96,7 +97,7 @@ export type Product = {
 
 // Вспомогательные геттеры — НЕ ТРОГАТЬ
 export function getGallery(p: Product): string[] {
-  return [p.photo1, p.photo2, p.photo3, p.photo4, p.photo5].filter(
+  return [p.photo1, p.photo2, p.photo3, p.photo4, p.photo5, p.photo6].filter(
     (x): x is string => Boolean(x),
   );
 }
