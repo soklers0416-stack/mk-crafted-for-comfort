@@ -69,7 +69,7 @@ function CartPage() {
             <div className="space-y-4">
               {detailed.map((it) => (
                 <div key={it.id} className="flex gap-4 rounded-3xl border border-border/60 bg-card p-4">
-                  <img src={it.product.image} alt={it.product.title} loading="lazy" className="h-28 w-28 shrink-0 rounded-2xl object-cover md:h-32 md:w-32" />
+                  <img src={it.product.photo1} alt={it.product.title} loading="lazy" className="h-28 w-28 shrink-0 rounded-2xl bg-surface-muted object-contain p-2 md:h-32 md:w-32" />
                   <div className="flex flex-1 flex-col">
                     <div className="flex items-start justify-between gap-3">
                       <h3 className="font-display text-base font-semibold md:text-lg">{it.product.title}</h3>
