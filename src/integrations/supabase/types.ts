@@ -14,16 +14,230 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      categories: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string | null
+          slug: string
+          sort_order: number
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          slug: string
+          sort_order?: number
+          title: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          slug?: string
+          sort_order?: number
+          title?: string
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          availability: string | null
+          category_slug: string
+          created_at: string
+          description: string
+          filling: string | null
+          has_box: boolean | null
+          id: string
+          is_bestseller: boolean
+          mechanism: string | null
+          photo1: string | null
+          photo2: string | null
+          photo3: string | null
+          photo4: string | null
+          photo5: string | null
+          photo6: string | null
+          price: number
+          price_from: boolean
+          production_time: string | null
+          sale_enabled: boolean
+          sale_label: string | null
+          sale_new_price: number | null
+          sale_old_price: number | null
+          sale_text: string | null
+          sizes: Json
+          sleeping_place: string | null
+          sort_order: number
+          specs: Json
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          availability?: string | null
+          category_slug: string
+          created_at?: string
+          description?: string
+          filling?: string | null
+          has_box?: boolean | null
+          id?: string
+          is_bestseller?: boolean
+          mechanism?: string | null
+          photo1?: string | null
+          photo2?: string | null
+          photo3?: string | null
+          photo4?: string | null
+          photo5?: string | null
+          photo6?: string | null
+          price?: number
+          price_from?: boolean
+          production_time?: string | null
+          sale_enabled?: boolean
+          sale_label?: string | null
+          sale_new_price?: number | null
+          sale_old_price?: number | null
+          sale_text?: string | null
+          sizes?: Json
+          sleeping_place?: string | null
+          sort_order?: number
+          specs?: Json
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          availability?: string | null
+          category_slug?: string
+          created_at?: string
+          description?: string
+          filling?: string | null
+          has_box?: boolean | null
+          id?: string
+          is_bestseller?: boolean
+          mechanism?: string | null
+          photo1?: string | null
+          photo2?: string | null
+          photo3?: string | null
+          photo4?: string | null
+          photo5?: string | null
+          photo6?: string | null
+          price?: number
+          price_from?: boolean
+          production_time?: string | null
+          sale_enabled?: boolean
+          sale_label?: string | null
+          sale_new_price?: number | null
+          sale_old_price?: number | null
+          sale_text?: string | null
+          sizes?: Json
+          sleeping_place?: string | null
+          sort_order?: number
+          specs?: Json
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_category_slug_fkey"
+            columns: ["category_slug"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
+      requests: {
+        Row: {
+          created_at: string
+          data: Json
+          id: string
+          source: string
+          status: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          data?: Json
+          id?: string
+          source?: string
+          status?: string
+          title?: string
+        }
+        Update: {
+          created_at?: string
+          data?: Json
+          id?: string
+          source?: string
+          status?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      reviews: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          rating: number
+          sort_order: number
+          source: string
+          text: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          rating?: number
+          sort_order?: number
+          source?: string
+          text: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          rating?: number
+          sort_order?: number
+          source?: string
+          text?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +364,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin"],
+    },
   },
 } as const
