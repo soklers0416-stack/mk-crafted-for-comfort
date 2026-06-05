@@ -79,6 +79,7 @@ export type Product = {
   photo3?: string;
   photo4?: string;
   photo5?: string;
+  photo6?: string;
 
   // Характеристики
   sizes?: SizeRow[];
