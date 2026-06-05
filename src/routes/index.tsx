@@ -6,7 +6,9 @@ import { Footer } from "@/components/Footer";
 import { CategoryCard } from "@/components/CategoryCard";
 import { ProductCard } from "@/components/ProductCard";
 import { ContactDialog } from "@/components/ContactDialog";
-import { bestsellers, advantages, heroFeatures, reviews } from "@/lib/data";
+import { advantages, heroFeatures } from "@/lib/data";
+import { useQuery } from "@tanstack/react-query";
+import { productsQuery, reviewsQuery } from "@/lib/queries";
 import hero from "@/assets/hero-living.jpg";
 import apartmentImg from "@/assets/apartment.jpg";
 import factory from "@/assets/factory.jpg";
@@ -33,6 +35,9 @@ export const Route = createFileRoute("/")({
 
 function HomePage() {
   const [contactOpen, setContactOpen] = useState(false);
+  const { data: allProducts = [] } = useQuery(productsQuery);
+  const { data: reviews = [] } = useQuery(reviewsQuery);
+  const bestsellers = allProducts.filter((p) => p.is_bestseller).slice(0, 4);
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -228,7 +233,7 @@ function HomePage() {
         </div>
         <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {reviews.slice(0, 6).map((r) => (
-            <article key={r.name} className="rounded-3xl border border-border/60 bg-card p-6">
+            <article key={r.id} className="rounded-3xl border border-border/60 bg-card p-6">
               <div className="flex items-center gap-1 text-primary">
                 {Array.from({ length: r.rating }).map((_, i) => (
                   <Star key={i} className="h-4 w-4 fill-current" />
