@@ -1,31 +1,29 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
-import { products } from "@/lib/data";
+import { productsQuery } from "@/lib/queries";
 
 export const Route = createFileRoute("/promotions")({
   head: () => ({
     meta: [
       { title: "Акции и скидки — МК Мебель" },
       { name: "description", content: "Действующие акции и специальные предложения МК Мебель." },
-      { property: "og:title", content: "Акции и скидки — МК Мебель" },
-      { property: "og:description", content: "Скидки и хиты продаж от собственного производства." },
     ],
   }),
   component: PromotionsPage,
 });
 
 function PromotionsPage() {
-  const list = products.filter((p) => p.sale?.enabled);
+  const { data: products = [] } = useQuery(productsQuery);
+  const list = products.filter((p) => p.sale_enabled);
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <div className="mx-auto max-w-7xl px-4 py-12 md:px-8 md:py-16">
         <p className="text-sm font-medium uppercase tracking-wider text-primary">Акции</p>
-        <h1 className="mt-2 font-display text-4xl font-bold tracking-tight md:text-5xl">
-          Действующие акции
-        </h1>
+        <h1 className="mt-2 font-display text-4xl font-bold tracking-tight md:text-5xl">Действующие акции</h1>
         <p className="mt-4 max-w-2xl text-base text-muted-foreground">
           Специальные цены, хиты продаж и ограниченные предложения от собственного производства.
         </p>

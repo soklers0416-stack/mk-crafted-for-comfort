@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { formatPrice } from "@/lib/cart";
-import type { Product } from "@/lib/data";
+import type { Product } from "@/lib/db";
 import { RequestDialog } from "@/components/RequestDialog";
 
 export function ProductCard({ product }: { product: Product }) {
   const [requestOpen, setRequestOpen] = useState(false);
-  const sale = product.sale?.enabled ? product.sale : null;
-  const displayPrice = sale?.newPrice ?? product.price;
+  const sale = product.sale_enabled ? product : null;
+  const displayPrice = sale?.sale_new_price ?? product.price;
 
   return (
     <article className="group flex flex-col overflow-hidden rounded-3xl border border-border/60 bg-card transition hover:shadow-card">
@@ -16,15 +16,17 @@ export function ProductCard({ product }: { product: Product }) {
         params={{ id: product.id }}
         className="relative block aspect-[5/4] overflow-hidden bg-surface-muted"
       >
-        <img
-          src={product.photo1}
-          alt={product.title}
-          loading="lazy"
-          className="h-full w-full object-contain p-3 transition duration-700 group-hover:scale-[1.03]"
-        />
+        {product.photo1 && (
+          <img
+            src={product.photo1}
+            alt={product.title}
+            loading="lazy"
+            className="h-full w-full object-contain p-3 transition duration-700 group-hover:scale-[1.03]"
+          />
+        )}
         {sale && (
           <span className="absolute left-3 top-3 rounded-full bg-red-600 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-white shadow">
-            {sale.label ?? "АКЦИЯ"}
+            {product.sale_label ?? "АКЦИЯ"}
           </span>
         )}
       </Link>
@@ -36,10 +38,9 @@ export function ProductCard({ product }: { product: Product }) {
           <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{product.description}</p>
         </div>
 
-        {/* Краткие характеристики */}
         <ul className="space-y-1 text-xs text-muted-foreground">
-          {product.sleepingPlace && product.sleepingPlace !== "—" && (
-            <li>Спальное место: <span className="text-foreground">{product.sleepingPlace}</span></li>
+          {product.sleeping_place && product.sleeping_place !== "—" && (
+            <li>Спальное место: <span className="text-foreground">{product.sleeping_place}</span></li>
           )}
           {product.mechanism && product.mechanism !== "—" && (
             <li>Механизм: <span className="text-foreground">{product.mechanism}</span></li>
@@ -51,11 +52,11 @@ export function ProductCard({ product }: { product: Product }) {
 
         <div className="mt-auto flex items-center justify-between gap-3">
           <div className="flex flex-col">
-            {sale?.oldPrice && (
-              <span className="text-xs text-muted-foreground line-through">{formatPrice(sale.oldPrice)}</span>
+            {sale?.sale_old_price && (
+              <span className="text-xs text-muted-foreground line-through">{formatPrice(sale.sale_old_price)}</span>
             )}
             <span className="font-display text-xl font-semibold">
-              {product.priceFrom && <span className="text-sm font-normal text-muted-foreground">от </span>}
+              {product.price_from && <span className="text-sm font-normal text-muted-foreground">от </span>}
               {formatPrice(displayPrice)}
             </span>
           </div>
