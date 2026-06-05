@@ -364,6 +364,18 @@ function ProductPage() {
           { name: "city", label: "Город доставки" },
         ]}
       />
+      <RequestDialog
+        open={installmentOpen}
+        onOpenChange={setInstallmentOpen}
+        title="Рассрочка"
+        description="Расскажем об условиях рассрочки Т-Банк и Халва."
+        source={`installment:${product.id}`}
+        fields={[
+          { name: "name", label: "Имя" },
+          { name: "phone", label: "Телефон", type: "tel" },
+          { name: "term", label: "Желаемый срок (мес.)", required: false },
+        ]}
+      />
     </div>
   );
 }
