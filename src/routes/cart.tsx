@@ -5,7 +5,8 @@ import { Minus, Plus, Trash2 } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { formatPrice, useCart } from "@/lib/cart";
-import { productsQuery } from "@/lib/queries";
+import { productsQuery, fabricsQuery } from "@/lib/queries";
+import { getSelectedFabric } from "@/lib/productFabric";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -22,6 +23,7 @@ export const Route = createFileRoute("/cart")({
 function CartPage() {
   const { items, setQty, remove, clear } = useCart();
   const { data: products = [] } = useQuery(productsQuery);
+  const { data: fabrics = [] } = useQuery(fabricsQuery);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [comment, setComment] = useState("");
@@ -30,22 +32,24 @@ function CartPage() {
   const detailed = items
     .map((it) => {
       const product = products.find((p) => p.id === it.id);
-      return product ? { ...it, product } : null;
+      if (!product) return null;
+      const fabricId = typeof window !== "undefined" ? getSelectedFabric(product.id) : null;
+      const fabric = fabricId ? fabrics.find((f) => f.id === fabricId) ?? null : null;
+      return { ...it, product, fabric };
     })
-    .filter(Boolean) as Array<{ id: string; qty: number; product: typeof products[number] }>;
+    .filter(Boolean) as Array<{ id: string; qty: number; product: typeof products[number]; fabric: typeof fabrics[number] | null }>;
 
   const total = detailed.reduce((s, x) => {
-    const price = x.product.sale_enabled && x.product.sale_new_price
-      ? x.product.sale_new_price
-      : x.product.price;
-    return s + price * x.qty;
+    const base = x.product.sale_enabled && x.product.sale_new_price ? x.product.sale_new_price : x.product.price;
+    const surcharge = x.fabric?.surcharge ?? 0;
+    return s + (base + surcharge) * x.qty;
   }, 0);
 
   const submitOrder = useMutation({
     mutationFn: async () => {
       if (!name.trim() || !phone.trim()) throw new Error("Укажите имя и телефон");
       const itemsSummary = detailed
-        .map((x) => `${x.product.title} ×${x.qty}`)
+        .map((x) => `${x.product.title}${x.fabric ? ` (ткань: ${x.fabric.title})` : ""} ×${x.qty}`)
         .join("; ");
       const { error } = await (supabase as any).from("requests").insert({
         source: "cart",
