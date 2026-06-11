@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { categoriesQuery, productQuery } from "@/lib/queries";
+import { categoriesQuery, productQuery, fabricsQuery, productFabricsQuery, fabricCategoriesQuery } from "@/lib/queries";
 import type { Product, SizeRow, Spec } from "@/lib/db";
 import { toast } from "sonner";
 import { ArrowLeft, Upload, X, Plus, Trash2 } from "lucide-react";
