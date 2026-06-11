@@ -79,11 +79,16 @@ function ProductPage() {
   const gallery = getGallery(product);
   const currentImg = activeImg ?? gallery[0] ?? null;
   const sale = product.sale_enabled ? product : null;
-  const basePrice = sale?.sale_new_price ?? product.price;
+  const baseProductPrice = sale?.sale_new_price ?? product.price;
+  // Если есть размеры — цена берётся от выбранного размера (s.price — строка вида "39 900")
+  const hasSizes = Array.isArray(product.sizes) && product.sizes.length > 0;
+  const sizePriceNum = hasSizes ? Number(String(product.sizes[selectedSizeIdx]?.price ?? "").replace(/[^\d]/g, "")) : NaN;
+  const basePrice = hasSizes && Number.isFinite(sizePriceNum) && sizePriceNum > 0 ? sizePriceNum : baseProductPrice;
   const surcharge = selectedFabric?.surcharge ?? 0;
   const displayPrice = basePrice + surcharge;
   const category = categories.find((c) => c.slug === product.category_slug);
   const similar = allProducts.filter((p) => p.category_slug === product.category_slug && p.id !== product.id).slice(0, 4);
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -106,7 +111,7 @@ function ProductPage() {
 
         <div className="mt-6 grid gap-10 lg:grid-cols-2">
           <div>
-            <div className="relative overflow-hidden rounded-3xl bg-surface-muted">
+            <div className="relative overflow-hidden rounded-3xl border border-border/40 bg-card">
               {currentImg && <img src={currentImg} alt={product.title} className="aspect-[5/4] w-full object-contain p-4" />}
               {sale && (
                 <span className="absolute left-4 top-4 rounded-full bg-red-600 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-white shadow">
@@ -118,7 +123,8 @@ function ProductPage() {
               <div className="mt-4 grid grid-cols-6 gap-3">
                 {gallery.map((g, i) => (
                   <button key={i} onClick={() => setActiveImg(g)}
-                    className={`overflow-hidden rounded-2xl border-2 bg-surface-muted transition ${
+                    className={`overflow-hidden rounded-2xl border-2 bg-card transition ${
+
                       currentImg === g ? "border-primary" : "border-transparent hover:border-border"
                     }`}>
                     <img src={g} alt="" className="aspect-square w-full object-contain p-2" />
@@ -141,47 +147,110 @@ function ProductPage() {
               </div>
             )}
 
-            <dl className="mt-6 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
+            {/* Характеристики в столбик под плашкой "В наличии" */}
+            <ul className="mt-5 space-y-2 text-sm">
               {product.sleeping_place && product.sleeping_place !== "—" && (
-                <div className="flex justify-between gap-3 border-b border-dashed border-border/60 py-2">
-                  <dt className="text-muted-foreground">Спальное место</dt><dd className="text-right font-medium">{product.sleeping_place}</dd>
-                </div>
+                <li className="flex items-baseline justify-between gap-3 border-b border-dashed border-border/60 py-2">
+                  <span className="text-muted-foreground">Спальное место</span>
+                  <span className="text-right font-medium">{product.sleeping_place}</span>
+                </li>
               )}
               {product.mechanism && product.mechanism !== "—" && (
-                <div className="flex justify-between gap-3 border-b border-dashed border-border/60 py-2">
-                  <dt className="text-muted-foreground">Механизм</dt><dd className="text-right font-medium">{product.mechanism}</dd>
-                </div>
+                <li className="flex items-baseline justify-between gap-3 border-b border-dashed border-border/60 py-2">
+                  <span className="flex items-center gap-1.5 text-muted-foreground">
+                    Механизм
+                    <button
+                      type="button"
+                      onClick={() => setMechInfoOpen(true)}
+                      aria-label="Что это за механизм?"
+                      className="grid h-5 w-5 place-items-center rounded-full bg-primary/10 text-primary hover:bg-primary/20"
+                    >
+                      <Info className="h-3 w-3" />
+                    </button>
+                  </span>
+                  <span className="text-right font-medium">{product.mechanism}</span>
+                </li>
               )}
               {product.filling && product.filling !== "—" && (
-                <div className="flex justify-between gap-3 border-b border-dashed border-border/60 py-2">
-                  <dt className="text-muted-foreground">Наполнение</dt><dd className="text-right font-medium">{product.filling}</dd>
-                </div>
+                <li className="flex items-baseline justify-between gap-3 border-b border-dashed border-border/60 py-2">
+                  <span className="flex items-center gap-1.5 text-muted-foreground">
+                    Наполнение
+                    <button
+                      type="button"
+                      onClick={() => setFillInfoOpen(true)}
+                      aria-label="Что внутри?"
+                      className="grid h-5 w-5 place-items-center rounded-full bg-primary/10 text-primary hover:bg-primary/20"
+                    >
+                      <Info className="h-3 w-3" />
+                    </button>
+                  </span>
+                  <span className="text-right font-medium">{product.filling}</span>
+                </li>
               )}
               {typeof product.has_box === "boolean" && (
-                <div className="flex justify-between gap-3 border-b border-dashed border-border/60 py-2">
-                  <dt className="text-muted-foreground">Короб</dt><dd className="text-right font-medium">{product.has_box ? "Есть" : "Нет"}</dd>
-                </div>
+                <li className="flex items-baseline justify-between gap-3 border-b border-dashed border-border/60 py-2">
+                  <span className="text-muted-foreground">Короб</span>
+                  <span className="text-right font-medium">{product.has_box ? "Есть" : "Нет"}</span>
+                </li>
               )}
-            </dl>
+            </ul>
+
+            {/* Размеры — кнопками */}
+            {hasSizes && (
+              <div className="mt-6">
+                <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Размер</div>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {product.sizes.map((s, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setSelectedSizeIdx(i)}
+                      className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
+                        selectedSizeIdx === i ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card hover:border-primary"
+                      }`}
+                    >
+                      {s.size}
+                    </button>
+                  ))}
+                </div>
+                {product.custom_size_enabled && (
+                  <button
+                    onClick={() => setCustomSizeOpen(true)}
+                    className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+                  >
+                    Нужен другой размер?
+                  </button>
+                )}
+              </div>
+            )}
+            {!hasSizes && product.custom_size_enabled && (
+              <button
+                onClick={() => setCustomSizeOpen(true)}
+                className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+              >
+                Нужен другой размер?
+              </button>
+            )}
 
             <div className="mt-6 flex items-baseline gap-3">
               {sale?.sale_old_price && <span className="text-lg text-muted-foreground line-through">{formatPrice(sale.sale_old_price)}</span>}
               <span className="font-display text-4xl font-bold">
-                {product.price_from && <span className="text-lg font-normal text-muted-foreground">от </span>}
+                {product.price_from && !hasSizes && <span className="text-lg font-normal text-muted-foreground">от </span>}
                 {formatPrice(displayPrice)}
               </span>
             </div>
             {sale?.sale_text && <p className="mt-1 text-sm font-medium text-red-600">{sale.sale_text}</p>}
 
-            <div className="mt-6 flex flex-wrap gap-3">
+            <div className="mt-6 flex flex-wrap items-center gap-3">
               <button onClick={() => { add(product.id); toast.success("Добавлено в корзину"); }}
                 className="inline-flex h-12 items-center gap-2 rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground transition hover:bg-primary/90">
-                <ShoppingBag className="h-4 w-4" />Оформить заказ
+                <ShoppingBag className="h-4 w-4" />В корзину
               </button>
+              <FavoriteButton id={product.id} className="h-12 w-12" />
               <button onClick={() => setQuestionOpen(true)} className="inline-flex h-12 items-center rounded-full border border-border bg-card px-6 text-sm font-medium transition hover:border-primary hover:text-primary">Я просто спросить</button>
               <button onClick={() => setDeliveryOpen(true)} className="inline-flex h-12 items-center rounded-full border border-border bg-card px-6 text-sm font-medium transition hover:border-primary hover:text-primary">Рассчитать доставку</button>
               <button onClick={() => setInstallmentOpen(true)} className="inline-flex h-12 items-center gap-2 rounded-full border border-border bg-card px-6 text-sm font-medium transition hover:border-primary hover:text-primary"><CreditCard className="h-4 w-4" />Рассрочка</button>
             </div>
+
 
             {/* Выбранная ткань */}
             <div className="mt-6 rounded-2xl border border-border/60 bg-card p-5">
