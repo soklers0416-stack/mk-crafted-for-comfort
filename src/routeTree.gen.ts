@@ -26,7 +26,11 @@ import { Route as FabricsIdRouteImport } from './routes/fabrics.$id'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminReviewsRouteImport } from './routes/_authenticated/admin.reviews'
 import { Route as AuthenticatedAdminRequestsRouteImport } from './routes/_authenticated/admin.requests'
+import { Route as AuthenticatedAdminGalleryRouteImport } from './routes/_authenticated/admin.gallery'
+import { Route as AuthenticatedAdminFaqsRouteImport } from './routes/_authenticated/admin.faqs'
+import { Route as AuthenticatedAdminCustomerPhotosRouteImport } from './routes/_authenticated/admin.customer-photos'
 import { Route as AuthenticatedAdminCategoriesRouteImport } from './routes/_authenticated/admin.categories'
+import { Route as AuthenticatedAdminAboutRouteImport } from './routes/_authenticated/admin.about'
 import { Route as AuthenticatedAdminFabricsIndexRouteImport } from './routes/_authenticated/admin.fabrics.index'
 import { Route as ApiPublicPhotoSplatRouteImport } from './routes/api/public/photo.$'
 import { Route as AuthenticatedAdminProductsIdRouteImport } from './routes/_authenticated/admin.products.$id'
@@ -119,12 +123,34 @@ const AuthenticatedAdminRequestsRoute =
     path: '/admin/requests',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminGalleryRoute =
+  AuthenticatedAdminGalleryRouteImport.update({
+    id: '/admin/gallery',
+    path: '/admin/gallery',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminFaqsRoute = AuthenticatedAdminFaqsRouteImport.update({
+  id: '/admin/faqs',
+  path: '/admin/faqs',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminCustomerPhotosRoute =
+  AuthenticatedAdminCustomerPhotosRouteImport.update({
+    id: '/admin/customer-photos',
+    path: '/admin/customer-photos',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminCategoriesRoute =
   AuthenticatedAdminCategoriesRouteImport.update({
     id: '/admin/categories',
     path: '/admin/categories',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminAboutRoute = AuthenticatedAdminAboutRouteImport.update({
+  id: '/admin/about',
+  path: '/admin/about',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAdminFabricsIndexRoute =
   AuthenticatedAdminFabricsIndexRouteImport.update({
     id: '/admin/fabrics/',
@@ -169,7 +195,11 @@ export interface FileRoutesByFullPath {
   '/reviews': typeof ReviewsRoute
   '/fabrics/$id': typeof FabricsIdRoute
   '/product/$id': typeof ProductIdRoute
+  '/admin/about': typeof AuthenticatedAdminAboutRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
+  '/admin/customer-photos': typeof AuthenticatedAdminCustomerPhotosRoute
+  '/admin/faqs': typeof AuthenticatedAdminFaqsRoute
+  '/admin/gallery': typeof AuthenticatedAdminGalleryRoute
   '/admin/requests': typeof AuthenticatedAdminRequestsRoute
   '/admin/reviews': typeof AuthenticatedAdminReviewsRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -193,7 +223,11 @@ export interface FileRoutesByTo {
   '/reviews': typeof ReviewsRoute
   '/fabrics/$id': typeof FabricsIdRoute
   '/product/$id': typeof ProductIdRoute
+  '/admin/about': typeof AuthenticatedAdminAboutRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
+  '/admin/customer-photos': typeof AuthenticatedAdminCustomerPhotosRoute
+  '/admin/faqs': typeof AuthenticatedAdminFaqsRoute
+  '/admin/gallery': typeof AuthenticatedAdminGalleryRoute
   '/admin/requests': typeof AuthenticatedAdminRequestsRoute
   '/admin/reviews': typeof AuthenticatedAdminReviewsRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -219,7 +253,11 @@ export interface FileRoutesById {
   '/reviews': typeof ReviewsRoute
   '/fabrics/$id': typeof FabricsIdRoute
   '/product/$id': typeof ProductIdRoute
+  '/_authenticated/admin/about': typeof AuthenticatedAdminAboutRoute
   '/_authenticated/admin/categories': typeof AuthenticatedAdminCategoriesRoute
+  '/_authenticated/admin/customer-photos': typeof AuthenticatedAdminCustomerPhotosRoute
+  '/_authenticated/admin/faqs': typeof AuthenticatedAdminFaqsRoute
+  '/_authenticated/admin/gallery': typeof AuthenticatedAdminGalleryRoute
   '/_authenticated/admin/requests': typeof AuthenticatedAdminRequestsRoute
   '/_authenticated/admin/reviews': typeof AuthenticatedAdminReviewsRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -245,7 +283,11 @@ export interface FileRouteTypes {
     | '/reviews'
     | '/fabrics/$id'
     | '/product/$id'
+    | '/admin/about'
     | '/admin/categories'
+    | '/admin/customer-photos'
+    | '/admin/faqs'
+    | '/admin/gallery'
     | '/admin/requests'
     | '/admin/reviews'
     | '/admin/'
@@ -269,7 +311,11 @@ export interface FileRouteTypes {
     | '/reviews'
     | '/fabrics/$id'
     | '/product/$id'
+    | '/admin/about'
     | '/admin/categories'
+    | '/admin/customer-photos'
+    | '/admin/faqs'
+    | '/admin/gallery'
     | '/admin/requests'
     | '/admin/reviews'
     | '/admin'
@@ -294,7 +340,11 @@ export interface FileRouteTypes {
     | '/reviews'
     | '/fabrics/$id'
     | '/product/$id'
+    | '/_authenticated/admin/about'
     | '/_authenticated/admin/categories'
+    | '/_authenticated/admin/customer-photos'
+    | '/_authenticated/admin/faqs'
+    | '/_authenticated/admin/gallery'
     | '/_authenticated/admin/requests'
     | '/_authenticated/admin/reviews'
     | '/_authenticated/admin/'
@@ -443,11 +493,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRequestsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/gallery': {
+      id: '/_authenticated/admin/gallery'
+      path: '/admin/gallery'
+      fullPath: '/admin/gallery'
+      preLoaderRoute: typeof AuthenticatedAdminGalleryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/faqs': {
+      id: '/_authenticated/admin/faqs'
+      path: '/admin/faqs'
+      fullPath: '/admin/faqs'
+      preLoaderRoute: typeof AuthenticatedAdminFaqsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/customer-photos': {
+      id: '/_authenticated/admin/customer-photos'
+      path: '/admin/customer-photos'
+      fullPath: '/admin/customer-photos'
+      preLoaderRoute: typeof AuthenticatedAdminCustomerPhotosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/categories': {
       id: '/_authenticated/admin/categories'
       path: '/admin/categories'
       fullPath: '/admin/categories'
       preLoaderRoute: typeof AuthenticatedAdminCategoriesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/about': {
+      id: '/_authenticated/admin/about'
+      path: '/admin/about'
+      fullPath: '/admin/about'
+      preLoaderRoute: typeof AuthenticatedAdminAboutRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/fabrics/': {
@@ -489,7 +567,11 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminAboutRoute: typeof AuthenticatedAdminAboutRoute
   AuthenticatedAdminCategoriesRoute: typeof AuthenticatedAdminCategoriesRoute
+  AuthenticatedAdminCustomerPhotosRoute: typeof AuthenticatedAdminCustomerPhotosRoute
+  AuthenticatedAdminFaqsRoute: typeof AuthenticatedAdminFaqsRoute
+  AuthenticatedAdminGalleryRoute: typeof AuthenticatedAdminGalleryRoute
   AuthenticatedAdminRequestsRoute: typeof AuthenticatedAdminRequestsRoute
   AuthenticatedAdminReviewsRoute: typeof AuthenticatedAdminReviewsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
@@ -500,7 +582,11 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminAboutRoute: AuthenticatedAdminAboutRoute,
   AuthenticatedAdminCategoriesRoute: AuthenticatedAdminCategoriesRoute,
+  AuthenticatedAdminCustomerPhotosRoute: AuthenticatedAdminCustomerPhotosRoute,
+  AuthenticatedAdminFaqsRoute: AuthenticatedAdminFaqsRoute,
+  AuthenticatedAdminGalleryRoute: AuthenticatedAdminGalleryRoute,
   AuthenticatedAdminRequestsRoute: AuthenticatedAdminRequestsRoute,
   AuthenticatedAdminReviewsRoute: AuthenticatedAdminReviewsRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
