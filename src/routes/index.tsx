@@ -6,6 +6,7 @@ import { Footer } from "@/components/Footer";
 import { CategoryCard } from "@/components/CategoryCard";
 import { ProductCard } from "@/components/ProductCard";
 import { ContactDialog } from "@/components/ContactDialog";
+import { HeroSlider } from "@/components/HeroSlider";
 import { advantages, heroFeatures } from "@/lib/data";
 import { useQuery } from "@tanstack/react-query";
 import { productsQuery, reviewsQuery, productStatsQuery, homeBlocksQuery } from "@/lib/queries";
