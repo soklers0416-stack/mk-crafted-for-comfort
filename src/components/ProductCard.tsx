@@ -4,6 +4,7 @@ import { ShoppingBag } from "lucide-react";
 import { formatPrice, useCart } from "@/lib/cart";
 import type { Product } from "@/lib/db";
 import { FavoriteButton } from "@/components/FavoriteButton";
+import { incrementStat } from "@/lib/favorites";
 import { toast } from "sonner";
 
 export function ProductCard({ product }: { product: Product }) {
