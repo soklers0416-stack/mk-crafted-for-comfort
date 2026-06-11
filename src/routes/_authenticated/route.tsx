@@ -43,6 +43,7 @@ function AdminLayout() {
     { to: "/admin/categories", label: "Категории" },
     { to: "/admin/specs", label: "Справочник характеристик" },
     { to: "/admin/fabrics", label: "Ткани" },
+    { to: "/admin/apartment", label: "Квартира под ключ" },
     { to: "/admin/partners", label: "Партнёры" },
     { to: "/admin/partners/categories", label: "Категории партнёров" },
     { to: "/admin/partners/content", label: "Тексты «Партнёры»" },
