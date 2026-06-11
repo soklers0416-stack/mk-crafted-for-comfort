@@ -96,7 +96,7 @@ export function DynamicForm({
           data[f.name] = await uploadFile(v);
         }
       }
-      await submit({ data: { formKey, title: config!.title, data: { ...data, ...(extraData ?? {}) } } });
+      await submit({ data: { formKey, title: config.title, data: { ...data, ...(extraData ?? {}) } } });
       setSent(true);
       onSent?.();
     } catch (err: any) {
