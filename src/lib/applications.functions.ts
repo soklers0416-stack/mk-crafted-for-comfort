@@ -21,7 +21,7 @@ export const submitApplication = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     // 1) Сохраняем заявку
-    const { data: inserted, error } = await supabaseAdmin
+    const { data: inserted, error } = await (supabaseAdmin as any)
       .from("requests")
       .insert({ source: data.formKey, title: data.title || data.formKey, data: data.data, status: "new" })
       .select("id, created_at")

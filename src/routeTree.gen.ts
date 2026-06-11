@@ -30,10 +30,13 @@ import { Route as AuthenticatedAdminSpecsRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminReviewsRouteImport } from './routes/_authenticated/admin.reviews'
 import { Route as AuthenticatedAdminRequestsRouteImport } from './routes/_authenticated/admin.requests'
 import { Route as AuthenticatedAdminPartnerApplicationsRouteImport } from './routes/_authenticated/admin.partner-applications'
+import { Route as AuthenticatedAdminIntegrationsRouteImport } from './routes/_authenticated/admin.integrations'
 import { Route as AuthenticatedAdminGalleryRouteImport } from './routes/_authenticated/admin.gallery'
+import { Route as AuthenticatedAdminFormsRouteImport } from './routes/_authenticated/admin.forms'
 import { Route as AuthenticatedAdminFaqsRouteImport } from './routes/_authenticated/admin.faqs'
 import { Route as AuthenticatedAdminCustomerPhotosRouteImport } from './routes/_authenticated/admin.customer-photos'
 import { Route as AuthenticatedAdminCategoriesRouteImport } from './routes/_authenticated/admin.categories'
+import { Route as AuthenticatedAdminApplicationsRouteImport } from './routes/_authenticated/admin.applications'
 import { Route as AuthenticatedAdminAboutRouteImport } from './routes/_authenticated/admin.about'
 import { Route as AuthenticatedAdminPartnersIndexRouteImport } from './routes/_authenticated/admin.partners.index'
 import { Route as AuthenticatedAdminFabricsIndexRouteImport } from './routes/_authenticated/admin.fabrics.index'
@@ -152,12 +155,23 @@ const AuthenticatedAdminPartnerApplicationsRoute =
     path: '/admin/partner-applications',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminIntegrationsRoute =
+  AuthenticatedAdminIntegrationsRouteImport.update({
+    id: '/admin/integrations',
+    path: '/admin/integrations',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminGalleryRoute =
   AuthenticatedAdminGalleryRouteImport.update({
     id: '/admin/gallery',
     path: '/admin/gallery',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminFormsRoute = AuthenticatedAdminFormsRouteImport.update({
+  id: '/admin/forms',
+  path: '/admin/forms',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAdminFaqsRoute = AuthenticatedAdminFaqsRouteImport.update({
   id: '/admin/faqs',
   path: '/admin/faqs',
@@ -173,6 +187,12 @@ const AuthenticatedAdminCategoriesRoute =
   AuthenticatedAdminCategoriesRouteImport.update({
     id: '/admin/categories',
     path: '/admin/categories',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminApplicationsRoute =
+  AuthenticatedAdminApplicationsRouteImport.update({
+    id: '/admin/applications',
+    path: '/admin/applications',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAdminAboutRoute = AuthenticatedAdminAboutRouteImport.update({
@@ -251,10 +271,13 @@ export interface FileRoutesByFullPath {
   '/partners/$id': typeof PartnersIdRoute
   '/product/$id': typeof ProductIdRoute
   '/admin/about': typeof AuthenticatedAdminAboutRoute
+  '/admin/applications': typeof AuthenticatedAdminApplicationsRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/admin/customer-photos': typeof AuthenticatedAdminCustomerPhotosRoute
   '/admin/faqs': typeof AuthenticatedAdminFaqsRoute
+  '/admin/forms': typeof AuthenticatedAdminFormsRoute
   '/admin/gallery': typeof AuthenticatedAdminGalleryRoute
+  '/admin/integrations': typeof AuthenticatedAdminIntegrationsRoute
   '/admin/partner-applications': typeof AuthenticatedAdminPartnerApplicationsRoute
   '/admin/requests': typeof AuthenticatedAdminRequestsRoute
   '/admin/reviews': typeof AuthenticatedAdminReviewsRoute
@@ -287,10 +310,13 @@ export interface FileRoutesByTo {
   '/partners/$id': typeof PartnersIdRoute
   '/product/$id': typeof ProductIdRoute
   '/admin/about': typeof AuthenticatedAdminAboutRoute
+  '/admin/applications': typeof AuthenticatedAdminApplicationsRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/admin/customer-photos': typeof AuthenticatedAdminCustomerPhotosRoute
   '/admin/faqs': typeof AuthenticatedAdminFaqsRoute
+  '/admin/forms': typeof AuthenticatedAdminFormsRoute
   '/admin/gallery': typeof AuthenticatedAdminGalleryRoute
+  '/admin/integrations': typeof AuthenticatedAdminIntegrationsRoute
   '/admin/partner-applications': typeof AuthenticatedAdminPartnerApplicationsRoute
   '/admin/requests': typeof AuthenticatedAdminRequestsRoute
   '/admin/reviews': typeof AuthenticatedAdminReviewsRoute
@@ -325,10 +351,13 @@ export interface FileRoutesById {
   '/partners/$id': typeof PartnersIdRoute
   '/product/$id': typeof ProductIdRoute
   '/_authenticated/admin/about': typeof AuthenticatedAdminAboutRoute
+  '/_authenticated/admin/applications': typeof AuthenticatedAdminApplicationsRoute
   '/_authenticated/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/_authenticated/admin/customer-photos': typeof AuthenticatedAdminCustomerPhotosRoute
   '/_authenticated/admin/faqs': typeof AuthenticatedAdminFaqsRoute
+  '/_authenticated/admin/forms': typeof AuthenticatedAdminFormsRoute
   '/_authenticated/admin/gallery': typeof AuthenticatedAdminGalleryRoute
+  '/_authenticated/admin/integrations': typeof AuthenticatedAdminIntegrationsRoute
   '/_authenticated/admin/partner-applications': typeof AuthenticatedAdminPartnerApplicationsRoute
   '/_authenticated/admin/requests': typeof AuthenticatedAdminRequestsRoute
   '/_authenticated/admin/reviews': typeof AuthenticatedAdminReviewsRoute
@@ -363,10 +392,13 @@ export interface FileRouteTypes {
     | '/partners/$id'
     | '/product/$id'
     | '/admin/about'
+    | '/admin/applications'
     | '/admin/categories'
     | '/admin/customer-photos'
     | '/admin/faqs'
+    | '/admin/forms'
     | '/admin/gallery'
+    | '/admin/integrations'
     | '/admin/partner-applications'
     | '/admin/requests'
     | '/admin/reviews'
@@ -399,10 +431,13 @@ export interface FileRouteTypes {
     | '/partners/$id'
     | '/product/$id'
     | '/admin/about'
+    | '/admin/applications'
     | '/admin/categories'
     | '/admin/customer-photos'
     | '/admin/faqs'
+    | '/admin/forms'
     | '/admin/gallery'
+    | '/admin/integrations'
     | '/admin/partner-applications'
     | '/admin/requests'
     | '/admin/reviews'
@@ -436,10 +471,13 @@ export interface FileRouteTypes {
     | '/partners/$id'
     | '/product/$id'
     | '/_authenticated/admin/about'
+    | '/_authenticated/admin/applications'
     | '/_authenticated/admin/categories'
     | '/_authenticated/admin/customer-photos'
     | '/_authenticated/admin/faqs'
+    | '/_authenticated/admin/forms'
     | '/_authenticated/admin/gallery'
+    | '/_authenticated/admin/integrations'
     | '/_authenticated/admin/partner-applications'
     | '/_authenticated/admin/requests'
     | '/_authenticated/admin/reviews'
@@ -623,11 +661,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminPartnerApplicationsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/integrations': {
+      id: '/_authenticated/admin/integrations'
+      path: '/admin/integrations'
+      fullPath: '/admin/integrations'
+      preLoaderRoute: typeof AuthenticatedAdminIntegrationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/gallery': {
       id: '/_authenticated/admin/gallery'
       path: '/admin/gallery'
       fullPath: '/admin/gallery'
       preLoaderRoute: typeof AuthenticatedAdminGalleryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/forms': {
+      id: '/_authenticated/admin/forms'
+      path: '/admin/forms'
+      fullPath: '/admin/forms'
+      preLoaderRoute: typeof AuthenticatedAdminFormsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/faqs': {
@@ -649,6 +701,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/categories'
       fullPath: '/admin/categories'
       preLoaderRoute: typeof AuthenticatedAdminCategoriesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/applications': {
+      id: '/_authenticated/admin/applications'
+      path: '/admin/applications'
+      fullPath: '/admin/applications'
+      preLoaderRoute: typeof AuthenticatedAdminApplicationsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/about': {
@@ -726,10 +785,13 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminAboutRoute: typeof AuthenticatedAdminAboutRoute
+  AuthenticatedAdminApplicationsRoute: typeof AuthenticatedAdminApplicationsRoute
   AuthenticatedAdminCategoriesRoute: typeof AuthenticatedAdminCategoriesRoute
   AuthenticatedAdminCustomerPhotosRoute: typeof AuthenticatedAdminCustomerPhotosRoute
   AuthenticatedAdminFaqsRoute: typeof AuthenticatedAdminFaqsRoute
+  AuthenticatedAdminFormsRoute: typeof AuthenticatedAdminFormsRoute
   AuthenticatedAdminGalleryRoute: typeof AuthenticatedAdminGalleryRoute
+  AuthenticatedAdminIntegrationsRoute: typeof AuthenticatedAdminIntegrationsRoute
   AuthenticatedAdminPartnerApplicationsRoute: typeof AuthenticatedAdminPartnerApplicationsRoute
   AuthenticatedAdminRequestsRoute: typeof AuthenticatedAdminRequestsRoute
   AuthenticatedAdminReviewsRoute: typeof AuthenticatedAdminReviewsRoute
@@ -747,10 +809,13 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminAboutRoute: AuthenticatedAdminAboutRoute,
+  AuthenticatedAdminApplicationsRoute: AuthenticatedAdminApplicationsRoute,
   AuthenticatedAdminCategoriesRoute: AuthenticatedAdminCategoriesRoute,
   AuthenticatedAdminCustomerPhotosRoute: AuthenticatedAdminCustomerPhotosRoute,
   AuthenticatedAdminFaqsRoute: AuthenticatedAdminFaqsRoute,
+  AuthenticatedAdminFormsRoute: AuthenticatedAdminFormsRoute,
   AuthenticatedAdminGalleryRoute: AuthenticatedAdminGalleryRoute,
+  AuthenticatedAdminIntegrationsRoute: AuthenticatedAdminIntegrationsRoute,
   AuthenticatedAdminPartnerApplicationsRoute:
     AuthenticatedAdminPartnerApplicationsRoute,
   AuthenticatedAdminRequestsRoute: AuthenticatedAdminRequestsRoute,
