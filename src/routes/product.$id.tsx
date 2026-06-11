@@ -1,15 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Check, ShoppingBag, Truck, Palette, ChevronRight, CreditCard } from "lucide-react";
+import { Check, ShoppingBag, Truck, Palette, ChevronRight, CreditCard, Info, Heart } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
 import { ContactDialog } from "@/components/ContactDialog";
 import { RequestDialog } from "@/components/RequestDialog";
 import { FabricPicker } from "@/components/FabricPicker";
+import { FavoriteButton } from "@/components/FavoriteButton";
+import { SpecInfoDialog } from "@/components/SpecInfoDialog";
 import { formatPrice, useCart } from "@/lib/cart";
-import { categoriesQuery, productsQuery, productQuery, fabricsQuery } from "@/lib/queries";
+import { categoriesQuery, productsQuery, productQuery, fabricsQuery, specMechanismsQuery, specFillingsQuery } from "@/lib/queries";
 import { getGallery } from "@/lib/db";
 import { getSelectedFabric, setSelectedFabric, subscribeFabric } from "@/lib/productFabric";
 import { toast } from "sonner";
@@ -30,15 +32,21 @@ function ProductPage() {
   const { data: categories = [] } = useQuery(categoriesQuery);
   const { data: allProducts = [] } = useQuery(productsQuery);
   const { data: fabrics = [] } = useQuery(fabricsQuery);
+  const { data: mechanisms = [] } = useQuery(specMechanismsQuery);
+  const { data: fillings = [] } = useQuery(specFillingsQuery);
   const [activeImg, setActiveImg] = useState<string | null>(null);
   const [contactOpen, setContactOpen] = useState(false);
   const [questionOpen, setQuestionOpen] = useState(false);
   const [colorOpen, setColorOpen] = useState(false);
   const [deliveryOpen, setDeliveryOpen] = useState(false);
   const [installmentOpen, setInstallmentOpen] = useState(false);
+  const [customSizeOpen, setCustomSizeOpen] = useState(false);
   const [fabricPickerOpen, setFabricPickerOpen] = useState(false);
   const [fabricExamplesOpen, setFabricExamplesOpen] = useState(false);
   const [fabricId, setFabricId] = useState<string | null>(null);
+  const [selectedSizeIdx, setSelectedSizeIdx] = useState(0);
+  const [mechInfoOpen, setMechInfoOpen] = useState(false);
+  const [fillInfoOpen, setFillInfoOpen] = useState(false);
 
   useEffect(() => {
     setFabricId(getSelectedFabric(id));
@@ -46,6 +54,9 @@ function ProductPage() {
   }, [id]);
 
   const selectedFabric = fabrics.find((f) => f.id === fabricId) ?? null;
+  const mechanismInfo = useMemo(() => mechanisms.find((m) => m.id === product?.mechanism_id) ?? null, [mechanisms, product?.mechanism_id]);
+  const fillingInfo = useMemo(() => fillings.find((m) => m.id === product?.filling_id) ?? null, [fillings, product?.filling_id]);
+
 
   if (isLoading) {
     return <div className="min-h-screen bg-background"><Header /><div className="p-12 text-center text-muted-foreground">Загрузка…</div><Footer /></div>;
