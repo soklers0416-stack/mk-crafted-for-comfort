@@ -27,6 +27,10 @@ export type Product = {
   sleeping_place: string | null;
   mechanism: string | null;
   filling: string | null;
+  mechanism_id: string | null;
+  filling_id: string | null;
+  sofa_type: string | null;
+  custom_size_enabled: boolean;
   has_box: boolean | null;
   availability: "в наличии" | "под заказ" | null;
   production_time: string | null;
@@ -40,6 +44,24 @@ export type Product = {
   is_bestseller: boolean;
   sort_order: number;
 };
+
+export type SpecItem = {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  photo: string | null;
+  recommendations: string;
+  sort_order: number;
+};
+
+export const SOFA_TYPES: { slug: string; title: string }[] = [
+  { slug: "straight", title: "Прямые" },
+  { slug: "corner", title: "Угловые" },
+  { slug: "modular", title: "Модульные" },
+  { slug: "mini", title: "Мини-диваны" },
+];
+
 
 export type Review = {
   id: string;
