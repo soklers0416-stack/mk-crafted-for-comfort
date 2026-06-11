@@ -31,6 +31,18 @@ export function useFormConfig(key: string) {
   });
 }
 
+const DEFAULT_CONFIG: Omit<FormConfig, "key" | "updated_at"> = {
+  title: "Заявка",
+  description: "",
+  button_text: "Отправить",
+  success_text: "Спасибо! Менеджер свяжется в ближайшее время.",
+  fields: [
+    { name: "name", label: "Имя", type: "text", required: true, order: 1 },
+    { name: "phone", label: "Телефон", type: "tel", required: true, order: 2 },
+    { name: "comment", label: "Комментарий", type: "textarea", required: false, order: 3 },
+  ],
+};
+
 export function DynamicForm({
   formKey,
   extraData,
@@ -42,13 +54,15 @@ export function DynamicForm({
   onSent?: () => void;
   className?: string;
 }) {
-  const { data: config, isLoading } = useFormConfig(formKey);
+  const { data: configData, isLoading } = useFormConfig(formKey);
+  const config: FormConfig =
+    configData ?? { key: formKey, updated_at: "", ...DEFAULT_CONFIG };
   const [values, setValues] = useState<Record<string, any>>({});
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
   const submit = useServerFn(submitApplication);
 
-  if (isLoading || !config) {
+  if (isLoading) {
     return <div className="py-8 text-center text-sm text-muted-foreground">Загрузка…</div>;
   }
 
