@@ -26,6 +26,7 @@ import { Route as ProductIdRouteImport } from './routes/product.$id'
 import { Route as PartnersIdRouteImport } from './routes/partners.$id'
 import { Route as FabricsIdRouteImport } from './routes/fabrics.$id'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedAdminSpecsRouteImport } from './routes/_authenticated/admin.specs'
 import { Route as AuthenticatedAdminReviewsRouteImport } from './routes/_authenticated/admin.reviews'
 import { Route as AuthenticatedAdminRequestsRouteImport } from './routes/_authenticated/admin.requests'
 import { Route as AuthenticatedAdminPartnerApplicationsRouteImport } from './routes/_authenticated/admin.partner-applications'
@@ -126,6 +127,11 @@ const FabricsIdRoute = FabricsIdRouteImport.update({
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminSpecsRoute = AuthenticatedAdminSpecsRouteImport.update({
+  id: '/admin/specs',
+  path: '/admin/specs',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedAdminReviewsRoute =
@@ -252,6 +258,7 @@ export interface FileRoutesByFullPath {
   '/admin/partner-applications': typeof AuthenticatedAdminPartnerApplicationsRoute
   '/admin/requests': typeof AuthenticatedAdminRequestsRoute
   '/admin/reviews': typeof AuthenticatedAdminReviewsRoute
+  '/admin/specs': typeof AuthenticatedAdminSpecsRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/admin/fabrics/$id': typeof AuthenticatedAdminFabricsIdRoute
   '/admin/fabrics/categories': typeof AuthenticatedAdminFabricsCategoriesRoute
@@ -287,6 +294,7 @@ export interface FileRoutesByTo {
   '/admin/partner-applications': typeof AuthenticatedAdminPartnerApplicationsRoute
   '/admin/requests': typeof AuthenticatedAdminRequestsRoute
   '/admin/reviews': typeof AuthenticatedAdminReviewsRoute
+  '/admin/specs': typeof AuthenticatedAdminSpecsRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/admin/fabrics/$id': typeof AuthenticatedAdminFabricsIdRoute
   '/admin/fabrics/categories': typeof AuthenticatedAdminFabricsCategoriesRoute
@@ -324,6 +332,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/partner-applications': typeof AuthenticatedAdminPartnerApplicationsRoute
   '/_authenticated/admin/requests': typeof AuthenticatedAdminRequestsRoute
   '/_authenticated/admin/reviews': typeof AuthenticatedAdminReviewsRoute
+  '/_authenticated/admin/specs': typeof AuthenticatedAdminSpecsRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/admin/fabrics/$id': typeof AuthenticatedAdminFabricsIdRoute
   '/_authenticated/admin/fabrics/categories': typeof AuthenticatedAdminFabricsCategoriesRoute
@@ -361,6 +370,7 @@ export interface FileRouteTypes {
     | '/admin/partner-applications'
     | '/admin/requests'
     | '/admin/reviews'
+    | '/admin/specs'
     | '/admin/'
     | '/admin/fabrics/$id'
     | '/admin/fabrics/categories'
@@ -396,6 +406,7 @@ export interface FileRouteTypes {
     | '/admin/partner-applications'
     | '/admin/requests'
     | '/admin/reviews'
+    | '/admin/specs'
     | '/admin'
     | '/admin/fabrics/$id'
     | '/admin/fabrics/categories'
@@ -432,6 +443,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/partner-applications'
     | '/_authenticated/admin/requests'
     | '/_authenticated/admin/reviews'
+    | '/_authenticated/admin/specs'
     | '/_authenticated/admin/'
     | '/_authenticated/admin/fabrics/$id'
     | '/_authenticated/admin/fabrics/categories'
@@ -583,6 +595,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/specs': {
+      id: '/_authenticated/admin/specs'
+      path: '/admin/specs'
+      fullPath: '/admin/specs'
+      preLoaderRoute: typeof AuthenticatedAdminSpecsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/reviews': {
       id: '/_authenticated/admin/reviews'
       path: '/admin/reviews'
@@ -714,6 +733,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminPartnerApplicationsRoute: typeof AuthenticatedAdminPartnerApplicationsRoute
   AuthenticatedAdminRequestsRoute: typeof AuthenticatedAdminRequestsRoute
   AuthenticatedAdminReviewsRoute: typeof AuthenticatedAdminReviewsRoute
+  AuthenticatedAdminSpecsRoute: typeof AuthenticatedAdminSpecsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedAdminFabricsIdRoute: typeof AuthenticatedAdminFabricsIdRoute
   AuthenticatedAdminFabricsCategoriesRoute: typeof AuthenticatedAdminFabricsCategoriesRoute
@@ -735,6 +755,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedAdminPartnerApplicationsRoute,
   AuthenticatedAdminRequestsRoute: AuthenticatedAdminRequestsRoute,
   AuthenticatedAdminReviewsRoute: AuthenticatedAdminReviewsRoute,
+  AuthenticatedAdminSpecsRoute: AuthenticatedAdminSpecsRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   AuthenticatedAdminFabricsIdRoute: AuthenticatedAdminFabricsIdRoute,
   AuthenticatedAdminFabricsCategoriesRoute:

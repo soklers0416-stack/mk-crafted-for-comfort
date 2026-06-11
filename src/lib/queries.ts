@@ -3,8 +3,9 @@ import { supabase } from "@/integrations/supabase/client";
 import type {
   Category, Product, Review, Fabric, FabricCategory, ProductFabric,
   AboutContent, AboutAdvantage, AboutStat, AboutStep, CustomerPhoto, GalleryItem, Faq,
-  Partner, PartnerCategory,
+  Partner, PartnerCategory, SpecItem,
 } from "./db";
+
 
 const sb = supabase as any;
 
@@ -220,3 +221,22 @@ export const partnerApplicationsQuery = queryOptions({
     return (data ?? []) as any[];
   },
 });
+
+export const specMechanismsQuery = queryOptions({
+  queryKey: ["spec_mechanisms"],
+  queryFn: async (): Promise<SpecItem[]> => {
+    const { data, error } = await sb.from("spec_mechanisms").select("*").order("sort_order");
+    if (error) throw error;
+    return (data ?? []) as SpecItem[];
+  },
+});
+
+export const specFillingsQuery = queryOptions({
+  queryKey: ["spec_fillings"],
+  queryFn: async (): Promise<SpecItem[]> => {
+    const { data, error } = await sb.from("spec_fillings").select("*").order("sort_order");
+    if (error) throw error;
+    return (data ?? []) as SpecItem[];
+  },
+});
+

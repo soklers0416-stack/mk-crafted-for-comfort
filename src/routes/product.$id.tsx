@@ -1,15 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Check, ShoppingBag, Truck, Palette, ChevronRight, CreditCard } from "lucide-react";
+import { Check, ShoppingBag, Truck, Palette, ChevronRight, CreditCard, Info, Heart } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
 import { ContactDialog } from "@/components/ContactDialog";
 import { RequestDialog } from "@/components/RequestDialog";
 import { FabricPicker } from "@/components/FabricPicker";
+import { FavoriteButton } from "@/components/FavoriteButton";
+import { SpecInfoDialog } from "@/components/SpecInfoDialog";
 import { formatPrice, useCart } from "@/lib/cart";
-import { categoriesQuery, productsQuery, productQuery, fabricsQuery } from "@/lib/queries";
+import { categoriesQuery, productsQuery, productQuery, fabricsQuery, specMechanismsQuery, specFillingsQuery } from "@/lib/queries";
 import { getGallery } from "@/lib/db";
 import { getSelectedFabric, setSelectedFabric, subscribeFabric } from "@/lib/productFabric";
 import { toast } from "sonner";
@@ -30,15 +32,21 @@ function ProductPage() {
   const { data: categories = [] } = useQuery(categoriesQuery);
   const { data: allProducts = [] } = useQuery(productsQuery);
   const { data: fabrics = [] } = useQuery(fabricsQuery);
+  const { data: mechanisms = [] } = useQuery(specMechanismsQuery);
+  const { data: fillings = [] } = useQuery(specFillingsQuery);
   const [activeImg, setActiveImg] = useState<string | null>(null);
   const [contactOpen, setContactOpen] = useState(false);
   const [questionOpen, setQuestionOpen] = useState(false);
   const [colorOpen, setColorOpen] = useState(false);
   const [deliveryOpen, setDeliveryOpen] = useState(false);
   const [installmentOpen, setInstallmentOpen] = useState(false);
+  const [customSizeOpen, setCustomSizeOpen] = useState(false);
   const [fabricPickerOpen, setFabricPickerOpen] = useState(false);
   const [fabricExamplesOpen, setFabricExamplesOpen] = useState(false);
   const [fabricId, setFabricId] = useState<string | null>(null);
+  const [selectedSizeIdx, setSelectedSizeIdx] = useState(0);
+  const [mechInfoOpen, setMechInfoOpen] = useState(false);
+  const [fillInfoOpen, setFillInfoOpen] = useState(false);
 
   useEffect(() => {
     setFabricId(getSelectedFabric(id));
@@ -46,6 +54,9 @@ function ProductPage() {
   }, [id]);
 
   const selectedFabric = fabrics.find((f) => f.id === fabricId) ?? null;
+  const mechanismInfo = useMemo(() => mechanisms.find((m) => m.id === product?.mechanism_id) ?? null, [mechanisms, product?.mechanism_id]);
+  const fillingInfo = useMemo(() => fillings.find((m) => m.id === product?.filling_id) ?? null, [fillings, product?.filling_id]);
+
 
   if (isLoading) {
     return <div className="min-h-screen bg-background"><Header /><div className="p-12 text-center text-muted-foreground">Загрузка…</div><Footer /></div>;
@@ -68,11 +79,16 @@ function ProductPage() {
   const gallery = getGallery(product);
   const currentImg = activeImg ?? gallery[0] ?? null;
   const sale = product.sale_enabled ? product : null;
-  const basePrice = sale?.sale_new_price ?? product.price;
+  const baseProductPrice = sale?.sale_new_price ?? product.price;
+  // Если есть размеры — цена берётся от выбранного размера (s.price — строка вида "39 900")
+  const hasSizes = Array.isArray(product.sizes) && product.sizes.length > 0;
+  const sizePriceNum = hasSizes ? Number(String(product.sizes[selectedSizeIdx]?.price ?? "").replace(/[^\d]/g, "")) : NaN;
+  const basePrice = hasSizes && Number.isFinite(sizePriceNum) && sizePriceNum > 0 ? sizePriceNum : baseProductPrice;
   const surcharge = selectedFabric?.surcharge ?? 0;
   const displayPrice = basePrice + surcharge;
   const category = categories.find((c) => c.slug === product.category_slug);
   const similar = allProducts.filter((p) => p.category_slug === product.category_slug && p.id !== product.id).slice(0, 4);
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -95,7 +111,7 @@ function ProductPage() {
 
         <div className="mt-6 grid gap-10 lg:grid-cols-2">
           <div>
-            <div className="relative overflow-hidden rounded-3xl bg-surface-muted">
+            <div className="relative overflow-hidden rounded-3xl border border-border/40 bg-card">
               {currentImg && <img src={currentImg} alt={product.title} className="aspect-[5/4] w-full object-contain p-4" />}
               {sale && (
                 <span className="absolute left-4 top-4 rounded-full bg-red-600 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-white shadow">
@@ -107,7 +123,8 @@ function ProductPage() {
               <div className="mt-4 grid grid-cols-6 gap-3">
                 {gallery.map((g, i) => (
                   <button key={i} onClick={() => setActiveImg(g)}
-                    className={`overflow-hidden rounded-2xl border-2 bg-surface-muted transition ${
+                    className={`overflow-hidden rounded-2xl border-2 bg-card transition ${
+
                       currentImg === g ? "border-primary" : "border-transparent hover:border-border"
                     }`}>
                     <img src={g} alt="" className="aspect-square w-full object-contain p-2" />
@@ -130,47 +147,110 @@ function ProductPage() {
               </div>
             )}
 
-            <dl className="mt-6 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
+            {/* Характеристики в столбик под плашкой "В наличии" */}
+            <ul className="mt-5 space-y-2 text-sm">
               {product.sleeping_place && product.sleeping_place !== "—" && (
-                <div className="flex justify-between gap-3 border-b border-dashed border-border/60 py-2">
-                  <dt className="text-muted-foreground">Спальное место</dt><dd className="text-right font-medium">{product.sleeping_place}</dd>
-                </div>
+                <li className="flex items-baseline justify-between gap-3 border-b border-dashed border-border/60 py-2">
+                  <span className="text-muted-foreground">Спальное место</span>
+                  <span className="text-right font-medium">{product.sleeping_place}</span>
+                </li>
               )}
               {product.mechanism && product.mechanism !== "—" && (
-                <div className="flex justify-between gap-3 border-b border-dashed border-border/60 py-2">
-                  <dt className="text-muted-foreground">Механизм</dt><dd className="text-right font-medium">{product.mechanism}</dd>
-                </div>
+                <li className="flex items-baseline justify-between gap-3 border-b border-dashed border-border/60 py-2">
+                  <span className="flex items-center gap-1.5 text-muted-foreground">
+                    Механизм
+                    <button
+                      type="button"
+                      onClick={() => setMechInfoOpen(true)}
+                      aria-label="Что это за механизм?"
+                      className="grid h-5 w-5 place-items-center rounded-full bg-primary/10 text-primary hover:bg-primary/20"
+                    >
+                      <Info className="h-3 w-3" />
+                    </button>
+                  </span>
+                  <span className="text-right font-medium">{product.mechanism}</span>
+                </li>
               )}
               {product.filling && product.filling !== "—" && (
-                <div className="flex justify-between gap-3 border-b border-dashed border-border/60 py-2">
-                  <dt className="text-muted-foreground">Наполнение</dt><dd className="text-right font-medium">{product.filling}</dd>
-                </div>
+                <li className="flex items-baseline justify-between gap-3 border-b border-dashed border-border/60 py-2">
+                  <span className="flex items-center gap-1.5 text-muted-foreground">
+                    Наполнение
+                    <button
+                      type="button"
+                      onClick={() => setFillInfoOpen(true)}
+                      aria-label="Что внутри?"
+                      className="grid h-5 w-5 place-items-center rounded-full bg-primary/10 text-primary hover:bg-primary/20"
+                    >
+                      <Info className="h-3 w-3" />
+                    </button>
+                  </span>
+                  <span className="text-right font-medium">{product.filling}</span>
+                </li>
               )}
               {typeof product.has_box === "boolean" && (
-                <div className="flex justify-between gap-3 border-b border-dashed border-border/60 py-2">
-                  <dt className="text-muted-foreground">Короб</dt><dd className="text-right font-medium">{product.has_box ? "Есть" : "Нет"}</dd>
-                </div>
+                <li className="flex items-baseline justify-between gap-3 border-b border-dashed border-border/60 py-2">
+                  <span className="text-muted-foreground">Короб</span>
+                  <span className="text-right font-medium">{product.has_box ? "Есть" : "Нет"}</span>
+                </li>
               )}
-            </dl>
+            </ul>
+
+            {/* Размеры — кнопками */}
+            {hasSizes && (
+              <div className="mt-6">
+                <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Размер</div>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {product.sizes.map((s, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setSelectedSizeIdx(i)}
+                      className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
+                        selectedSizeIdx === i ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card hover:border-primary"
+                      }`}
+                    >
+                      {s.size}
+                    </button>
+                  ))}
+                </div>
+                {product.custom_size_enabled && (
+                  <button
+                    onClick={() => setCustomSizeOpen(true)}
+                    className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+                  >
+                    Нужен другой размер?
+                  </button>
+                )}
+              </div>
+            )}
+            {!hasSizes && product.custom_size_enabled && (
+              <button
+                onClick={() => setCustomSizeOpen(true)}
+                className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+              >
+                Нужен другой размер?
+              </button>
+            )}
 
             <div className="mt-6 flex items-baseline gap-3">
               {sale?.sale_old_price && <span className="text-lg text-muted-foreground line-through">{formatPrice(sale.sale_old_price)}</span>}
               <span className="font-display text-4xl font-bold">
-                {product.price_from && <span className="text-lg font-normal text-muted-foreground">от </span>}
+                {product.price_from && !hasSizes && <span className="text-lg font-normal text-muted-foreground">от </span>}
                 {formatPrice(displayPrice)}
               </span>
             </div>
             {sale?.sale_text && <p className="mt-1 text-sm font-medium text-red-600">{sale.sale_text}</p>}
 
-            <div className="mt-6 flex flex-wrap gap-3">
+            <div className="mt-6 flex flex-wrap items-center gap-3">
               <button onClick={() => { add(product.id); toast.success("Добавлено в корзину"); }}
                 className="inline-flex h-12 items-center gap-2 rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground transition hover:bg-primary/90">
-                <ShoppingBag className="h-4 w-4" />Оформить заказ
+                <ShoppingBag className="h-4 w-4" />В корзину
               </button>
+              <FavoriteButton id={product.id} className="h-12 w-12" />
               <button onClick={() => setQuestionOpen(true)} className="inline-flex h-12 items-center rounded-full border border-border bg-card px-6 text-sm font-medium transition hover:border-primary hover:text-primary">Я просто спросить</button>
               <button onClick={() => setDeliveryOpen(true)} className="inline-flex h-12 items-center rounded-full border border-border bg-card px-6 text-sm font-medium transition hover:border-primary hover:text-primary">Рассчитать доставку</button>
               <button onClick={() => setInstallmentOpen(true)} className="inline-flex h-12 items-center gap-2 rounded-full border border-border bg-card px-6 text-sm font-medium transition hover:border-primary hover:text-primary"><CreditCard className="h-4 w-4" />Рассрочка</button>
             </div>
+
 
             {/* Выбранная ткань */}
             <div className="mt-6 rounded-2xl border border-border/60 bg-card p-5">
@@ -213,33 +293,8 @@ function ProductPage() {
           </div>
         </div>
 
-        {product.sizes && product.sizes.length > 0 && (
-          <section className="mt-16">
-            <h2 className="font-display text-2xl font-bold md:text-3xl">Размеры и цены</h2>
-            <div className="mt-6 overflow-hidden rounded-3xl border border-border/60">
-              <table className="w-full text-left text-sm">
-                <thead className="bg-surface text-muted-foreground">
-                  <tr>
-                    <th className="px-5 py-4 font-medium">Размер</th>
-                    <th className="px-5 py-4 font-medium">Спальное место</th>
-                    <th className="px-5 py-4 font-medium">Короб</th>
-                    <th className="px-5 py-4 text-right font-medium">Цена</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {product.sizes.map((s, i) => (
-                    <tr key={i} className="border-t border-border/60">
-                      <td className="px-5 py-4 font-medium">{s.size}</td>
-                      <td className="px-5 py-4 text-muted-foreground">{s.sleeping}</td>
-                      <td className="px-5 py-4 text-muted-foreground">{s.box}</td>
-                      <td className="px-5 py-4 text-right font-semibold">{s.price}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </section>
-        )}
+        {/* Таблица размеров убрана — выбор размера выведен кнопками выше */}
+
 
         {product.specs && product.specs.length > 0 && (
           <section className="mt-16">
@@ -288,8 +343,35 @@ function ProductPage() {
       </div>
 
       <Footer />
+      <RequestDialog
+        open={customSizeOpen}
+        onOpenChange={setCustomSizeOpen}
+        title="Нужен другой размер?"
+        description={`Изготовим ${product.title.toLowerCase()} в нужном вам размере.`}
+        source={`custom-size:${product.id}`}
+        submitLabel="Отправить заявку"
+        fields={[
+          { name: "name", label: "Имя" },
+          { name: "phone", label: "Телефон", type: "tel" },
+          { name: "size", label: "Желаемый размер" },
+          { name: "comment", label: "Комментарий", required: false },
+        ]}
+      />
+      <SpecInfoDialog
+        open={mechInfoOpen}
+        onOpenChange={setMechInfoOpen}
+        title="Механизм"
+        spec={mechanismInfo ? { name: mechanismInfo.name, description: mechanismInfo.description, photo: mechanismInfo.photo, recommendations: mechanismInfo.recommendations } : (product.mechanism ? { name: product.mechanism } : null)}
+      />
+      <SpecInfoDialog
+        open={fillInfoOpen}
+        onOpenChange={setFillInfoOpen}
+        title="Что внутри?"
+        spec={fillingInfo ? { name: fillingInfo.name, description: fillingInfo.description, photo: fillingInfo.photo, recommendations: fillingInfo.recommendations } : (product.filling ? { name: product.filling } : null)}
+      />
 
       <ContactDialog open={contactOpen} onOpenChange={setContactOpen} />
+
       <RequestDialog open={questionOpen} onOpenChange={setQuestionOpen} title="Я просто спросить" description="Ответим на любые вопросы по товару." source={`question:${product.id}`}
         fields={[{ name: "name", label: "Имя" },{ name: "phone", label: "Телефон", type: "tel" },{ name: "question", label: "Ваш вопрос", required: false }]} />
       <RequestDialog open={colorOpen} onOpenChange={setColorOpen} title="Другие цвета и ткани" description="Подберём вариант под ваш интерьер." source={`color:${product.id}`} submitLabel="Отправить запрос"

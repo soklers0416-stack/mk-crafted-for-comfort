@@ -2,8 +2,9 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { categoriesQuery, productQuery, fabricsQuery, productFabricsQuery, fabricCategoriesQuery } from "@/lib/queries";
+import { categoriesQuery, productQuery, fabricsQuery, productFabricsQuery, fabricCategoriesQuery, specMechanismsQuery, specFillingsQuery } from "@/lib/queries";
 import type { Product, SizeRow, Spec } from "@/lib/db";
+import { SOFA_TYPES } from "@/lib/db";
 import { toast } from "sonner";
 import { ArrowLeft, Upload, X, Plus, Trash2 } from "lucide-react";
 
@@ -21,6 +22,10 @@ const EMPTY: Omit<Product, "id"> = {
   sleeping_place: "",
   mechanism: "",
   filling: "",
+  mechanism_id: null,
+  filling_id: null,
+  sofa_type: null,
+  custom_size_enabled: false,
   has_box: false,
   availability: "в наличии",
   production_time: "",
@@ -35,6 +40,7 @@ const EMPTY: Omit<Product, "id"> = {
   sort_order: 0,
 };
 
+
 function EditProduct() {
   const { id } = Route.useParams();
   const isNew = id === "new";
@@ -45,6 +51,8 @@ function EditProduct() {
   const { data: fabrics = [] } = useQuery(fabricsQuery);
   const { data: fabCats = [] } = useQuery(fabricCategoriesQuery);
   const { data: pf = [] } = useQuery(productFabricsQuery);
+  const { data: mechanisms = [] } = useQuery(specMechanismsQuery);
+  const { data: fillings = [] } = useQuery(specFillingsQuery);
 
   const [form, setForm] = useState<Omit<Product, "id">>(EMPTY);
   const [busy, setBusy] = useState(false);
@@ -188,9 +196,44 @@ function EditProduct() {
           <Section title="Характеристики">
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Спальное место"><input value={form.sleeping_place ?? ""} onChange={(e) => update("sleeping_place", e.target.value)} className={inputCls} /></Field>
-              <Field label="Механизм"><input value={form.mechanism ?? ""} onChange={(e) => update("mechanism", e.target.value)} className={inputCls} /></Field>
-              <Field label="Наполнение"><input value={form.filling ?? ""} onChange={(e) => update("filling", e.target.value)} className={inputCls} /></Field>
               <Field label="Короб"><Toggle on={Boolean(form.has_box)} onChange={(v) => update("has_box", v)} /></Field>
+              <Field label="Механизм (из справочника)">
+                <select
+                  value={form.mechanism_id ?? ""}
+                  onChange={(e) => {
+                    const v = e.target.value || null;
+                    const m = mechanisms.find((x) => x.id === v);
+                    setForm((f) => ({ ...f, mechanism_id: v, mechanism: m?.name ?? "" }));
+                  }}
+                  className={inputCls}
+                >
+                  <option value="">— не выбрано —</option>
+                  {mechanisms.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
+                </select>
+              </Field>
+              <Field label="Наполнение (из справочника)">
+                <select
+                  value={form.filling_id ?? ""}
+                  onChange={(e) => {
+                    const v = e.target.value || null;
+                    const m = fillings.find((x) => x.id === v);
+                    setForm((f) => ({ ...f, filling_id: v, filling: m?.name ?? "" }));
+                  }}
+                  className={inputCls}
+                >
+                  <option value="">— не выбрано —</option>
+                  {fillings.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
+                </select>
+              </Field>
+              <Field label="Тип дивана (для подкатегорий)">
+                <select value={form.sofa_type ?? ""} onChange={(e) => update("sofa_type", (e.target.value || null) as any)} className={inputCls}>
+                  <option value="">— не указано —</option>
+                  {SOFA_TYPES.map((t) => <option key={t.slug} value={t.slug}>{t.title}</option>)}
+                </select>
+              </Field>
+              <Field label="Возможно изготовление нестандартного размера">
+                <Toggle on={Boolean(form.custom_size_enabled)} onChange={(v) => update("custom_size_enabled", v)} />
+              </Field>
               <Field label="Наличие">
                 <select value={form.availability ?? "в наличии"} onChange={(e) => update("availability", e.target.value as any)} className={inputCls}>
                   <option value="в наличии">в наличии</option>
@@ -199,7 +242,9 @@ function EditProduct() {
               </Field>
               <Field label="Срок изготовления"><input value={form.production_time ?? ""} onChange={(e) => update("production_time", e.target.value)} className={inputCls} /></Field>
             </div>
+            <p className="mt-2 text-xs text-muted-foreground">Описания механизма и наполнения подтянутся автоматически из «Справочника характеристик».</p>
           </Section>
+
 
           {/* Доступные ткани */}
           <Section title="Доступные ткани">

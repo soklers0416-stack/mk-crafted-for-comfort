@@ -1,27 +1,41 @@
-import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { formatPrice } from "@/lib/cart";
+import { useState } from "react";
+import { ShoppingBag } from "lucide-react";
+import { formatPrice, useCart } from "@/lib/cart";
 import type { Product } from "@/lib/db";
-import { RequestDialog } from "@/components/RequestDialog";
+import { FavoriteButton } from "@/components/FavoriteButton";
+import { toast } from "sonner";
 
 export function ProductCard({ product }: { product: Product }) {
-  const [requestOpen, setRequestOpen] = useState(false);
+  const { add } = useCart();
+  const [hover, setHover] = useState(false);
   const sale = product.sale_enabled ? product : null;
   const displayPrice = sale?.sale_new_price ?? product.price;
+  const hasSecond = Boolean(product.photo2);
 
   return (
     <article className="group flex flex-col overflow-hidden rounded-3xl border border-border/60 bg-card transition hover:shadow-card">
       <Link
         to="/product/$id"
         params={{ id: product.id }}
-        className="relative block aspect-[5/4] overflow-hidden bg-surface-muted"
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+        className="relative block aspect-[5/4] overflow-hidden bg-card"
       >
         {product.photo1 && (
           <img
             src={product.photo1}
             alt={product.title}
             loading="lazy"
-            className="h-full w-full object-contain p-3 transition duration-700 group-hover:scale-[1.03]"
+            className={`absolute inset-0 h-full w-full object-contain p-4 transition-opacity duration-500 ${hover && hasSecond ? "opacity-0" : "opacity-100"}`}
+          />
+        )}
+        {hasSecond && (
+          <img
+            src={product.photo2!}
+            alt=""
+            loading="lazy"
+            className={`absolute inset-0 h-full w-full object-contain p-4 transition-opacity duration-500 ${hover ? "opacity-100" : "opacity-0"}`}
           />
         )}
         {sale && (
@@ -29,7 +43,9 @@ export function ProductCard({ product }: { product: Product }) {
             {product.sale_label ?? "АКЦИЯ"}
           </span>
         )}
+        <FavoriteButton id={product.id} className="absolute right-3 top-3 h-9 w-9" />
       </Link>
+
       <div className="flex flex-1 flex-col gap-4 p-5">
         <div>
           <Link to="/product/$id" params={{ id: product.id }}>
@@ -38,15 +54,25 @@ export function ProductCard({ product }: { product: Product }) {
           <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{product.description}</p>
         </div>
 
+        {product.availability && (
+          <div className="inline-flex w-fit items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+            {product.availability === "в наличии" ? "В наличии" : "Под заказ"}
+          </div>
+        )}
+
         <ul className="space-y-1 text-xs text-muted-foreground">
           {product.sleeping_place && product.sleeping_place !== "—" && (
-            <li>Спальное место: <span className="text-foreground">{product.sleeping_place}</span></li>
+            <li>Спальное место: <span className="text-foreground font-medium">{product.sleeping_place}</span></li>
           )}
           {product.mechanism && product.mechanism !== "—" && (
-            <li>Механизм: <span className="text-foreground">{product.mechanism}</span></li>
+            <li>Механизм: <span className="text-foreground font-medium">{product.mechanism}</span></li>
           )}
-          {product.availability && (
-            <li>Наличие: <span className="text-foreground">{product.availability === "в наличии" ? "В наличии" : "Под заказ"}</span></li>
+          {product.filling && product.filling !== "—" && (
+            <li>Наполнение: <span className="text-foreground font-medium">{product.filling}</span></li>
+          )}
+          {typeof product.has_box === "boolean" && (
+            <li>Короб: <span className="text-foreground font-medium">{product.has_box ? "есть" : "нет"}</span></li>
           )}
         </ul>
 
@@ -61,7 +87,8 @@ export function ProductCard({ product }: { product: Product }) {
             </span>
           </div>
         </div>
-        <div className="flex gap-2">
+
+        <div className="flex items-center gap-2">
           <Link
             to="/product/$id"
             params={{ id: product.id }}
@@ -70,26 +97,15 @@ export function ProductCard({ product }: { product: Product }) {
             Подробнее
           </Link>
           <button
-            onClick={() => setRequestOpen(true)}
-            className="rounded-full bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition hover:bg-primary/90"
+            onClick={() => { add(product.id); toast.success("Добавлено в корзину"); }}
+            className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition hover:bg-primary/90"
           >
-            Оставить заявку
+            <ShoppingBag className="h-4 w-4" />
+            В корзину
           </button>
+          <FavoriteButton id={product.id} className="h-10 w-10 shrink-0" />
         </div>
       </div>
-
-      <RequestDialog
-        open={requestOpen}
-        onOpenChange={setRequestOpen}
-        title={`Заявка: ${product.title}`}
-        description="Оставьте контакты — менеджер свяжется с вами."
-        source={`card:${product.id}`}
-        fields={[
-          { name: "name", label: "Имя" },
-          { name: "phone", label: "Телефон", type: "tel" },
-          { name: "comment", label: "Комментарий", required: false },
-        ]}
-      />
     </article>
   );
 }

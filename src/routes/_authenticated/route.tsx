@@ -41,6 +41,7 @@ function AdminLayout() {
   const tabs = [
     { to: "/admin", label: "Товары" },
     { to: "/admin/categories", label: "Категории" },
+    { to: "/admin/specs", label: "Справочник характеристик" },
     { to: "/admin/fabrics", label: "Ткани" },
     { to: "/admin/partners", label: "Партнёры" },
     { to: "/admin/partners/categories", label: "Категории партнёров" },

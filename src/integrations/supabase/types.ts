@@ -469,12 +469,15 @@ export type Database = {
           availability: string | null
           category_slug: string
           created_at: string
+          custom_size_enabled: boolean
           description: string
           filling: string | null
+          filling_id: string | null
           has_box: boolean | null
           id: string
           is_bestseller: boolean
           mechanism: string | null
+          mechanism_id: string | null
           photo1: string | null
           photo2: string | null
           photo3: string | null
@@ -491,6 +494,7 @@ export type Database = {
           sale_text: string | null
           sizes: Json
           sleeping_place: string | null
+          sofa_type: string | null
           sort_order: number
           specs: Json
           title: string
@@ -500,12 +504,15 @@ export type Database = {
           availability?: string | null
           category_slug: string
           created_at?: string
+          custom_size_enabled?: boolean
           description?: string
           filling?: string | null
+          filling_id?: string | null
           has_box?: boolean | null
           id?: string
           is_bestseller?: boolean
           mechanism?: string | null
+          mechanism_id?: string | null
           photo1?: string | null
           photo2?: string | null
           photo3?: string | null
@@ -522,6 +529,7 @@ export type Database = {
           sale_text?: string | null
           sizes?: Json
           sleeping_place?: string | null
+          sofa_type?: string | null
           sort_order?: number
           specs?: Json
           title: string
@@ -531,12 +539,15 @@ export type Database = {
           availability?: string | null
           category_slug?: string
           created_at?: string
+          custom_size_enabled?: boolean
           description?: string
           filling?: string | null
+          filling_id?: string | null
           has_box?: boolean | null
           id?: string
           is_bestseller?: boolean
           mechanism?: string | null
+          mechanism_id?: string | null
           photo1?: string | null
           photo2?: string | null
           photo3?: string | null
@@ -553,6 +564,7 @@ export type Database = {
           sale_text?: string | null
           sizes?: Json
           sleeping_place?: string | null
+          sofa_type?: string | null
           sort_order?: number
           specs?: Json
           title?: string
@@ -565,6 +577,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "categories"
             referencedColumns: ["slug"]
+          },
+          {
+            foreignKeyName: "products_filling_id_fkey"
+            columns: ["filling_id"]
+            isOneToOne: false
+            referencedRelation: "spec_fillings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_mechanism_id_fkey"
+            columns: ["mechanism_id"]
+            isOneToOne: false
+            referencedRelation: "spec_mechanisms"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -622,6 +648,78 @@ export type Database = {
           sort_order?: number
           source?: string
           text?: string
+        }
+        Relationships: []
+      }
+      spec_fillings: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          name: string
+          photo: string | null
+          recommendations: string
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string
+          id?: string
+          name: string
+          photo?: string | null
+          recommendations?: string
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          name?: string
+          photo?: string | null
+          recommendations?: string
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      spec_mechanisms: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          name: string
+          photo: string | null
+          recommendations: string
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string
+          id?: string
+          name: string
+          photo?: string | null
+          recommendations?: string
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          name?: string
+          photo?: string | null
+          recommendations?: string
+          slug?: string
+          sort_order?: number
+          updated_at?: string
         }
         Relationships: []
       }
