@@ -46,19 +46,31 @@ function CartPage() {
     return s + (base + surcharge) * x.qty;
   }, 0);
 
+  const submitFn = useServerFn(submitApplication);
   const submitOrder = useMutation({
     mutationFn: async () => {
       if (!name.trim() || !phone.trim()) throw new Error("Укажите имя и телефон");
-      const itemsSummary = detailed
-        .map((x) => `${x.product.title}${x.fabric ? ` (ткань: ${x.fabric.title})` : ""} ×${x.qty}`)
-        .join("; ");
-      const { error } = await (supabase as any).from("requests").insert({
-        source: "cart",
-        title: "Заказ из корзины",
-        data: { name, phone, comment, items: itemsSummary, total: formatPrice(total) },
-        status: "new",
+      // Подробный состав корзины — текстом, без ID товаров.
+      const itemsList = detailed.map((x) => {
+        const base = x.product.sale_enabled && x.product.sale_new_price ? x.product.sale_new_price : x.product.price;
+        const surcharge = x.fabric?.surcharge ?? 0;
+        const lineTotal = (base + surcharge) * x.qty;
+        const parts = [
+          `• ${x.product.title}`,
+          x.fabric ? `   Ткань: ${x.fabric.title}` : null,
+          `   Количество: ${x.qty}`,
+          `   Цена: ${formatPrice(lineTotal)}`,
+        ].filter(Boolean);
+        return parts.join("\n");
+      }).join("\n\n");
+      const itemsSummary = `${itemsList}\n\nИтого: ${formatPrice(total)}`;
+      await submitFn({
+        data: {
+          formKey: "cart",
+          title: "Заказ из корзины",
+          data: { name, phone, comment, items: itemsSummary, total: formatPrice(total) },
+        },
       });
-      if (error) throw error;
     },
     onSuccess: () => { setSent(true); clear(); },
     onError: (e: any) => toast.error(e.message),
