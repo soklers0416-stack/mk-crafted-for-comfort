@@ -5,8 +5,9 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
 import { categoriesQuery, productsQuery } from "@/lib/queries";
+import { SOFA_TYPES } from "@/lib/db";
 
-const search = z.object({ category: z.string().optional() });
+const search = z.object({ category: z.string().optional(), sofa_type: z.string().optional() });
 
 export const Route = createFileRoute("/catalog")({
   validateSearch: search,
@@ -22,12 +23,14 @@ export const Route = createFileRoute("/catalog")({
 });
 
 function CatalogPage() {
-  const { category } = Route.useSearch();
+  const { category, sofa_type } = Route.useSearch();
   const navigate = Route.useNavigate();
   const { data: categories = [] } = useQuery(categoriesQuery);
   const { data: products = [], isLoading } = useQuery(productsQuery);
 
-  const list = category ? products.filter((p) => p.category_slug === category) : products;
+  let list = category ? products.filter((p) => p.category_slug === category) : products;
+  const isSofa = category === "sofas" || category === "divany" || category === "divan";
+  if (isSofa && sofa_type) list = list.filter((p) => p.sofa_type === sofa_type);
   const current = categories.find((c) => c.slug === category);
 
   return (
@@ -60,6 +63,30 @@ function CatalogPage() {
             </button>
           ))}
         </div>
+
+        {isSofa && (
+          <div className="mt-4 flex flex-wrap gap-2">
+            <button
+              onClick={() => navigate({ search: { category } })}
+              className={`rounded-full border px-3 py-1.5 text-xs transition ${
+                !sofa_type ? "border-primary bg-primary/10 text-primary" : "border-border bg-card hover:border-primary"
+              }`}
+            >
+              Все типы
+            </button>
+            {SOFA_TYPES.map((t) => (
+              <button
+                key={t.slug}
+                onClick={() => navigate({ search: { category, sofa_type: t.slug } })}
+                className={`rounded-full border px-3 py-1.5 text-xs transition ${
+                  sofa_type === t.slug ? "border-primary bg-primary/10 text-primary" : "border-border bg-card hover:border-primary"
+                }`}
+              >
+                {t.title}
+              </button>
+            ))}
+          </div>
+        )}
 
         {isLoading ? (
           <p className="mt-12 text-muted-foreground">Загрузка…</p>
