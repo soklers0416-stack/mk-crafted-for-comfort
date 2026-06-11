@@ -419,6 +419,30 @@ export type Database = {
         }
         Relationships: []
       }
+      home_blocks: {
+        Row: {
+          enabled: boolean
+          key: string
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          enabled?: boolean
+          key: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          enabled?: boolean
+          key?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       integrations: {
         Row: {
           apps_script_url: string
@@ -627,6 +651,38 @@ export type Database = {
             foreignKeyName: "product_fabrics_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_stats: {
+        Row: {
+          cart_adds: number
+          likes: number
+          product_id: string
+          updated_at: string
+          views: number
+        }
+        Insert: {
+          cart_adds?: number
+          likes?: number
+          product_id: string
+          updated_at?: string
+          views?: number
+        }
+        Update: {
+          cart_adds?: number
+          likes?: number
+          product_id?: string
+          updated_at?: string
+          views?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_stats_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: true
             referencedRelation: "products"
             referencedColumns: ["id"]
           },
@@ -937,6 +993,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      increment_product_stat: {
+        Args: { p_delta?: number; p_field: string; p_id: string }
+        Returns: undefined
       }
     }
     Enums: {
