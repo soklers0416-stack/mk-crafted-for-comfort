@@ -13,6 +13,7 @@ import {
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { toast } from "sonner";
 import { useReveal } from "@/hooks/useReveal";
+import { PageBanner, PageBlocksRenderer } from "@/components/PageBlocks";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -83,6 +84,7 @@ function AboutPage() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
+      <PageBanner pageKey="about" />
 
       {/* HERO с фото на фоне и цифрами поверх */}
       <section className="relative overflow-hidden">
@@ -351,6 +353,7 @@ function AboutPage() {
         </Reveal>
       </section>
 
+      <PageBlocksRenderer pageKey="about" />
       <Footer />
 
       {lightbox && (

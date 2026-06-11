@@ -8,6 +8,7 @@ import { DynamicForm } from "@/components/DynamicForm";
 import { productsQuery } from "@/lib/queries";
 import { formatPrice } from "@/lib/cart";
 import type { Product } from "@/lib/db";
+import { PageBanner, PageBlocksRenderer } from "@/components/PageBlocks";
 import {
   apartmentContentQuery, apartmentCategoriesQuery, apartmentDiscountsQuery,
   pickDiscount, trackApartmentEvent, type ApartmentCategory,
@@ -77,6 +78,7 @@ function ApartmentPage() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
+      <PageBanner pageKey="apartment" />
 
       {/* Hero */}
       <section className="border-b border-border/60 bg-gradient-to-br from-primary/5 via-background to-background">
@@ -183,6 +185,7 @@ function ApartmentPage() {
         </div>
       </section>
 
+      <PageBlocksRenderer pageKey="apartment" />
       <Footer />
 
       {/* Info dialog */}

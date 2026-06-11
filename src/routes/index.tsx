@@ -6,6 +6,7 @@ import { Footer } from "@/components/Footer";
 import { CategoryCard } from "@/components/CategoryCard";
 import { ProductCard } from "@/components/ProductCard";
 import { ContactDialog } from "@/components/ContactDialog";
+import { HeroSlider } from "@/components/HeroSlider";
 import { advantages, heroFeatures } from "@/lib/data";
 import { useQuery } from "@tanstack/react-query";
 import { productsQuery, reviewsQuery, productStatsQuery, homeBlocksQuery } from "@/lib/queries";
@@ -72,65 +73,20 @@ function HomePage() {
     <div className="min-h-screen bg-background">
       <Header />
 
-      {/* HERO */}
-      <section className="relative">
-        <div className="mx-auto max-w-7xl px-4 pt-8 md:px-8 md:pt-12">
-          <div className="relative overflow-hidden rounded-[28px] md:rounded-[40px]">
-            <img
-              src={hero}
-              alt="Современная гостиная МК Мебель"
-              width={1920}
-              height={1080}
-              className="h-[560px] w-full object-cover md:h-[680px]"
-            />
-            <div className="absolute inset-0 bg-gradient-to-tr from-white/85 via-white/45 to-transparent md:from-white/75 md:via-white/30" />
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full px-6 md:px-14">
-                <div className="max-w-2xl">
-                  <span className="inline-flex items-center gap-2 rounded-full bg-white/85 px-3 py-1.5 text-xs font-medium text-foreground/80 backdrop-blur">
-                    <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-                    Производство в Краснодаре
-                  </span>
-                  <h1 className="mt-5 font-display text-4xl font-bold leading-[1.05] tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-7xl">
-                    Ваш дом<br />
-                    Ваш стиль<br />
-                    <span className="text-primary">Наша мебель</span>
-                  </h1>
-                  <p className="mt-5 max-w-lg text-base text-foreground/75 md:text-lg shadow">
-                    Собственное производство в Краснодаре<br />
-                    Стильная мебель без наценок
-                  </p>
-                  <div className="mt-7 flex flex-wrap gap-3">
-                    <Link
-                      to="/catalog"
-                      className="inline-flex h-12 items-center gap-2 rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground transition hover:bg-primary/90"
-                    >
-                      Перейти в каталог
-                      <ArrowRight className="h-4 w-4" />
-                    </Link>
-                    <Link
-                      to="/apartment"
-                      className="inline-flex h-12 items-center rounded-full border border-foreground/15 bg-white/85 px-6 text-sm font-medium text-foreground backdrop-blur transition hover:border-primary hover:text-primary"
-                    >
-                      Квартира под ключ
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+      {/* HERO SLIDER (управляется через админку) */}
+      <HeroSlider />
 
-          {/* Hero features */}
-          <div className="mt-6 grid grid-cols-2 gap-3 md:mt-8 md:grid-cols-4 md:gap-4">
-            {heroFeatures.map((f) => (
-              <div key={f} className="flex items-start gap-3 rounded-2xl border border-border/60 bg-card p-4">
-                <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
-                  <Check className="h-3.5 w-3.5" />
-                </span>
-                <span className="text-sm font-medium leading-tight">{f}</span>
-              </div>
-            ))}
-          </div>
+      {/* Hero features */}
+      <section className="mx-auto mt-6 max-w-7xl px-4 md:mt-8 md:px-8">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+          {heroFeatures.map((f) => (
+            <div key={f} className="flex items-start gap-3 rounded-2xl border border-border/60 bg-card p-4">
+              <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
+                <Check className="h-3.5 w-3.5" />
+              </span>
+              <span className="text-sm font-medium leading-tight">{f}</span>
+            </div>
+          ))}
         </div>
       </section>
 

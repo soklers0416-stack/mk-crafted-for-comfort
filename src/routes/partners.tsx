@@ -11,6 +11,7 @@ import {
 } from "@/lib/queries";
 import { supabase } from "@/integrations/supabase/client";
 import { useReveal } from "@/hooks/useReveal";
+import { PageBanner, PageBlocksRenderer } from "@/components/PageBlocks";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -54,6 +55,7 @@ function PartnersPage() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
+      <PageBanner pageKey="partners" />
 
       <section className="mx-auto max-w-7xl px-4 py-16 md:px-8 md:py-24">
         <div
@@ -178,6 +180,7 @@ function PartnersPage() {
         </div>
       </section>
 
+      <PageBlocksRenderer pageKey="partners" />
       <Footer />
     </div>
   );

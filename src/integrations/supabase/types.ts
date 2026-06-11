@@ -443,6 +443,51 @@ export type Database = {
         }
         Relationships: []
       }
+      home_slides: {
+        Row: {
+          bg_color: string | null
+          button_link: string | null
+          button_text: string | null
+          created_at: string
+          id: string
+          image_url: string | null
+          is_visible: boolean
+          sort_order: number
+          subtitle: string | null
+          text_align: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          bg_color?: string | null
+          button_link?: string | null
+          button_text?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_visible?: boolean
+          sort_order?: number
+          subtitle?: string | null
+          text_align?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          bg_color?: string | null
+          button_link?: string | null
+          button_text?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_visible?: boolean
+          sort_order?: number
+          subtitle?: string | null
+          text_align?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       integrations: {
         Row: {
           apps_script_url: string
@@ -476,6 +521,63 @@ export type Database = {
           sheets_url?: string
           updated_at?: string
           webhook_url?: string
+        }
+        Relationships: []
+      }
+      page_blocks: {
+        Row: {
+          body: string | null
+          button_link: string | null
+          button_text: string | null
+          created_at: string
+          gallery: Json
+          id: string
+          image_url: string | null
+          is_visible: boolean
+          kind: string
+          page_key: string
+          settings: Json
+          sort_order: number
+          subtitle: string | null
+          system_ref: string | null
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          body?: string | null
+          button_link?: string | null
+          button_text?: string | null
+          created_at?: string
+          gallery?: Json
+          id?: string
+          image_url?: string | null
+          is_visible?: boolean
+          kind?: string
+          page_key: string
+          settings?: Json
+          sort_order?: number
+          subtitle?: string | null
+          system_ref?: string | null
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          body?: string | null
+          button_link?: string | null
+          button_text?: string | null
+          created_at?: string
+          gallery?: Json
+          id?: string
+          image_url?: string | null
+          is_visible?: boolean
+          kind?: string
+          page_key?: string
+          settings?: Json
+          sort_order?: number
+          subtitle?: string | null
+          system_ref?: string | null
+          title?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
