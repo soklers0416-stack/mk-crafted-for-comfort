@@ -5,7 +5,8 @@ import { Minus, Plus, Trash2 } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { formatPrice, useCart } from "@/lib/cart";
-import { productsQuery } from "@/lib/queries";
+import { productsQuery, fabricsQuery } from "@/lib/queries";
+import { getSelectedFabric } from "@/lib/productFabric";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -22,6 +23,7 @@ export const Route = createFileRoute("/cart")({
 function CartPage() {
   const { items, setQty, remove, clear } = useCart();
   const { data: products = [] } = useQuery(productsQuery);
+  const { data: fabrics = [] } = useQuery(fabricsQuery);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [comment, setComment] = useState("");
@@ -30,22 +32,24 @@ function CartPage() {
   const detailed = items
     .map((it) => {
       const product = products.find((p) => p.id === it.id);
-      return product ? { ...it, product } : null;
+      if (!product) return null;
+      const fabricId = typeof window !== "undefined" ? getSelectedFabric(product.id) : null;
+      const fabric = fabricId ? fabrics.find((f) => f.id === fabricId) ?? null : null;
+      return { ...it, product, fabric };
     })
-    .filter(Boolean) as Array<{ id: string; qty: number; product: typeof products[number] }>;
+    .filter(Boolean) as Array<{ id: string; qty: number; product: typeof products[number]; fabric: typeof fabrics[number] | null }>;
 
   const total = detailed.reduce((s, x) => {
-    const price = x.product.sale_enabled && x.product.sale_new_price
-      ? x.product.sale_new_price
-      : x.product.price;
-    return s + price * x.qty;
+    const base = x.product.sale_enabled && x.product.sale_new_price ? x.product.sale_new_price : x.product.price;
+    const surcharge = x.fabric?.surcharge ?? 0;
+    return s + (base + surcharge) * x.qty;
   }, 0);
 
   const submitOrder = useMutation({
     mutationFn: async () => {
       if (!name.trim() || !phone.trim()) throw new Error("Укажите имя и телефон");
       const itemsSummary = detailed
-        .map((x) => `${x.product.title} ×${x.qty}`)
+        .map((x) => `${x.product.title}${x.fabric ? ` (ткань: ${x.fabric.title})` : ""} ×${x.qty}`)
         .join("; ");
       const { error } = await (supabase as any).from("requests").insert({
         source: "cart",
@@ -105,13 +109,19 @@ function CartPage() {
                       </button>
                     </div>
                     <p className="mt-1 line-clamp-2 text-xs text-muted-foreground md:text-sm">{it.product.description}</p>
+                    {it.fabric && (
+                      <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs text-primary">
+                        {it.fabric.sample_photo && <img src={it.fabric.sample_photo} className="h-4 w-4 rounded-full object-cover" alt="" />}
+                        Ткань: {it.fabric.title}{it.fabric.surcharge > 0 ? ` (+${formatPrice(it.fabric.surcharge)})` : ""}
+                      </div>
+                    )}
                     <div className="mt-auto flex items-center justify-between gap-3 pt-3">
                       <div className="inline-flex items-center rounded-full border border-border">
                         <button onClick={() => setQty(it.id, it.qty - 1)} className="grid h-9 w-9 place-items-center hover:text-primary"><Minus className="h-3.5 w-3.5" /></button>
                         <span className="w-8 text-center text-sm font-medium">{it.qty}</span>
                         <button onClick={() => setQty(it.id, it.qty + 1)} className="grid h-9 w-9 place-items-center hover:text-primary"><Plus className="h-3.5 w-3.5" /></button>
                       </div>
-                      <div className="font-display text-lg font-semibold">{formatPrice(it.product.price * it.qty)}</div>
+                      <div className="font-display text-lg font-semibold">{formatPrice(((it.product.sale_enabled && it.product.sale_new_price) ? it.product.sale_new_price : it.product.price + (it.fabric?.surcharge ?? 0)) * it.qty)}</div>
                     </div>
                   </div>
                 </div>

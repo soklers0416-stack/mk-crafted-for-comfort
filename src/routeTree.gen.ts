@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ReviewsRouteImport } from './routes/reviews'
 import { Route as PromotionsRouteImport } from './routes/promotions'
+import { Route as FabricsRouteImport } from './routes/fabrics'
 import { Route as DeliveryRouteImport } from './routes/delivery'
 import { Route as ContactsRouteImport } from './routes/contacts'
 import { Route as CatalogRouteImport } from './routes/catalog'
@@ -21,12 +22,20 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductIdRouteImport } from './routes/product.$id'
+import { Route as FabricsIdRouteImport } from './routes/fabrics.$id'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminReviewsRouteImport } from './routes/_authenticated/admin.reviews'
 import { Route as AuthenticatedAdminRequestsRouteImport } from './routes/_authenticated/admin.requests'
+import { Route as AuthenticatedAdminGalleryRouteImport } from './routes/_authenticated/admin.gallery'
+import { Route as AuthenticatedAdminFaqsRouteImport } from './routes/_authenticated/admin.faqs'
+import { Route as AuthenticatedAdminCustomerPhotosRouteImport } from './routes/_authenticated/admin.customer-photos'
 import { Route as AuthenticatedAdminCategoriesRouteImport } from './routes/_authenticated/admin.categories'
+import { Route as AuthenticatedAdminAboutRouteImport } from './routes/_authenticated/admin.about'
+import { Route as AuthenticatedAdminFabricsIndexRouteImport } from './routes/_authenticated/admin.fabrics.index'
 import { Route as ApiPublicPhotoSplatRouteImport } from './routes/api/public/photo.$'
 import { Route as AuthenticatedAdminProductsIdRouteImport } from './routes/_authenticated/admin.products.$id'
+import { Route as AuthenticatedAdminFabricsCategoriesRouteImport } from './routes/_authenticated/admin.fabrics.categories'
+import { Route as AuthenticatedAdminFabricsIdRouteImport } from './routes/_authenticated/admin.fabrics.$id'
 
 const ReviewsRoute = ReviewsRouteImport.update({
   id: '/reviews',
@@ -36,6 +45,11 @@ const ReviewsRoute = ReviewsRouteImport.update({
 const PromotionsRoute = PromotionsRouteImport.update({
   id: '/promotions',
   path: '/promotions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FabricsRoute = FabricsRouteImport.update({
+  id: '/fabrics',
+  path: '/fabrics',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DeliveryRoute = DeliveryRouteImport.update({
@@ -87,6 +101,11 @@ const ProductIdRoute = ProductIdRouteImport.update({
   path: '/product/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FabricsIdRoute = FabricsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => FabricsRoute,
+} as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
@@ -104,10 +123,38 @@ const AuthenticatedAdminRequestsRoute =
     path: '/admin/requests',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminGalleryRoute =
+  AuthenticatedAdminGalleryRouteImport.update({
+    id: '/admin/gallery',
+    path: '/admin/gallery',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminFaqsRoute = AuthenticatedAdminFaqsRouteImport.update({
+  id: '/admin/faqs',
+  path: '/admin/faqs',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminCustomerPhotosRoute =
+  AuthenticatedAdminCustomerPhotosRouteImport.update({
+    id: '/admin/customer-photos',
+    path: '/admin/customer-photos',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminCategoriesRoute =
   AuthenticatedAdminCategoriesRouteImport.update({
     id: '/admin/categories',
     path: '/admin/categories',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminAboutRoute = AuthenticatedAdminAboutRouteImport.update({
+  id: '/admin/about',
+  path: '/admin/about',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminFabricsIndexRoute =
+  AuthenticatedAdminFabricsIndexRouteImport.update({
+    id: '/admin/fabrics/',
+    path: '/admin/fabrics/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const ApiPublicPhotoSplatRoute = ApiPublicPhotoSplatRouteImport.update({
@@ -121,6 +168,18 @@ const AuthenticatedAdminProductsIdRoute =
     path: '/admin/products/$id',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminFabricsCategoriesRoute =
+  AuthenticatedAdminFabricsCategoriesRouteImport.update({
+    id: '/admin/fabrics/categories',
+    path: '/admin/fabrics/categories',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminFabricsIdRoute =
+  AuthenticatedAdminFabricsIdRouteImport.update({
+    id: '/admin/fabrics/$id',
+    path: '/admin/fabrics/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -131,15 +190,24 @@ export interface FileRoutesByFullPath {
   '/catalog': typeof CatalogRoute
   '/contacts': typeof ContactsRoute
   '/delivery': typeof DeliveryRoute
+  '/fabrics': typeof FabricsRouteWithChildren
   '/promotions': typeof PromotionsRoute
   '/reviews': typeof ReviewsRoute
+  '/fabrics/$id': typeof FabricsIdRoute
   '/product/$id': typeof ProductIdRoute
+  '/admin/about': typeof AuthenticatedAdminAboutRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
+  '/admin/customer-photos': typeof AuthenticatedAdminCustomerPhotosRoute
+  '/admin/faqs': typeof AuthenticatedAdminFaqsRoute
+  '/admin/gallery': typeof AuthenticatedAdminGalleryRoute
   '/admin/requests': typeof AuthenticatedAdminRequestsRoute
   '/admin/reviews': typeof AuthenticatedAdminReviewsRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/admin/fabrics/$id': typeof AuthenticatedAdminFabricsIdRoute
+  '/admin/fabrics/categories': typeof AuthenticatedAdminFabricsCategoriesRoute
   '/admin/products/$id': typeof AuthenticatedAdminProductsIdRoute
   '/api/public/photo/$': typeof ApiPublicPhotoSplatRoute
+  '/admin/fabrics/': typeof AuthenticatedAdminFabricsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -150,15 +218,24 @@ export interface FileRoutesByTo {
   '/catalog': typeof CatalogRoute
   '/contacts': typeof ContactsRoute
   '/delivery': typeof DeliveryRoute
+  '/fabrics': typeof FabricsRouteWithChildren
   '/promotions': typeof PromotionsRoute
   '/reviews': typeof ReviewsRoute
+  '/fabrics/$id': typeof FabricsIdRoute
   '/product/$id': typeof ProductIdRoute
+  '/admin/about': typeof AuthenticatedAdminAboutRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
+  '/admin/customer-photos': typeof AuthenticatedAdminCustomerPhotosRoute
+  '/admin/faqs': typeof AuthenticatedAdminFaqsRoute
+  '/admin/gallery': typeof AuthenticatedAdminGalleryRoute
   '/admin/requests': typeof AuthenticatedAdminRequestsRoute
   '/admin/reviews': typeof AuthenticatedAdminReviewsRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/admin/fabrics/$id': typeof AuthenticatedAdminFabricsIdRoute
+  '/admin/fabrics/categories': typeof AuthenticatedAdminFabricsCategoriesRoute
   '/admin/products/$id': typeof AuthenticatedAdminProductsIdRoute
   '/api/public/photo/$': typeof ApiPublicPhotoSplatRoute
+  '/admin/fabrics': typeof AuthenticatedAdminFabricsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -171,15 +248,24 @@ export interface FileRoutesById {
   '/catalog': typeof CatalogRoute
   '/contacts': typeof ContactsRoute
   '/delivery': typeof DeliveryRoute
+  '/fabrics': typeof FabricsRouteWithChildren
   '/promotions': typeof PromotionsRoute
   '/reviews': typeof ReviewsRoute
+  '/fabrics/$id': typeof FabricsIdRoute
   '/product/$id': typeof ProductIdRoute
+  '/_authenticated/admin/about': typeof AuthenticatedAdminAboutRoute
   '/_authenticated/admin/categories': typeof AuthenticatedAdminCategoriesRoute
+  '/_authenticated/admin/customer-photos': typeof AuthenticatedAdminCustomerPhotosRoute
+  '/_authenticated/admin/faqs': typeof AuthenticatedAdminFaqsRoute
+  '/_authenticated/admin/gallery': typeof AuthenticatedAdminGalleryRoute
   '/_authenticated/admin/requests': typeof AuthenticatedAdminRequestsRoute
   '/_authenticated/admin/reviews': typeof AuthenticatedAdminReviewsRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/admin/fabrics/$id': typeof AuthenticatedAdminFabricsIdRoute
+  '/_authenticated/admin/fabrics/categories': typeof AuthenticatedAdminFabricsCategoriesRoute
   '/_authenticated/admin/products/$id': typeof AuthenticatedAdminProductsIdRoute
   '/api/public/photo/$': typeof ApiPublicPhotoSplatRoute
+  '/_authenticated/admin/fabrics/': typeof AuthenticatedAdminFabricsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -192,15 +278,24 @@ export interface FileRouteTypes {
     | '/catalog'
     | '/contacts'
     | '/delivery'
+    | '/fabrics'
     | '/promotions'
     | '/reviews'
+    | '/fabrics/$id'
     | '/product/$id'
+    | '/admin/about'
     | '/admin/categories'
+    | '/admin/customer-photos'
+    | '/admin/faqs'
+    | '/admin/gallery'
     | '/admin/requests'
     | '/admin/reviews'
     | '/admin/'
+    | '/admin/fabrics/$id'
+    | '/admin/fabrics/categories'
     | '/admin/products/$id'
     | '/api/public/photo/$'
+    | '/admin/fabrics/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -211,15 +306,24 @@ export interface FileRouteTypes {
     | '/catalog'
     | '/contacts'
     | '/delivery'
+    | '/fabrics'
     | '/promotions'
     | '/reviews'
+    | '/fabrics/$id'
     | '/product/$id'
+    | '/admin/about'
     | '/admin/categories'
+    | '/admin/customer-photos'
+    | '/admin/faqs'
+    | '/admin/gallery'
     | '/admin/requests'
     | '/admin/reviews'
     | '/admin'
+    | '/admin/fabrics/$id'
+    | '/admin/fabrics/categories'
     | '/admin/products/$id'
     | '/api/public/photo/$'
+    | '/admin/fabrics'
   id:
     | '__root__'
     | '/'
@@ -231,15 +335,24 @@ export interface FileRouteTypes {
     | '/catalog'
     | '/contacts'
     | '/delivery'
+    | '/fabrics'
     | '/promotions'
     | '/reviews'
+    | '/fabrics/$id'
     | '/product/$id'
+    | '/_authenticated/admin/about'
     | '/_authenticated/admin/categories'
+    | '/_authenticated/admin/customer-photos'
+    | '/_authenticated/admin/faqs'
+    | '/_authenticated/admin/gallery'
     | '/_authenticated/admin/requests'
     | '/_authenticated/admin/reviews'
     | '/_authenticated/admin/'
+    | '/_authenticated/admin/fabrics/$id'
+    | '/_authenticated/admin/fabrics/categories'
     | '/_authenticated/admin/products/$id'
     | '/api/public/photo/$'
+    | '/_authenticated/admin/fabrics/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -252,6 +365,7 @@ export interface RootRouteChildren {
   CatalogRoute: typeof CatalogRoute
   ContactsRoute: typeof ContactsRoute
   DeliveryRoute: typeof DeliveryRoute
+  FabricsRoute: typeof FabricsRouteWithChildren
   PromotionsRoute: typeof PromotionsRoute
   ReviewsRoute: typeof ReviewsRoute
   ProductIdRoute: typeof ProductIdRoute
@@ -272,6 +386,13 @@ declare module '@tanstack/react-router' {
       path: '/promotions'
       fullPath: '/promotions'
       preLoaderRoute: typeof PromotionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fabrics': {
+      id: '/fabrics'
+      path: '/fabrics'
+      fullPath: '/fabrics'
+      preLoaderRoute: typeof FabricsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/delivery': {
@@ -344,6 +465,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/fabrics/$id': {
+      id: '/fabrics/$id'
+      path: '/$id'
+      fullPath: '/fabrics/$id'
+      preLoaderRoute: typeof FabricsIdRouteImport
+      parentRoute: typeof FabricsRoute
+    }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
       path: '/admin'
@@ -365,11 +493,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRequestsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/gallery': {
+      id: '/_authenticated/admin/gallery'
+      path: '/admin/gallery'
+      fullPath: '/admin/gallery'
+      preLoaderRoute: typeof AuthenticatedAdminGalleryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/faqs': {
+      id: '/_authenticated/admin/faqs'
+      path: '/admin/faqs'
+      fullPath: '/admin/faqs'
+      preLoaderRoute: typeof AuthenticatedAdminFaqsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/customer-photos': {
+      id: '/_authenticated/admin/customer-photos'
+      path: '/admin/customer-photos'
+      fullPath: '/admin/customer-photos'
+      preLoaderRoute: typeof AuthenticatedAdminCustomerPhotosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/categories': {
       id: '/_authenticated/admin/categories'
       path: '/admin/categories'
       fullPath: '/admin/categories'
       preLoaderRoute: typeof AuthenticatedAdminCategoriesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/about': {
+      id: '/_authenticated/admin/about'
+      path: '/admin/about'
+      fullPath: '/admin/about'
+      preLoaderRoute: typeof AuthenticatedAdminAboutRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/fabrics/': {
+      id: '/_authenticated/admin/fabrics/'
+      path: '/admin/fabrics'
+      fullPath: '/admin/fabrics/'
+      preLoaderRoute: typeof AuthenticatedAdminFabricsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/api/public/photo/$': {
@@ -386,27 +549,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminProductsIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/fabrics/categories': {
+      id: '/_authenticated/admin/fabrics/categories'
+      path: '/admin/fabrics/categories'
+      fullPath: '/admin/fabrics/categories'
+      preLoaderRoute: typeof AuthenticatedAdminFabricsCategoriesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/fabrics/$id': {
+      id: '/_authenticated/admin/fabrics/$id'
+      path: '/admin/fabrics/$id'
+      fullPath: '/admin/fabrics/$id'
+      preLoaderRoute: typeof AuthenticatedAdminFabricsIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminAboutRoute: typeof AuthenticatedAdminAboutRoute
   AuthenticatedAdminCategoriesRoute: typeof AuthenticatedAdminCategoriesRoute
+  AuthenticatedAdminCustomerPhotosRoute: typeof AuthenticatedAdminCustomerPhotosRoute
+  AuthenticatedAdminFaqsRoute: typeof AuthenticatedAdminFaqsRoute
+  AuthenticatedAdminGalleryRoute: typeof AuthenticatedAdminGalleryRoute
   AuthenticatedAdminRequestsRoute: typeof AuthenticatedAdminRequestsRoute
   AuthenticatedAdminReviewsRoute: typeof AuthenticatedAdminReviewsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedAdminFabricsIdRoute: typeof AuthenticatedAdminFabricsIdRoute
+  AuthenticatedAdminFabricsCategoriesRoute: typeof AuthenticatedAdminFabricsCategoriesRoute
   AuthenticatedAdminProductsIdRoute: typeof AuthenticatedAdminProductsIdRoute
+  AuthenticatedAdminFabricsIndexRoute: typeof AuthenticatedAdminFabricsIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminAboutRoute: AuthenticatedAdminAboutRoute,
   AuthenticatedAdminCategoriesRoute: AuthenticatedAdminCategoriesRoute,
+  AuthenticatedAdminCustomerPhotosRoute: AuthenticatedAdminCustomerPhotosRoute,
+  AuthenticatedAdminFaqsRoute: AuthenticatedAdminFaqsRoute,
+  AuthenticatedAdminGalleryRoute: AuthenticatedAdminGalleryRoute,
   AuthenticatedAdminRequestsRoute: AuthenticatedAdminRequestsRoute,
   AuthenticatedAdminReviewsRoute: AuthenticatedAdminReviewsRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  AuthenticatedAdminFabricsIdRoute: AuthenticatedAdminFabricsIdRoute,
+  AuthenticatedAdminFabricsCategoriesRoute:
+    AuthenticatedAdminFabricsCategoriesRoute,
   AuthenticatedAdminProductsIdRoute: AuthenticatedAdminProductsIdRoute,
+  AuthenticatedAdminFabricsIndexRoute: AuthenticatedAdminFabricsIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
+interface FabricsRouteChildren {
+  FabricsIdRoute: typeof FabricsIdRoute
+}
+
+const FabricsRouteChildren: FabricsRouteChildren = {
+  FabricsIdRoute: FabricsIdRoute,
+}
+
+const FabricsRouteWithChildren =
+  FabricsRoute._addFileChildren(FabricsRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -418,6 +621,7 @@ const rootRouteChildren: RootRouteChildren = {
   CatalogRoute: CatalogRoute,
   ContactsRoute: ContactsRoute,
   DeliveryRoute: DeliveryRoute,
+  FabricsRoute: FabricsRouteWithChildren,
   PromotionsRoute: PromotionsRoute,
   ReviewsRoute: ReviewsRoute,
   ProductIdRoute: ProductIdRoute,

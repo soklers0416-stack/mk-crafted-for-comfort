@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { categoriesQuery, productQuery } from "@/lib/queries";
+import { categoriesQuery, productQuery, fabricsQuery, productFabricsQuery, fabricCategoriesQuery } from "@/lib/queries";
 import type { Product, SizeRow, Spec } from "@/lib/db";
 import { toast } from "sonner";
 import { ArrowLeft, Upload, X, Plus, Trash2 } from "lucide-react";
@@ -42,14 +42,22 @@ function EditProduct() {
   const qc = useQueryClient();
   const { data: categories = [] } = useQuery(categoriesQuery);
   const { data: existing } = useQuery({ ...productQuery(id), enabled: !isNew });
+  const { data: fabrics = [] } = useQuery(fabricsQuery);
+  const { data: fabCats = [] } = useQuery(fabricCategoriesQuery);
+  const { data: pf = [] } = useQuery(productFabricsQuery);
 
   const [form, setForm] = useState<Omit<Product, "id">>(EMPTY);
   const [busy, setBusy] = useState(false);
+  const [selectedFabrics, setSelectedFabrics] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (existing) setForm(existing);
     if (!isNew && existing === null) toast.error("Товар не найден");
   }, [existing, isNew]);
+
+  useEffect(() => {
+    if (!isNew) setSelectedFabrics(new Set(pf.filter((r) => r.product_id === id).map((r) => r.fabric_id)));
+  }, [pf, id, isNew]);
 
   useEffect(() => {
     if (isNew && categories.length && !form.category_slug) {
@@ -75,24 +83,37 @@ function EditProduct() {
     setBusy(true);
     try {
       const payload = { ...form };
+      let productId = id;
       if (isNew) {
         const { data, error } = await (supabase as any).from("products").insert(payload).select("id").single();
         if (error) throw error;
+        productId = data.id;
         toast.success("Товар создан");
-        qc.invalidateQueries({ queryKey: ["products"] });
-        navigate({ to: "/admin/products/$id", params: { id: data.id } });
       } else {
         const { error } = await (supabase as any).from("products").update(payload).eq("id", id);
         if (error) throw error;
-        qc.invalidateQueries({ queryKey: ["products"] });
-        qc.invalidateQueries({ queryKey: ["product", id] });
-        toast.success("Сохранено");
       }
+      // Sync product_fabrics
+      await (supabase as any).from("product_fabrics").delete().eq("product_id", productId);
+      if (selectedFabrics.size > 0) {
+        const rows = Array.from(selectedFabrics).map((fid) => ({ product_id: productId, fabric_id: fid }));
+        const { error: e2 } = await (supabase as any).from("product_fabrics").insert(rows);
+        if (e2) throw e2;
+      }
+      qc.invalidateQueries({ queryKey: ["products"] });
+      qc.invalidateQueries({ queryKey: ["product", productId] });
+      qc.invalidateQueries({ queryKey: ["product_fabrics"] });
+      if (isNew) navigate({ to: "/admin/products/$id", params: { id: productId } });
+      else toast.success("Сохранено");
     } catch (e: any) {
       toast.error(e.message);
     } finally {
       setBusy(false);
     }
+  }
+
+  function toggleFabric(fid: string) {
+    setSelectedFabrics((s) => { const n = new Set(s); if (n.has(fid)) n.delete(fid); else n.add(fid); return n; });
   }
 
   const photoSlots: (1 | 2 | 3 | 4 | 5 | 6)[] = [1, 2, 3, 4, 5, 6];
@@ -179,6 +200,32 @@ function EditProduct() {
               <Field label="Срок изготовления"><input value={form.production_time ?? ""} onChange={(e) => update("production_time", e.target.value)} className={inputCls} /></Field>
             </div>
           </Section>
+
+          {/* Доступные ткани */}
+          <Section title="Доступные ткани">
+            <p className="text-xs text-muted-foreground">Отметьте ткани, доступные для выбора в этом товаре. Если ничего не отметить — будут доступны все ткани.</p>
+            {fabCats.map((c) => {
+              const list = fabrics.filter((f) => f.category_slug === c.slug);
+              if (list.length === 0) return null;
+              return (
+                <div key={c.slug} className="mt-3">
+                  <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{c.title}</div>
+                  <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                    {list.map((f) => (
+                      <label key={f.id} className="flex items-center gap-2 rounded-lg border border-border bg-background px-2 py-1.5 text-xs">
+                        <input type="checkbox" checked={selectedFabrics.has(f.id)} onChange={() => toggleFabric(f.id)} />
+                        {f.sample_photo && <img src={f.sample_photo} alt="" className="h-6 w-6 rounded object-cover" />}
+                        <span className="truncate">{f.title}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+            {fabrics.length === 0 && <p className="text-sm text-muted-foreground">Сначала добавьте ткани в разделе «Ткани».</p>}
+          </Section>
+
+
 
           {/* Размеры */}
           <Section

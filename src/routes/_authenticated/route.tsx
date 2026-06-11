@@ -41,6 +41,11 @@ function AdminLayout() {
   const tabs = [
     { to: "/admin", label: "Товары" },
     { to: "/admin/categories", label: "Категории" },
+    { to: "/admin/fabrics", label: "Ткани" },
+    { to: "/admin/about", label: "О компании" },
+    { to: "/admin/customer-photos", label: "Фото клиентов" },
+    { to: "/admin/gallery", label: "Галерея" },
+    { to: "/admin/faqs", label: "FAQ" },
     { to: "/admin/reviews", label: "Отзывы" },
     { to: "/admin/requests", label: "Заявки" },
   ];

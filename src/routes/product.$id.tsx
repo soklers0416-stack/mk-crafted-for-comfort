@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Check, ShoppingBag, Truck, Palette, ChevronRight, CreditCard } from "lucide-react";
 import { Header } from "@/components/Header";
@@ -7,9 +7,11 @@ import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
 import { ContactDialog } from "@/components/ContactDialog";
 import { RequestDialog } from "@/components/RequestDialog";
+import { FabricPicker } from "@/components/FabricPicker";
 import { formatPrice, useCart } from "@/lib/cart";
-import { categoriesQuery, productsQuery, productQuery } from "@/lib/queries";
+import { categoriesQuery, productsQuery, productQuery, fabricsQuery } from "@/lib/queries";
 import { getGallery } from "@/lib/db";
+import { getSelectedFabric, setSelectedFabric, subscribeFabric } from "@/lib/productFabric";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/product/$id")({
@@ -27,12 +29,23 @@ function ProductPage() {
   const { data: product, isLoading } = useQuery(productQuery(id));
   const { data: categories = [] } = useQuery(categoriesQuery);
   const { data: allProducts = [] } = useQuery(productsQuery);
+  const { data: fabrics = [] } = useQuery(fabricsQuery);
   const [activeImg, setActiveImg] = useState<string | null>(null);
   const [contactOpen, setContactOpen] = useState(false);
   const [questionOpen, setQuestionOpen] = useState(false);
   const [colorOpen, setColorOpen] = useState(false);
   const [deliveryOpen, setDeliveryOpen] = useState(false);
   const [installmentOpen, setInstallmentOpen] = useState(false);
+  const [fabricPickerOpen, setFabricPickerOpen] = useState(false);
+  const [fabricExamplesOpen, setFabricExamplesOpen] = useState(false);
+  const [fabricId, setFabricId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setFabricId(getSelectedFabric(id));
+    return subscribeFabric(() => setFabricId(getSelectedFabric(id)));
+  }, [id]);
+
+  const selectedFabric = fabrics.find((f) => f.id === fabricId) ?? null;
 
   if (isLoading) {
     return <div className="min-h-screen bg-background"><Header /><div className="p-12 text-center text-muted-foreground">Загрузка…</div><Footer /></div>;
@@ -55,7 +68,9 @@ function ProductPage() {
   const gallery = getGallery(product);
   const currentImg = activeImg ?? gallery[0] ?? null;
   const sale = product.sale_enabled ? product : null;
-  const displayPrice = sale?.sale_new_price ?? product.price;
+  const basePrice = sale?.sale_new_price ?? product.price;
+  const surcharge = selectedFabric?.surcharge ?? 0;
+  const displayPrice = basePrice + surcharge;
   const category = categories.find((c) => c.slug === product.category_slug);
   const similar = allProducts.filter((p) => p.category_slug === product.category_slug && p.id !== product.id).slice(0, 4);
 
@@ -157,18 +172,38 @@ function ProductPage() {
               <button onClick={() => setInstallmentOpen(true)} className="inline-flex h-12 items-center gap-2 rounded-full border border-border bg-card px-6 text-sm font-medium transition hover:border-primary hover:text-primary"><CreditCard className="h-4 w-4" />Рассрочка</button>
             </div>
 
+            {/* Выбранная ткань */}
             <div className="mt-6 rounded-2xl border border-border/60 bg-card p-5">
               <div className="flex items-start gap-3">
                 <Palette className="mt-0.5 h-5 w-5 text-primary" />
                 <div className="flex-1">
-                  <div className="font-medium">Доступно более 100 вариантов тканей и цветов</div>
-                  <button onClick={() => setColorOpen(true)}
-                    className="mt-2 inline-flex h-10 items-center rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground transition hover:bg-primary/90">
-                    Посмотреть другие цвета
-                  </button>
+                  <div className="text-xs uppercase tracking-wider text-muted-foreground">Выбранная ткань</div>
+                  {selectedFabric ? (
+                    <div className="mt-2 flex items-center gap-3">
+                      {selectedFabric.sample_photo && <img src={selectedFabric.sample_photo} alt="" className="h-12 w-12 rounded-xl object-cover" />}
+                      <div className="flex-1">
+                        <div className="font-medium">{selectedFabric.title}</div>
+                        {selectedFabric.code && <div className="text-xs text-muted-foreground">{selectedFabric.code}{selectedFabric.surcharge > 0 ? ` · +${formatPrice(selectedFabric.surcharge)}` : ""}</div>}
+                      </div>
+                      <button onClick={() => setFabricPickerOpen(true)} className="rounded-full border border-border px-4 py-2 text-xs font-medium hover:border-primary hover:text-primary">Изменить ткань</button>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="mt-1 font-medium">Ткань не выбрана</div>
+                      <button onClick={() => setFabricPickerOpen(true)} className="mt-2 inline-flex h-10 items-center rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground hover:bg-primary/90">Выбрать ткань</button>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
+
+            {selectedFabric && (
+              <div className="mt-4 rounded-2xl border border-primary/30 bg-primary/5 p-5">
+                <div className="font-display text-lg font-semibold">Хотите увидеть мебель в этой ткани?</div>
+                <p className="mt-1 text-sm text-muted-foreground">Мы можем отправить реальные фотографии мебели в выбранном цвете и помочь подобрать лучший вариант под ваш интерьер.</p>
+                <button onClick={() => setFabricExamplesOpen(true)} className="mt-3 inline-flex h-10 items-center rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground hover:bg-primary/90">Получить примеры</button>
+              </div>
+            )}
 
             <ul className="mt-6 grid gap-2 sm:grid-cols-2">
               {["Более 100 вариантов тканей","Возможно изменение размеров","В наличии или изготовление от 2 недель","Помощь в подборе мебели"].map((t) => (
@@ -263,6 +298,21 @@ function ProductPage() {
         fields={[{ name: "name", label: "Имя" },{ name: "phone", label: "Телефон", type: "tel" },{ name: "city", label: "Город доставки" }]} />
       <RequestDialog open={installmentOpen} onOpenChange={setInstallmentOpen} title="Рассрочка" description="Расскажем об условиях рассрочки Т-Банк и Халва." source={`installment:${product.id}`}
         fields={[{ name: "name", label: "Имя" },{ name: "phone", label: "Телефон", type: "tel" },{ name: "term", label: "Желаемый срок (мес.)", required: false }]} />
+      <RequestDialog
+        open={fabricExamplesOpen} onOpenChange={setFabricExamplesOpen}
+        title="Фото мебели в выбранной ткани"
+        description={`${product.title} · ${selectedFabric?.title ?? ""}`}
+        source={`fabric-examples:${product.id}:${selectedFabric?.id ?? ""}`}
+        submitLabel="Получить примеры"
+        fields={[{ name: "phone", label: "Телефон", type: "tel" }]}
+      />
+      <FabricPicker
+        open={fabricPickerOpen}
+        onOpenChange={setFabricPickerOpen}
+        productId={product.id}
+        selectedId={fabricId}
+        onSelect={(f) => { setSelectedFabric(product.id, f.id); toast.success(`Ткань выбрана: ${f.title}`); }}
+      />
     </div>
   );
 }

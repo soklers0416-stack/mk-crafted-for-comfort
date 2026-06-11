@@ -14,6 +14,99 @@ export type Database = {
   }
   public: {
     Tables: {
+      about_advantages: {
+        Row: {
+          created_at: string
+          description: string
+          icon: string
+          id: string
+          sort_order: number
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string
+          icon?: string
+          id?: string
+          sort_order?: number
+          title: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          icon?: string
+          id?: string
+          sort_order?: number
+          title?: string
+        }
+        Relationships: []
+      }
+      about_content: {
+        Row: {
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value?: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: []
+      }
+      about_stats: {
+        Row: {
+          created_at: string
+          id: string
+          label: string
+          sort_order: number
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label: string
+          sort_order?: number
+          value: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label?: string
+          sort_order?: number
+          value?: string
+        }
+        Relationships: []
+      }
+      about_steps: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          sort_order: number
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string
+          id?: string
+          sort_order?: number
+          title: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          sort_order?: number
+          title?: string
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           created_at: string
@@ -40,6 +133,192 @@ export type Database = {
           title?: string
         }
         Relationships: []
+      }
+      customer_photos: {
+        Row: {
+          city: string
+          comment: string
+          created_at: string
+          id: string
+          model: string
+          photo: string
+          sort_order: number
+        }
+        Insert: {
+          city?: string
+          comment?: string
+          created_at?: string
+          id?: string
+          model?: string
+          photo: string
+          sort_order?: number
+        }
+        Update: {
+          city?: string
+          comment?: string
+          created_at?: string
+          id?: string
+          model?: string
+          photo?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      fabric_categories: {
+        Row: {
+          created_at: string
+          id: string
+          slug: string
+          sort_order: number
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          slug: string
+          sort_order?: number
+          title: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          slug?: string
+          sort_order?: number
+          title?: string
+        }
+        Relationships: []
+      }
+      fabrics: {
+        Row: {
+          category_slug: string
+          characteristics: Json
+          code: string
+          created_at: string
+          description: string
+          furniture_photos: Json
+          id: string
+          recommendations: string
+          sample_photo: string | null
+          sort_order: number
+          surcharge: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category_slug: string
+          characteristics?: Json
+          code?: string
+          created_at?: string
+          description?: string
+          furniture_photos?: Json
+          id?: string
+          recommendations?: string
+          sample_photo?: string | null
+          sort_order?: number
+          surcharge?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category_slug?: string
+          characteristics?: Json
+          code?: string
+          created_at?: string
+          description?: string
+          furniture_photos?: Json
+          id?: string
+          recommendations?: string
+          sample_photo?: string | null
+          sort_order?: number
+          surcharge?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      faqs: {
+        Row: {
+          answer: string
+          created_at: string
+          id: string
+          question: string
+          sort_order: number
+        }
+        Insert: {
+          answer?: string
+          created_at?: string
+          id?: string
+          question: string
+          sort_order?: number
+        }
+        Update: {
+          answer?: string
+          created_at?: string
+          id?: string
+          question?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      gallery_items: {
+        Row: {
+          caption: string
+          category: string
+          created_at: string
+          id: string
+          photo: string
+          sort_order: number
+        }
+        Insert: {
+          caption?: string
+          category?: string
+          created_at?: string
+          id?: string
+          photo: string
+          sort_order?: number
+        }
+        Update: {
+          caption?: string
+          category?: string
+          created_at?: string
+          id?: string
+          photo?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      product_fabrics: {
+        Row: {
+          created_at: string
+          fabric_id: string
+          product_id: string
+        }
+        Insert: {
+          created_at?: string
+          fabric_id: string
+          product_id: string
+        }
+        Update: {
+          created_at?: string
+          fabric_id?: string
+          product_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_fabrics_fabric_id_fkey"
+            columns: ["fabric_id"]
+            isOneToOne: false
+            referencedRelation: "fabrics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_fabrics_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       products: {
         Row: {
