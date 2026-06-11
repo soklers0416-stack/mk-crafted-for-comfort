@@ -14,6 +14,9 @@ import { formatPrice, useCart } from "@/lib/cart";
 import { categoriesQuery, productsQuery, productQuery, fabricsQuery, specMechanismsQuery, specFillingsQuery } from "@/lib/queries";
 import { getGallery } from "@/lib/db";
 import { getSelectedFabric, setSelectedFabric, subscribeFabric } from "@/lib/productFabric";
+import { incrementStat } from "@/lib/favorites";
+import { pushRecentlyViewed, getRecentlyViewed, subscribeRecent } from "@/lib/recentlyViewed";
+import { ShareButton } from "@/components/ShareButton";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/product/$id")({
