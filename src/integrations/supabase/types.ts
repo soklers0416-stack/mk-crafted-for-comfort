@@ -287,6 +287,150 @@ export type Database = {
         }
         Relationships: []
       }
+      partner_applications: {
+        Row: {
+          category_slug: string
+          comment: string
+          company: string
+          created_at: string
+          email: string
+          id: string
+          name: string
+          phone: string
+          status: string
+          updated_at: string
+          website: string
+        }
+        Insert: {
+          category_slug?: string
+          comment?: string
+          company?: string
+          created_at?: string
+          email?: string
+          id?: string
+          name: string
+          phone?: string
+          status?: string
+          updated_at?: string
+          website?: string
+        }
+        Update: {
+          category_slug?: string
+          comment?: string
+          company?: string
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          phone?: string
+          status?: string
+          updated_at?: string
+          website?: string
+        }
+        Relationships: []
+      }
+      partner_categories: {
+        Row: {
+          created_at: string
+          id: string
+          slug: string
+          sort_order: number
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          slug: string
+          sort_order?: number
+          title: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          slug?: string
+          sort_order?: number
+          title?: string
+        }
+        Relationships: []
+      }
+      partners: {
+        Row: {
+          advantages: Json
+          category_slug: string
+          created_at: string
+          description: string
+          email: string
+          gallery: Json
+          id: string
+          is_active: boolean
+          logo: string | null
+          main_photo: string | null
+          phone: string
+          recommended_for: Json
+          socials: Json
+          sort_order: number
+          title: string
+          updated_at: string
+          website: string
+        }
+        Insert: {
+          advantages?: Json
+          category_slug: string
+          created_at?: string
+          description?: string
+          email?: string
+          gallery?: Json
+          id?: string
+          is_active?: boolean
+          logo?: string | null
+          main_photo?: string | null
+          phone?: string
+          recommended_for?: Json
+          socials?: Json
+          sort_order?: number
+          title: string
+          updated_at?: string
+          website?: string
+        }
+        Update: {
+          advantages?: Json
+          category_slug?: string
+          created_at?: string
+          description?: string
+          email?: string
+          gallery?: Json
+          id?: string
+          is_active?: boolean
+          logo?: string | null
+          main_photo?: string | null
+          phone?: string
+          recommended_for?: Json
+          socials?: Json
+          sort_order?: number
+          title?: string
+          updated_at?: string
+          website?: string
+        }
+        Relationships: []
+      }
+      partners_content: {
+        Row: {
+          key: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value?: string
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
       product_fabrics: {
         Row: {
           created_at: string
