@@ -293,33 +293,8 @@ function ProductPage() {
           </div>
         </div>
 
-        {product.sizes && product.sizes.length > 0 && (
-          <section className="mt-16">
-            <h2 className="font-display text-2xl font-bold md:text-3xl">Размеры и цены</h2>
-            <div className="mt-6 overflow-hidden rounded-3xl border border-border/60">
-              <table className="w-full text-left text-sm">
-                <thead className="bg-surface text-muted-foreground">
-                  <tr>
-                    <th className="px-5 py-4 font-medium">Размер</th>
-                    <th className="px-5 py-4 font-medium">Спальное место</th>
-                    <th className="px-5 py-4 font-medium">Короб</th>
-                    <th className="px-5 py-4 text-right font-medium">Цена</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {product.sizes.map((s, i) => (
-                    <tr key={i} className="border-t border-border/60">
-                      <td className="px-5 py-4 font-medium">{s.size}</td>
-                      <td className="px-5 py-4 text-muted-foreground">{s.sleeping}</td>
-                      <td className="px-5 py-4 text-muted-foreground">{s.box}</td>
-                      <td className="px-5 py-4 text-right font-semibold">{s.price}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </section>
-        )}
+        {/* Таблица размеров убрана — выбор размера выведен кнопками выше */}
+
 
         {product.specs && product.specs.length > 0 && (
           <section className="mt-16">
@@ -368,8 +343,35 @@ function ProductPage() {
       </div>
 
       <Footer />
+      <RequestDialog
+        open={customSizeOpen}
+        onOpenChange={setCustomSizeOpen}
+        title="Нужен другой размер?"
+        description={`Изготовим ${product.title.toLowerCase()} в нужном вам размере.`}
+        source={`custom-size:${product.id}`}
+        submitLabel="Отправить заявку"
+        fields={[
+          { name: "name", label: "Имя" },
+          { name: "phone", label: "Телефон", type: "tel" },
+          { name: "size", label: "Желаемый размер" },
+          { name: "comment", label: "Комментарий", required: false },
+        ]}
+      />
+      <SpecInfoDialog
+        open={mechInfoOpen}
+        onOpenChange={setMechInfoOpen}
+        title="Механизм"
+        spec={mechanismInfo ? { name: mechanismInfo.name, description: mechanismInfo.description, photo: mechanismInfo.photo, recommendations: mechanismInfo.recommendations } : (product.mechanism ? { name: product.mechanism } : null)}
+      />
+      <SpecInfoDialog
+        open={fillInfoOpen}
+        onOpenChange={setFillInfoOpen}
+        title="Что внутри?"
+        spec={fillingInfo ? { name: fillingInfo.name, description: fillingInfo.description, photo: fillingInfo.photo, recommendations: fillingInfo.recommendations } : (product.filling ? { name: product.filling } : null)}
+      />
 
       <ContactDialog open={contactOpen} onOpenChange={setContactOpen} />
+
       <RequestDialog open={questionOpen} onOpenChange={setQuestionOpen} title="Я просто спросить" description="Ответим на любые вопросы по товару." source={`question:${product.id}`}
         fields={[{ name: "name", label: "Имя" },{ name: "phone", label: "Телефон", type: "tel" },{ name: "question", label: "Ваш вопрос", required: false }]} />
       <RequestDialog open={colorOpen} onOpenChange={setColorOpen} title="Другие цвета и ткани" description="Подберём вариант под ваш интерьер." source={`color:${product.id}`} submitLabel="Отправить запрос"
