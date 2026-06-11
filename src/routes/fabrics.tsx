@@ -6,6 +6,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { fabricsQuery, fabricCategoriesQuery } from "@/lib/queries";
 import { formatPrice } from "@/lib/cart";
+import { PageBanner, PageBlocksRenderer } from "@/components/PageBlocks";
 
 export const Route = createFileRoute("/fabrics")({
   head: () => ({
@@ -32,6 +33,7 @@ function FabricsPage() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
+      <PageBanner pageKey="fabrics" />
       <div className="mx-auto max-w-7xl px-4 py-12 md:px-8 md:py-16">
         <p className="text-sm font-medium uppercase tracking-wider text-primary">Материалы</p>
         <h1 className="mt-2 font-display text-4xl font-bold tracking-tight md:text-5xl">Каталог тканей</h1>
@@ -74,6 +76,7 @@ function FabricsPage() {
           )}
         </div>
       </div>
+      <PageBlocksRenderer pageKey="fabrics" />
       <Footer />
     </div>
   );
