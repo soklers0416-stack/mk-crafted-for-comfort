@@ -1,5 +1,5 @@
-// Простое локальное избранное (localStorage). Структура подготовлена для будущего
-// подключения к БД: при появлении таблицы favorites достаточно подменить get/toggle/subscribe.
+// Избранное в localStorage + лайк-счётчик в БД через RPC increment_product_stat.
+import { supabase } from "@/integrations/supabase/client";
 
 const KEY = "mk-favorites-v1";
 const EVT = "mk-favorites-changed";
@@ -32,13 +32,16 @@ export function isFavorite(id: string): boolean {
 export function toggleFavorite(id: string): boolean {
   const arr = read();
   const i = arr.indexOf(id);
+  const sb = supabase as any;
   if (i >= 0) {
     arr.splice(i, 1);
     write(arr);
+    sb.rpc("increment_product_stat", { p_id: id, p_field: "likes", p_delta: -1 });
     return false;
   }
   arr.push(id);
   write(arr);
+  sb.rpc("increment_product_stat", { p_id: id, p_field: "likes", p_delta: 1 });
   return true;
 }
 
@@ -50,4 +53,10 @@ export function subscribeFavorites(cb: () => void): () => void {
     window.removeEventListener(EVT, cb);
     window.removeEventListener("storage", cb);
   };
+}
+
+export function incrementStat(id: string, field: "views" | "likes" | "cart_adds", delta = 1) {
+  try {
+    (supabase as any).rpc("increment_product_stat", { p_id: id, p_field: field, p_delta: delta });
+  } catch {}
 }
