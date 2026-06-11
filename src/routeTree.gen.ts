@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as ReviewsRouteImport } from './routes/reviews'
 import { Route as PromotionsRouteImport } from './routes/promotions'
 import { Route as PartnersRouteImport } from './routes/partners'
+import { Route as FavoritesRouteImport } from './routes/favorites'
 import { Route as FabricsRouteImport } from './routes/fabrics'
 import { Route as DeliveryRouteImport } from './routes/delivery'
 import { Route as ContactsRouteImport } from './routes/contacts'
@@ -66,6 +67,11 @@ const PromotionsRoute = PromotionsRouteImport.update({
 const PartnersRoute = PartnersRouteImport.update({
   id: '/partners',
   path: '/partners',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FavoritesRoute = FavoritesRouteImport.update({
+  id: '/favorites',
+  path: '/favorites',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FabricsRoute = FabricsRouteImport.update({
@@ -299,6 +305,7 @@ export interface FileRoutesByFullPath {
   '/contacts': typeof ContactsRoute
   '/delivery': typeof DeliveryRoute
   '/fabrics': typeof FabricsRouteWithChildren
+  '/favorites': typeof FavoritesRoute
   '/partners': typeof PartnersRouteWithChildren
   '/promotions': typeof PromotionsRoute
   '/reviews': typeof ReviewsRoute
@@ -343,6 +350,7 @@ export interface FileRoutesByTo {
   '/contacts': typeof ContactsRoute
   '/delivery': typeof DeliveryRoute
   '/fabrics': typeof FabricsRouteWithChildren
+  '/favorites': typeof FavoritesRoute
   '/partners': typeof PartnersRouteWithChildren
   '/promotions': typeof PromotionsRoute
   '/reviews': typeof ReviewsRoute
@@ -388,6 +396,7 @@ export interface FileRoutesById {
   '/contacts': typeof ContactsRoute
   '/delivery': typeof DeliveryRoute
   '/fabrics': typeof FabricsRouteWithChildren
+  '/favorites': typeof FavoritesRoute
   '/partners': typeof PartnersRouteWithChildren
   '/promotions': typeof PromotionsRoute
   '/reviews': typeof ReviewsRoute
@@ -434,6 +443,7 @@ export interface FileRouteTypes {
     | '/contacts'
     | '/delivery'
     | '/fabrics'
+    | '/favorites'
     | '/partners'
     | '/promotions'
     | '/reviews'
@@ -478,6 +488,7 @@ export interface FileRouteTypes {
     | '/contacts'
     | '/delivery'
     | '/fabrics'
+    | '/favorites'
     | '/partners'
     | '/promotions'
     | '/reviews'
@@ -522,6 +533,7 @@ export interface FileRouteTypes {
     | '/contacts'
     | '/delivery'
     | '/fabrics'
+    | '/favorites'
     | '/partners'
     | '/promotions'
     | '/reviews'
@@ -568,6 +580,7 @@ export interface RootRouteChildren {
   ContactsRoute: typeof ContactsRoute
   DeliveryRoute: typeof DeliveryRoute
   FabricsRoute: typeof FabricsRouteWithChildren
+  FavoritesRoute: typeof FavoritesRoute
   PartnersRoute: typeof PartnersRouteWithChildren
   PromotionsRoute: typeof PromotionsRoute
   ReviewsRoute: typeof ReviewsRoute
@@ -596,6 +609,13 @@ declare module '@tanstack/react-router' {
       path: '/partners'
       fullPath: '/partners'
       preLoaderRoute: typeof PartnersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/favorites': {
+      id: '/favorites'
+      path: '/favorites'
+      fullPath: '/favorites'
+      preLoaderRoute: typeof FavoritesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/fabrics': {
@@ -997,6 +1017,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactsRoute: ContactsRoute,
   DeliveryRoute: DeliveryRoute,
   FabricsRoute: FabricsRouteWithChildren,
+  FavoritesRoute: FavoritesRoute,
   PartnersRoute: PartnersRouteWithChildren,
   PromotionsRoute: PromotionsRoute,
   ReviewsRoute: ReviewsRoute,
