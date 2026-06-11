@@ -46,13 +46,14 @@ function AdminLayout() {
     { to: "/admin/partners", label: "Партнёры" },
     { to: "/admin/partners/categories", label: "Категории партнёров" },
     { to: "/admin/partners/content", label: "Тексты «Партнёры»" },
-    { to: "/admin/partner-applications", label: "Заявки партнёров" },
     { to: "/admin/about", label: "О компании" },
     { to: "/admin/customer-photos", label: "Фото клиентов" },
     { to: "/admin/gallery", label: "Галерея" },
     { to: "/admin/faqs", label: "FAQ" },
     { to: "/admin/reviews", label: "Отзывы" },
-    { to: "/admin/requests", label: "Заявки" },
+    { to: "/admin/applications", label: "Заявки" },
+    { to: "/admin/forms", label: "Формы заявок" },
+    { to: "/admin/integrations", label: "Интеграции" },
   ];
 
   return (
