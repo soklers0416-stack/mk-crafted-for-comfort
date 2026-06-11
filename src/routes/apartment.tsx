@@ -1,10 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, ArrowRight, Check, ShoppingBag } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, ShoppingBag, Users } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { categoriesQuery, productsQuery } from "@/lib/queries";
+import { categoriesQuery, productsQuery, partnersContentQuery } from "@/lib/queries";
 import { formatPrice, useCart } from "@/lib/cart";
 import { toast } from "sonner";
 
@@ -34,6 +34,7 @@ function ApartmentPage() {
   const navigate = useNavigate();
   const { data: products = [] } = useQuery(productsQuery);
   const { data: categories = [] } = useQuery(categoriesQuery);
+  const { data: partnersContent = {} } = useQuery(partnersContentQuery);
 
   const current = steps[step];
   const list = products.filter((p) => p.category_slug === current.slug);
@@ -152,6 +153,28 @@ function ApartmentPage() {
             </Link>
           </aside>
         </div>
+
+        <section className="mt-16 overflow-hidden rounded-3xl border border-border/60 bg-card md:mt-24">
+          <div className="grid items-center gap-6 p-8 md:grid-cols-[1fr_auto] md:p-12">
+            <div className="flex items-start gap-5">
+              <div className="hidden h-14 w-14 shrink-0 place-items-center rounded-2xl bg-primary/10 text-primary sm:grid">
+                <Users className="h-6 w-6" />
+              </div>
+              <div>
+                <h2 className="font-display text-2xl font-bold md:text-3xl">
+                  {partnersContent.turnkey_block_title || "Проверенные партнёры"}
+                </h2>
+                <p className="mt-3 max-w-2xl text-muted-foreground">
+                  {partnersContent.turnkey_block_text || "Нужны двери, обои или дизайн-проект? Мы можем порекомендовать проверенных специалистов."}
+                </p>
+              </div>
+            </div>
+            <Link to="/partners" className="inline-flex h-12 items-center gap-2 self-start rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground transition hover:bg-primary/90 md:self-center">
+              {partnersContent.turnkey_block_cta || "Посмотреть партнёров"}
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </section>
       </div>
       <Footer />
     </div>
