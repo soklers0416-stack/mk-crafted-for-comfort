@@ -53,6 +53,12 @@ function ProductPage() {
     return subscribeFabric(() => setFabricId(getSelectedFabric(id)));
   }, [id]);
 
+  useEffect(() => {
+    incrementStat(id, "views");
+    pushRecentlyViewed(id);
+  }, [id]);
+
+
   const selectedFabric = fabrics.find((f) => f.id === fabricId) ?? null;
   const mechanismInfo = useMemo(() => mechanisms.find((m) => m.id === product?.mechanism_id) ?? null, [mechanisms, product?.mechanism_id]);
   const fillingInfo = useMemo(() => fillings.find((m) => m.id === product?.filling_id) ?? null, [fillings, product?.filling_id]);
