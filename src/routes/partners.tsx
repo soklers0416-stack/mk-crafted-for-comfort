@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { ArrowRight, Phone, Globe, Building2 } from "lucide-react";
+import { ArrowRight, Phone, Building2 } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import {
@@ -266,5 +266,3 @@ function ApplyForm({
   );
 }
 
-// helper to silence unused import warning in this file
-export const __PartnersGlobe = Globe;
