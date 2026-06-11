@@ -21,6 +21,10 @@ const EMPTY: Omit<Product, "id"> = {
   sleeping_place: "",
   mechanism: "",
   filling: "",
+  mechanism_id: null,
+  filling_id: null,
+  sofa_type: null,
+  custom_size_enabled: false,
   has_box: false,
   availability: "в наличии",
   production_time: "",
@@ -34,6 +38,7 @@ const EMPTY: Omit<Product, "id"> = {
   is_bestseller: false,
   sort_order: 0,
 };
+
 
 function EditProduct() {
   const { id } = Route.useParams();
