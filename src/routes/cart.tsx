@@ -1,13 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { formatPrice, useCart } from "@/lib/cart";
 import { productsQuery, fabricsQuery } from "@/lib/queries";
 import { getSelectedFabric } from "@/lib/productFabric";
-import { supabase } from "@/integrations/supabase/client";
+import { submitApplication } from "@/lib/applications.functions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/cart")({
