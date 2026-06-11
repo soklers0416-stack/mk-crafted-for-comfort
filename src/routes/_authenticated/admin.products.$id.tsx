@@ -42,14 +42,22 @@ function EditProduct() {
   const qc = useQueryClient();
   const { data: categories = [] } = useQuery(categoriesQuery);
   const { data: existing } = useQuery({ ...productQuery(id), enabled: !isNew });
+  const { data: fabrics = [] } = useQuery(fabricsQuery);
+  const { data: fabCats = [] } = useQuery(fabricCategoriesQuery);
+  const { data: pf = [] } = useQuery(productFabricsQuery);
 
   const [form, setForm] = useState<Omit<Product, "id">>(EMPTY);
   const [busy, setBusy] = useState(false);
+  const [selectedFabrics, setSelectedFabrics] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (existing) setForm(existing);
     if (!isNew && existing === null) toast.error("Товар не найден");
   }, [existing, isNew]);
+
+  useEffect(() => {
+    if (!isNew) setSelectedFabrics(new Set(pf.filter((r) => r.product_id === id).map((r) => r.fabric_id)));
+  }, [pf, id, isNew]);
 
   useEffect(() => {
     if (isNew && categories.length && !form.category_slug) {
