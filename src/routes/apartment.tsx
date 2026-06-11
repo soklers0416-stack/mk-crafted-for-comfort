@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { DynamicForm } from "@/components/DynamicForm";
 import { productsQuery } from "@/lib/queries";
 import { formatPrice } from "@/lib/cart";
+import type { Product } from "@/lib/db";
 import {
   apartmentContentQuery, apartmentCategoriesQuery, apartmentDiscountsQuery,
   pickDiscount, trackApartmentEvent, type ApartmentCategory,
