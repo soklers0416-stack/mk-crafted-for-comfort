@@ -172,18 +172,38 @@ function ProductPage() {
               <button onClick={() => setInstallmentOpen(true)} className="inline-flex h-12 items-center gap-2 rounded-full border border-border bg-card px-6 text-sm font-medium transition hover:border-primary hover:text-primary"><CreditCard className="h-4 w-4" />Рассрочка</button>
             </div>
 
+            {/* Выбранная ткань */}
             <div className="mt-6 rounded-2xl border border-border/60 bg-card p-5">
               <div className="flex items-start gap-3">
                 <Palette className="mt-0.5 h-5 w-5 text-primary" />
                 <div className="flex-1">
-                  <div className="font-medium">Доступно более 100 вариантов тканей и цветов</div>
-                  <button onClick={() => setColorOpen(true)}
-                    className="mt-2 inline-flex h-10 items-center rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground transition hover:bg-primary/90">
-                    Посмотреть другие цвета
-                  </button>
+                  <div className="text-xs uppercase tracking-wider text-muted-foreground">Выбранная ткань</div>
+                  {selectedFabric ? (
+                    <div className="mt-2 flex items-center gap-3">
+                      {selectedFabric.sample_photo && <img src={selectedFabric.sample_photo} alt="" className="h-12 w-12 rounded-xl object-cover" />}
+                      <div className="flex-1">
+                        <div className="font-medium">{selectedFabric.title}</div>
+                        {selectedFabric.code && <div className="text-xs text-muted-foreground">{selectedFabric.code}{selectedFabric.surcharge > 0 ? ` · +${formatPrice(selectedFabric.surcharge)}` : ""}</div>}
+                      </div>
+                      <button onClick={() => setFabricPickerOpen(true)} className="rounded-full border border-border px-4 py-2 text-xs font-medium hover:border-primary hover:text-primary">Изменить ткань</button>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="mt-1 font-medium">Ткань не выбрана</div>
+                      <button onClick={() => setFabricPickerOpen(true)} className="mt-2 inline-flex h-10 items-center rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground hover:bg-primary/90">Выбрать ткань</button>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
+
+            {selectedFabric && (
+              <div className="mt-4 rounded-2xl border border-primary/30 bg-primary/5 p-5">
+                <div className="font-display text-lg font-semibold">Хотите увидеть мебель в этой ткани?</div>
+                <p className="mt-1 text-sm text-muted-foreground">Мы можем отправить реальные фотографии мебели в выбранном цвете и помочь подобрать лучший вариант под ваш интерьер.</p>
+                <button onClick={() => setFabricExamplesOpen(true)} className="mt-3 inline-flex h-10 items-center rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground hover:bg-primary/90">Получить примеры</button>
+              </div>
+            )}
 
             <ul className="mt-6 grid gap-2 sm:grid-cols-2">
               {["Более 100 вариантов тканей","Возможно изменение размеров","В наличии или изготовление от 2 недель","Помощь в подборе мебели"].map((t) => (
