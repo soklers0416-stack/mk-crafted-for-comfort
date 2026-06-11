@@ -107,6 +107,108 @@ export type Database = {
         }
         Relationships: []
       }
+      apartment_categories: {
+        Row: {
+          created_at: string
+          id: string
+          product_category_slugs: Json
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_category_slugs?: Json
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_category_slugs?: Json
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      apartment_content: {
+        Row: {
+          key: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value?: string
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
+      apartment_discounts: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          min_amount: number
+          min_items: number
+          percent: number
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string
+          id?: string
+          min_amount?: number
+          min_items?: number
+          percent?: number
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          min_amount?: number
+          min_items?: number
+          percent?: number
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      apartment_events: {
+        Row: {
+          created_at: string
+          data: Json
+          event_type: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          data?: Json
+          event_type: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          data?: Json
+          event_type?: string
+          id?: string
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           created_at: string
