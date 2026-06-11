@@ -250,11 +250,12 @@ function ProductPage() {
             {sale?.sale_text && <p className="mt-1 text-sm font-medium text-red-600">{sale.sale_text}</p>}
 
             <div className="mt-6 flex flex-wrap items-center gap-3">
-              <button onClick={() => { add(product.id); toast.success("Добавлено в корзину"); }}
+              <button onClick={() => { add(product.id); incrementStat(product.id, "cart_adds"); toast.success("Добавлено в корзину"); }}
                 className="inline-flex h-12 items-center gap-2 rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground transition hover:bg-primary/90">
                 <ShoppingBag className="h-4 w-4" />В корзину
               </button>
               <FavoriteButton id={product.id} className="h-12 w-12" />
+              <ShareButton title={product.title} />
               <button onClick={() => setQuestionOpen(true)} className="inline-flex h-12 items-center rounded-full border border-border bg-card px-6 text-sm font-medium transition hover:border-primary hover:text-primary">Я просто спросить</button>
               <button onClick={() => setDeliveryOpen(true)} className="inline-flex h-12 items-center rounded-full border border-border bg-card px-6 text-sm font-medium transition hover:border-primary hover:text-primary">Рассчитать доставку</button>
               <button onClick={() => setInstallmentOpen(true)} className="inline-flex h-12 items-center gap-2 rounded-full border border-border bg-card px-6 text-sm font-medium transition hover:border-primary hover:text-primary"><CreditCard className="h-4 w-4" />Рассрочка</button>
