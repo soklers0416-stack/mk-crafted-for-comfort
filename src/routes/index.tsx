@@ -159,24 +159,54 @@ function HomePage() {
       </section>
 
       {/* BESTSELLERS */}
-      <section className="mx-auto mt-24 max-w-7xl px-4 md:px-8">
-        <div className="flex items-end justify-between gap-4">
-          <div>
-            <p className="text-sm font-medium uppercase tracking-wider text-primary">Популярное</p>
-            <h2 className="mt-2 font-display text-3xl font-bold tracking-tight md:text-4xl">
-              Хиты продаж
-            </h2>
+      {blockEnabled("bestsellers") && bestsellers.length > 0 && (
+        <section className="mx-auto mt-24 max-w-7xl px-4 md:px-8">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <p className="text-sm font-medium uppercase tracking-wider text-primary">Популярное</p>
+              <h2 className="mt-2 font-display text-3xl font-bold tracking-tight md:text-4xl">
+                {blockTitle("bestsellers", "Хиты продаж")}
+              </h2>
+            </div>
+            <Link to="/catalog" className="hidden sm:inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
+              Весь каталог <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
-          <Link to="/catalog" className="hidden sm:inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
-            Весь каталог <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
-        <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {bestsellers.map((p) => (
-            <ProductCard key={p.id} product={p} />
-          ))}
-        </div>
-      </section>
+          <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {bestsellers.map((p) => (<ProductCard key={p.id} product={p} />))}
+          </div>
+        </section>
+      )}
+
+      {/* POPULAR NOW */}
+      {blockEnabled("popular") && popular.length > 0 && (
+        <section className="mx-auto mt-24 max-w-7xl px-4 md:px-8">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <p className="text-sm font-medium uppercase tracking-wider text-primary">Тренд</p>
+              <h2 className="mt-2 font-display text-3xl font-bold tracking-tight md:text-4xl">
+                {blockTitle("popular", "Популярное сейчас")}
+              </h2>
+            </div>
+          </div>
+          <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {popular.map((p) => (<ProductCard key={p.id} product={p} />))}
+          </div>
+        </section>
+      )}
+
+      {/* RECENTLY VIEWED */}
+      {blockEnabled("recently_viewed") && recent.length > 0 && (
+        <section className="mx-auto mt-24 max-w-7xl px-4 md:px-8">
+          <h2 className="font-display text-3xl font-bold tracking-tight md:text-4xl">
+            {blockTitle("recently_viewed", "Вы недавно смотрели")}
+          </h2>
+          <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {recent.map((p) => (<ProductCard key={p.id} product={p} />))}
+          </div>
+        </section>
+      )}
+
 
       {/* ADVANTAGES */}
       <section className="mx-auto mt-24 max-w-7xl px-4 md:px-8">
