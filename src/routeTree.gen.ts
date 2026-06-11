@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ReviewsRouteImport } from './routes/reviews'
 import { Route as PromotionsRouteImport } from './routes/promotions'
+import { Route as PartnersRouteImport } from './routes/partners'
 import { Route as FabricsRouteImport } from './routes/fabrics'
 import { Route as DeliveryRouteImport } from './routes/delivery'
 import { Route as ContactsRouteImport } from './routes/contacts'
@@ -22,6 +23,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductIdRouteImport } from './routes/product.$id'
+import { Route as PartnersIdRouteImport } from './routes/partners.$id'
 import { Route as FabricsIdRouteImport } from './routes/fabrics.$id'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminReviewsRouteImport } from './routes/_authenticated/admin.reviews'
@@ -45,6 +47,11 @@ const ReviewsRoute = ReviewsRouteImport.update({
 const PromotionsRoute = PromotionsRouteImport.update({
   id: '/promotions',
   path: '/promotions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PartnersRoute = PartnersRouteImport.update({
+  id: '/partners',
+  path: '/partners',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FabricsRoute = FabricsRouteImport.update({
@@ -100,6 +107,11 @@ const ProductIdRoute = ProductIdRouteImport.update({
   id: '/product/$id',
   path: '/product/$id',
   getParentRoute: () => rootRouteImport,
+} as any)
+const PartnersIdRoute = PartnersIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => PartnersRoute,
 } as any)
 const FabricsIdRoute = FabricsIdRouteImport.update({
   id: '/$id',
@@ -191,9 +203,11 @@ export interface FileRoutesByFullPath {
   '/contacts': typeof ContactsRoute
   '/delivery': typeof DeliveryRoute
   '/fabrics': typeof FabricsRouteWithChildren
+  '/partners': typeof PartnersRouteWithChildren
   '/promotions': typeof PromotionsRoute
   '/reviews': typeof ReviewsRoute
   '/fabrics/$id': typeof FabricsIdRoute
+  '/partners/$id': typeof PartnersIdRoute
   '/product/$id': typeof ProductIdRoute
   '/admin/about': typeof AuthenticatedAdminAboutRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
@@ -219,9 +233,11 @@ export interface FileRoutesByTo {
   '/contacts': typeof ContactsRoute
   '/delivery': typeof DeliveryRoute
   '/fabrics': typeof FabricsRouteWithChildren
+  '/partners': typeof PartnersRouteWithChildren
   '/promotions': typeof PromotionsRoute
   '/reviews': typeof ReviewsRoute
   '/fabrics/$id': typeof FabricsIdRoute
+  '/partners/$id': typeof PartnersIdRoute
   '/product/$id': typeof ProductIdRoute
   '/admin/about': typeof AuthenticatedAdminAboutRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
@@ -249,9 +265,11 @@ export interface FileRoutesById {
   '/contacts': typeof ContactsRoute
   '/delivery': typeof DeliveryRoute
   '/fabrics': typeof FabricsRouteWithChildren
+  '/partners': typeof PartnersRouteWithChildren
   '/promotions': typeof PromotionsRoute
   '/reviews': typeof ReviewsRoute
   '/fabrics/$id': typeof FabricsIdRoute
+  '/partners/$id': typeof PartnersIdRoute
   '/product/$id': typeof ProductIdRoute
   '/_authenticated/admin/about': typeof AuthenticatedAdminAboutRoute
   '/_authenticated/admin/categories': typeof AuthenticatedAdminCategoriesRoute
@@ -279,9 +297,11 @@ export interface FileRouteTypes {
     | '/contacts'
     | '/delivery'
     | '/fabrics'
+    | '/partners'
     | '/promotions'
     | '/reviews'
     | '/fabrics/$id'
+    | '/partners/$id'
     | '/product/$id'
     | '/admin/about'
     | '/admin/categories'
@@ -307,9 +327,11 @@ export interface FileRouteTypes {
     | '/contacts'
     | '/delivery'
     | '/fabrics'
+    | '/partners'
     | '/promotions'
     | '/reviews'
     | '/fabrics/$id'
+    | '/partners/$id'
     | '/product/$id'
     | '/admin/about'
     | '/admin/categories'
@@ -336,9 +358,11 @@ export interface FileRouteTypes {
     | '/contacts'
     | '/delivery'
     | '/fabrics'
+    | '/partners'
     | '/promotions'
     | '/reviews'
     | '/fabrics/$id'
+    | '/partners/$id'
     | '/product/$id'
     | '/_authenticated/admin/about'
     | '/_authenticated/admin/categories'
@@ -366,6 +390,7 @@ export interface RootRouteChildren {
   ContactsRoute: typeof ContactsRoute
   DeliveryRoute: typeof DeliveryRoute
   FabricsRoute: typeof FabricsRouteWithChildren
+  PartnersRoute: typeof PartnersRouteWithChildren
   PromotionsRoute: typeof PromotionsRoute
   ReviewsRoute: typeof ReviewsRoute
   ProductIdRoute: typeof ProductIdRoute
@@ -386,6 +411,13 @@ declare module '@tanstack/react-router' {
       path: '/promotions'
       fullPath: '/promotions'
       preLoaderRoute: typeof PromotionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/partners': {
+      id: '/partners'
+      path: '/partners'
+      fullPath: '/partners'
+      preLoaderRoute: typeof PartnersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/fabrics': {
@@ -464,6 +496,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/product/$id'
       preLoaderRoute: typeof ProductIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/partners/$id': {
+      id: '/partners/$id'
+      path: '/$id'
+      fullPath: '/partners/$id'
+      preLoaderRoute: typeof PartnersIdRouteImport
+      parentRoute: typeof PartnersRoute
     }
     '/fabrics/$id': {
       id: '/fabrics/$id'
@@ -611,6 +650,18 @@ const FabricsRouteChildren: FabricsRouteChildren = {
 const FabricsRouteWithChildren =
   FabricsRoute._addFileChildren(FabricsRouteChildren)
 
+interface PartnersRouteChildren {
+  PartnersIdRoute: typeof PartnersIdRoute
+}
+
+const PartnersRouteChildren: PartnersRouteChildren = {
+  PartnersIdRoute: PartnersIdRoute,
+}
+
+const PartnersRouteWithChildren = PartnersRoute._addFileChildren(
+  PartnersRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
@@ -622,6 +673,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactsRoute: ContactsRoute,
   DeliveryRoute: DeliveryRoute,
   FabricsRoute: FabricsRouteWithChildren,
+  PartnersRoute: PartnersRouteWithChildren,
   PromotionsRoute: PromotionsRoute,
   ReviewsRoute: ReviewsRoute,
   ProductIdRoute: ProductIdRoute,
