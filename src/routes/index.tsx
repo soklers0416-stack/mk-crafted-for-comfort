@@ -39,7 +39,35 @@ function HomePage() {
   const [contactOpen, setContactOpen] = useState(false);
   const { data: allProducts = [] } = useQuery(productsQuery);
   const { data: reviews = [] } = useQuery(reviewsQuery);
-  const bestsellers = allProducts.filter((p) => p.is_bestseller).slice(0, 4);
+  const { data: stats = [] } = useQuery(productStatsQuery);
+  const { data: blocks = [] } = useQuery(homeBlocksQuery);
+  const statMap = new Map(stats.map((s) => [s.product_id, s]));
+  const likesOf = (id: string) => statMap.get(id)?.likes ?? 0;
+  const viewsOf = (id: string) => statMap.get(id)?.views ?? 0;
+  const manualHits = allProducts.filter((p) => p.is_bestseller);
+  const autoHits = [...allProducts].sort((a, b) => likesOf(b.id) - likesOf(a.id)).filter((p) => likesOf(p.id) > 0);
+  const seen = new Set<string>();
+  const bestsellers = [...manualHits, ...autoHits].filter((p) => (seen.has(p.id) ? false : (seen.add(p.id), true))).slice(0, 4);
+  const popular = [...allProducts]
+    .map((p) => ({ p, score: viewsOf(p.id) * 1 + likesOf(p.id) * 3 }))
+    .sort((a, b) => b.score - a.score)
+    .filter((x) => x.score > 0)
+    .slice(0, 4)
+    .map((x) => x.p);
+
+  const [recentIds, setRecentIds] = useState<string[]>([]);
+  useEffectReact(() => {
+    const upd = () => setRecentIds(getRecentlyViewed());
+    upd();
+    return subscribeRecent(upd);
+  }, []);
+  const recent = recentIds.map((id) => allProducts.find((p) => p.id === id)).filter(Boolean).slice(0, 4) as typeof allProducts;
+
+  const blockEnabled = (key: string) => {
+    const b = blocks.find((x) => x.key === key);
+    return b ? b.enabled : true;
+  };
+  const blockTitle = (key: string, fallback: string) => blocks.find((x) => x.key === key)?.title ?? fallback;
   return (
     <div className="min-h-screen bg-background">
       <Header />
