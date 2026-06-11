@@ -83,24 +83,37 @@ function EditProduct() {
     setBusy(true);
     try {
       const payload = { ...form };
+      let productId = id;
       if (isNew) {
         const { data, error } = await (supabase as any).from("products").insert(payload).select("id").single();
         if (error) throw error;
+        productId = data.id;
         toast.success("Товар создан");
-        qc.invalidateQueries({ queryKey: ["products"] });
-        navigate({ to: "/admin/products/$id", params: { id: data.id } });
       } else {
         const { error } = await (supabase as any).from("products").update(payload).eq("id", id);
         if (error) throw error;
-        qc.invalidateQueries({ queryKey: ["products"] });
-        qc.invalidateQueries({ queryKey: ["product", id] });
-        toast.success("Сохранено");
       }
+      // Sync product_fabrics
+      await (supabase as any).from("product_fabrics").delete().eq("product_id", productId);
+      if (selectedFabrics.size > 0) {
+        const rows = Array.from(selectedFabrics).map((fid) => ({ product_id: productId, fabric_id: fid }));
+        const { error: e2 } = await (supabase as any).from("product_fabrics").insert(rows);
+        if (e2) throw e2;
+      }
+      qc.invalidateQueries({ queryKey: ["products"] });
+      qc.invalidateQueries({ queryKey: ["product", productId] });
+      qc.invalidateQueries({ queryKey: ["product_fabrics"] });
+      if (isNew) navigate({ to: "/admin/products/$id", params: { id: productId } });
+      else toast.success("Сохранено");
     } catch (e: any) {
       toast.error(e.message);
     } finally {
       setBusy(false);
     }
+  }
+
+  function toggleFabric(fid: string) {
+    setSelectedFabrics((s) => { const n = new Set(s); if (n.has(fid)) n.delete(fid); else n.add(fid); return n; });
   }
 
   const photoSlots: (1 | 2 | 3 | 4 | 5 | 6)[] = [1, 2, 3, 4, 5, 6];
