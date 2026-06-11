@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ReviewsRouteImport } from './routes/reviews'
 import { Route as PromotionsRouteImport } from './routes/promotions'
+import { Route as FabricsRouteImport } from './routes/fabrics'
 import { Route as DeliveryRouteImport } from './routes/delivery'
 import { Route as ContactsRouteImport } from './routes/contacts'
 import { Route as CatalogRouteImport } from './routes/catalog'
@@ -21,6 +22,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductIdRouteImport } from './routes/product.$id'
+import { Route as FabricsIdRouteImport } from './routes/fabrics.$id'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminReviewsRouteImport } from './routes/_authenticated/admin.reviews'
 import { Route as AuthenticatedAdminRequestsRouteImport } from './routes/_authenticated/admin.requests'
@@ -36,6 +38,11 @@ const ReviewsRoute = ReviewsRouteImport.update({
 const PromotionsRoute = PromotionsRouteImport.update({
   id: '/promotions',
   path: '/promotions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FabricsRoute = FabricsRouteImport.update({
+  id: '/fabrics',
+  path: '/fabrics',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DeliveryRoute = DeliveryRouteImport.update({
@@ -87,6 +94,11 @@ const ProductIdRoute = ProductIdRouteImport.update({
   path: '/product/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FabricsIdRoute = FabricsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => FabricsRoute,
+} as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
@@ -131,8 +143,10 @@ export interface FileRoutesByFullPath {
   '/catalog': typeof CatalogRoute
   '/contacts': typeof ContactsRoute
   '/delivery': typeof DeliveryRoute
+  '/fabrics': typeof FabricsRouteWithChildren
   '/promotions': typeof PromotionsRoute
   '/reviews': typeof ReviewsRoute
+  '/fabrics/$id': typeof FabricsIdRoute
   '/product/$id': typeof ProductIdRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/admin/requests': typeof AuthenticatedAdminRequestsRoute
@@ -150,8 +164,10 @@ export interface FileRoutesByTo {
   '/catalog': typeof CatalogRoute
   '/contacts': typeof ContactsRoute
   '/delivery': typeof DeliveryRoute
+  '/fabrics': typeof FabricsRouteWithChildren
   '/promotions': typeof PromotionsRoute
   '/reviews': typeof ReviewsRoute
+  '/fabrics/$id': typeof FabricsIdRoute
   '/product/$id': typeof ProductIdRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/admin/requests': typeof AuthenticatedAdminRequestsRoute
@@ -171,8 +187,10 @@ export interface FileRoutesById {
   '/catalog': typeof CatalogRoute
   '/contacts': typeof ContactsRoute
   '/delivery': typeof DeliveryRoute
+  '/fabrics': typeof FabricsRouteWithChildren
   '/promotions': typeof PromotionsRoute
   '/reviews': typeof ReviewsRoute
+  '/fabrics/$id': typeof FabricsIdRoute
   '/product/$id': typeof ProductIdRoute
   '/_authenticated/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/_authenticated/admin/requests': typeof AuthenticatedAdminRequestsRoute
@@ -192,8 +210,10 @@ export interface FileRouteTypes {
     | '/catalog'
     | '/contacts'
     | '/delivery'
+    | '/fabrics'
     | '/promotions'
     | '/reviews'
+    | '/fabrics/$id'
     | '/product/$id'
     | '/admin/categories'
     | '/admin/requests'
@@ -211,8 +231,10 @@ export interface FileRouteTypes {
     | '/catalog'
     | '/contacts'
     | '/delivery'
+    | '/fabrics'
     | '/promotions'
     | '/reviews'
+    | '/fabrics/$id'
     | '/product/$id'
     | '/admin/categories'
     | '/admin/requests'
@@ -231,8 +253,10 @@ export interface FileRouteTypes {
     | '/catalog'
     | '/contacts'
     | '/delivery'
+    | '/fabrics'
     | '/promotions'
     | '/reviews'
+    | '/fabrics/$id'
     | '/product/$id'
     | '/_authenticated/admin/categories'
     | '/_authenticated/admin/requests'
@@ -252,6 +276,7 @@ export interface RootRouteChildren {
   CatalogRoute: typeof CatalogRoute
   ContactsRoute: typeof ContactsRoute
   DeliveryRoute: typeof DeliveryRoute
+  FabricsRoute: typeof FabricsRouteWithChildren
   PromotionsRoute: typeof PromotionsRoute
   ReviewsRoute: typeof ReviewsRoute
   ProductIdRoute: typeof ProductIdRoute
@@ -272,6 +297,13 @@ declare module '@tanstack/react-router' {
       path: '/promotions'
       fullPath: '/promotions'
       preLoaderRoute: typeof PromotionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fabrics': {
+      id: '/fabrics'
+      path: '/fabrics'
+      fullPath: '/fabrics'
+      preLoaderRoute: typeof FabricsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/delivery': {
@@ -344,6 +376,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/fabrics/$id': {
+      id: '/fabrics/$id'
+      path: '/$id'
+      fullPath: '/fabrics/$id'
+      preLoaderRoute: typeof FabricsIdRouteImport
+      parentRoute: typeof FabricsRoute
+    }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
       path: '/admin'
@@ -408,6 +447,17 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface FabricsRouteChildren {
+  FabricsIdRoute: typeof FabricsIdRoute
+}
+
+const FabricsRouteChildren: FabricsRouteChildren = {
+  FabricsIdRoute: FabricsIdRoute,
+}
+
+const FabricsRouteWithChildren =
+  FabricsRoute._addFileChildren(FabricsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
@@ -418,6 +468,7 @@ const rootRouteChildren: RootRouteChildren = {
   CatalogRoute: CatalogRoute,
   ContactsRoute: ContactsRoute,
   DeliveryRoute: DeliveryRoute,
+  FabricsRoute: FabricsRouteWithChildren,
   PromotionsRoute: PromotionsRoute,
   ReviewsRoute: ReviewsRoute,
   ProductIdRoute: ProductIdRoute,
@@ -426,3 +477,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
