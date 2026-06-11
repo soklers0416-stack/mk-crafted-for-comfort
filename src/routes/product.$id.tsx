@@ -298,6 +298,21 @@ function ProductPage() {
         fields={[{ name: "name", label: "Имя" },{ name: "phone", label: "Телефон", type: "tel" },{ name: "city", label: "Город доставки" }]} />
       <RequestDialog open={installmentOpen} onOpenChange={setInstallmentOpen} title="Рассрочка" description="Расскажем об условиях рассрочки Т-Банк и Халва." source={`installment:${product.id}`}
         fields={[{ name: "name", label: "Имя" },{ name: "phone", label: "Телефон", type: "tel" },{ name: "term", label: "Желаемый срок (мес.)", required: false }]} />
+      <RequestDialog
+        open={fabricExamplesOpen} onOpenChange={setFabricExamplesOpen}
+        title="Фото мебели в выбранной ткани"
+        description={`${product.title} · ${selectedFabric?.title ?? ""}`}
+        source={`fabric-examples:${product.id}:${selectedFabric?.id ?? ""}`}
+        submitLabel="Получить примеры"
+        fields={[{ name: "phone", label: "Телефон", type: "tel" }]}
+      />
+      <FabricPicker
+        open={fabricPickerOpen}
+        onOpenChange={setFabricPickerOpen}
+        productId={product.id}
+        selectedId={fabricId}
+        onSelect={(f) => { setSelectedFabric(product.id, f.id); toast.success(`Ткань выбрана: ${f.title}`); }}
+      />
     </div>
   );
 }
