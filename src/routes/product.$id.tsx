@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Check, ShoppingBag, Truck, Palette, ChevronRight, CreditCard } from "lucide-react";
 import { Header } from "@/components/Header";
@@ -7,9 +7,11 @@ import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
 import { ContactDialog } from "@/components/ContactDialog";
 import { RequestDialog } from "@/components/RequestDialog";
+import { FabricPicker } from "@/components/FabricPicker";
 import { formatPrice, useCart } from "@/lib/cart";
-import { categoriesQuery, productsQuery, productQuery } from "@/lib/queries";
+import { categoriesQuery, productsQuery, productQuery, fabricsQuery } from "@/lib/queries";
 import { getGallery } from "@/lib/db";
+import { getSelectedFabric, setSelectedFabric, subscribeFabric } from "@/lib/productFabric";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/product/$id")({
@@ -27,12 +29,23 @@ function ProductPage() {
   const { data: product, isLoading } = useQuery(productQuery(id));
   const { data: categories = [] } = useQuery(categoriesQuery);
   const { data: allProducts = [] } = useQuery(productsQuery);
+  const { data: fabrics = [] } = useQuery(fabricsQuery);
   const [activeImg, setActiveImg] = useState<string | null>(null);
   const [contactOpen, setContactOpen] = useState(false);
   const [questionOpen, setQuestionOpen] = useState(false);
   const [colorOpen, setColorOpen] = useState(false);
   const [deliveryOpen, setDeliveryOpen] = useState(false);
   const [installmentOpen, setInstallmentOpen] = useState(false);
+  const [fabricPickerOpen, setFabricPickerOpen] = useState(false);
+  const [fabricExamplesOpen, setFabricExamplesOpen] = useState(false);
+  const [fabricId, setFabricId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setFabricId(getSelectedFabric(id));
+    return subscribeFabric(() => setFabricId(getSelectedFabric(id)));
+  }, [id]);
+
+  const selectedFabric = fabrics.find((f) => f.id === fabricId) ?? null;
 
   if (isLoading) {
     return <div className="min-h-screen bg-background"><Header /><div className="p-12 text-center text-muted-foreground">Загрузка…</div><Footer /></div>;
