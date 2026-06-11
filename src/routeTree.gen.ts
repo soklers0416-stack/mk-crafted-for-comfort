@@ -33,6 +33,7 @@ import { Route as AuthenticatedAdminRequestsRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminProductStatsRouteImport } from './routes/_authenticated/admin.product-stats'
 import { Route as AuthenticatedAdminPartnerApplicationsRouteImport } from './routes/_authenticated/admin.partner-applications'
 import { Route as AuthenticatedAdminIntegrationsRouteImport } from './routes/_authenticated/admin.integrations'
+import { Route as AuthenticatedAdminHomeSlidesRouteImport } from './routes/_authenticated/admin.home-slides'
 import { Route as AuthenticatedAdminHomeBlocksRouteImport } from './routes/_authenticated/admin.home-blocks'
 import { Route as AuthenticatedAdminGalleryRouteImport } from './routes/_authenticated/admin.gallery'
 import { Route as AuthenticatedAdminFormsRouteImport } from './routes/_authenticated/admin.forms'
@@ -43,6 +44,7 @@ import { Route as AuthenticatedAdminApplicationsRouteImport } from './routes/_au
 import { Route as AuthenticatedAdminApartmentRouteImport } from './routes/_authenticated/admin.apartment'
 import { Route as AuthenticatedAdminAboutRouteImport } from './routes/_authenticated/admin.about'
 import { Route as AuthenticatedAdminPartnersIndexRouteImport } from './routes/_authenticated/admin.partners.index'
+import { Route as AuthenticatedAdminPageBlocksIndexRouteImport } from './routes/_authenticated/admin.page-blocks.index'
 import { Route as AuthenticatedAdminFabricsIndexRouteImport } from './routes/_authenticated/admin.fabrics.index'
 import { Route as AuthenticatedAdminApartmentIndexRouteImport } from './routes/_authenticated/admin.apartment.index'
 import { Route as ApiPublicPhotoSplatRouteImport } from './routes/api/public/photo.$'
@@ -50,6 +52,7 @@ import { Route as AuthenticatedAdminProductsIdRouteImport } from './routes/_auth
 import { Route as AuthenticatedAdminPartnersContentRouteImport } from './routes/_authenticated/admin.partners.content'
 import { Route as AuthenticatedAdminPartnersCategoriesRouteImport } from './routes/_authenticated/admin.partners.categories'
 import { Route as AuthenticatedAdminPartnersIdRouteImport } from './routes/_authenticated/admin.partners.$id'
+import { Route as AuthenticatedAdminPageBlocksPageKeyRouteImport } from './routes/_authenticated/admin.page-blocks.$pageKey'
 import { Route as AuthenticatedAdminFabricsCategoriesRouteImport } from './routes/_authenticated/admin.fabrics.categories'
 import { Route as AuthenticatedAdminFabricsIdRouteImport } from './routes/_authenticated/admin.fabrics.$id'
 import { Route as AuthenticatedAdminApartmentDiscountsRouteImport } from './routes/_authenticated/admin.apartment.discounts'
@@ -180,6 +183,12 @@ const AuthenticatedAdminIntegrationsRoute =
     path: '/admin/integrations',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminHomeSlidesRoute =
+  AuthenticatedAdminHomeSlidesRouteImport.update({
+    id: '/admin/home-slides',
+    path: '/admin/home-slides',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminHomeBlocksRoute =
   AuthenticatedAdminHomeBlocksRouteImport.update({
     id: '/admin/home-blocks',
@@ -237,6 +246,12 @@ const AuthenticatedAdminPartnersIndexRoute =
     path: '/admin/partners/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminPageBlocksIndexRoute =
+  AuthenticatedAdminPageBlocksIndexRouteImport.update({
+    id: '/admin/page-blocks/',
+    path: '/admin/page-blocks/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminFabricsIndexRoute =
   AuthenticatedAdminFabricsIndexRouteImport.update({
     id: '/admin/fabrics/',
@@ -276,6 +291,12 @@ const AuthenticatedAdminPartnersIdRoute =
   AuthenticatedAdminPartnersIdRouteImport.update({
     id: '/admin/partners/$id',
     path: '/admin/partners/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminPageBlocksPageKeyRoute =
+  AuthenticatedAdminPageBlocksPageKeyRouteImport.update({
+    id: '/admin/page-blocks/$pageKey',
+    path: '/admin/page-blocks/$pageKey',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAdminFabricsCategoriesRoute =
@@ -335,6 +356,7 @@ export interface FileRoutesByFullPath {
   '/admin/forms': typeof AuthenticatedAdminFormsRoute
   '/admin/gallery': typeof AuthenticatedAdminGalleryRoute
   '/admin/home-blocks': typeof AuthenticatedAdminHomeBlocksRoute
+  '/admin/home-slides': typeof AuthenticatedAdminHomeSlidesRoute
   '/admin/integrations': typeof AuthenticatedAdminIntegrationsRoute
   '/admin/partner-applications': typeof AuthenticatedAdminPartnerApplicationsRoute
   '/admin/product-stats': typeof AuthenticatedAdminProductStatsRoute
@@ -347,6 +369,7 @@ export interface FileRoutesByFullPath {
   '/admin/apartment/discounts': typeof AuthenticatedAdminApartmentDiscountsRoute
   '/admin/fabrics/$id': typeof AuthenticatedAdminFabricsIdRoute
   '/admin/fabrics/categories': typeof AuthenticatedAdminFabricsCategoriesRoute
+  '/admin/page-blocks/$pageKey': typeof AuthenticatedAdminPageBlocksPageKeyRoute
   '/admin/partners/$id': typeof AuthenticatedAdminPartnersIdRoute
   '/admin/partners/categories': typeof AuthenticatedAdminPartnersCategoriesRoute
   '/admin/partners/content': typeof AuthenticatedAdminPartnersContentRoute
@@ -354,6 +377,7 @@ export interface FileRoutesByFullPath {
   '/api/public/photo/$': typeof ApiPublicPhotoSplatRoute
   '/admin/apartment/': typeof AuthenticatedAdminApartmentIndexRoute
   '/admin/fabrics/': typeof AuthenticatedAdminFabricsIndexRoute
+  '/admin/page-blocks/': typeof AuthenticatedAdminPageBlocksIndexRoute
   '/admin/partners/': typeof AuthenticatedAdminPartnersIndexRoute
 }
 export interface FileRoutesByTo {
@@ -381,6 +405,7 @@ export interface FileRoutesByTo {
   '/admin/forms': typeof AuthenticatedAdminFormsRoute
   '/admin/gallery': typeof AuthenticatedAdminGalleryRoute
   '/admin/home-blocks': typeof AuthenticatedAdminHomeBlocksRoute
+  '/admin/home-slides': typeof AuthenticatedAdminHomeSlidesRoute
   '/admin/integrations': typeof AuthenticatedAdminIntegrationsRoute
   '/admin/partner-applications': typeof AuthenticatedAdminPartnerApplicationsRoute
   '/admin/product-stats': typeof AuthenticatedAdminProductStatsRoute
@@ -393,6 +418,7 @@ export interface FileRoutesByTo {
   '/admin/apartment/discounts': typeof AuthenticatedAdminApartmentDiscountsRoute
   '/admin/fabrics/$id': typeof AuthenticatedAdminFabricsIdRoute
   '/admin/fabrics/categories': typeof AuthenticatedAdminFabricsCategoriesRoute
+  '/admin/page-blocks/$pageKey': typeof AuthenticatedAdminPageBlocksPageKeyRoute
   '/admin/partners/$id': typeof AuthenticatedAdminPartnersIdRoute
   '/admin/partners/categories': typeof AuthenticatedAdminPartnersCategoriesRoute
   '/admin/partners/content': typeof AuthenticatedAdminPartnersContentRoute
@@ -400,6 +426,7 @@ export interface FileRoutesByTo {
   '/api/public/photo/$': typeof ApiPublicPhotoSplatRoute
   '/admin/apartment': typeof AuthenticatedAdminApartmentIndexRoute
   '/admin/fabrics': typeof AuthenticatedAdminFabricsIndexRoute
+  '/admin/page-blocks': typeof AuthenticatedAdminPageBlocksIndexRoute
   '/admin/partners': typeof AuthenticatedAdminPartnersIndexRoute
 }
 export interface FileRoutesById {
@@ -430,6 +457,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/forms': typeof AuthenticatedAdminFormsRoute
   '/_authenticated/admin/gallery': typeof AuthenticatedAdminGalleryRoute
   '/_authenticated/admin/home-blocks': typeof AuthenticatedAdminHomeBlocksRoute
+  '/_authenticated/admin/home-slides': typeof AuthenticatedAdminHomeSlidesRoute
   '/_authenticated/admin/integrations': typeof AuthenticatedAdminIntegrationsRoute
   '/_authenticated/admin/partner-applications': typeof AuthenticatedAdminPartnerApplicationsRoute
   '/_authenticated/admin/product-stats': typeof AuthenticatedAdminProductStatsRoute
@@ -442,6 +470,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/apartment/discounts': typeof AuthenticatedAdminApartmentDiscountsRoute
   '/_authenticated/admin/fabrics/$id': typeof AuthenticatedAdminFabricsIdRoute
   '/_authenticated/admin/fabrics/categories': typeof AuthenticatedAdminFabricsCategoriesRoute
+  '/_authenticated/admin/page-blocks/$pageKey': typeof AuthenticatedAdminPageBlocksPageKeyRoute
   '/_authenticated/admin/partners/$id': typeof AuthenticatedAdminPartnersIdRoute
   '/_authenticated/admin/partners/categories': typeof AuthenticatedAdminPartnersCategoriesRoute
   '/_authenticated/admin/partners/content': typeof AuthenticatedAdminPartnersContentRoute
@@ -449,6 +478,7 @@ export interface FileRoutesById {
   '/api/public/photo/$': typeof ApiPublicPhotoSplatRoute
   '/_authenticated/admin/apartment/': typeof AuthenticatedAdminApartmentIndexRoute
   '/_authenticated/admin/fabrics/': typeof AuthenticatedAdminFabricsIndexRoute
+  '/_authenticated/admin/page-blocks/': typeof AuthenticatedAdminPageBlocksIndexRoute
   '/_authenticated/admin/partners/': typeof AuthenticatedAdminPartnersIndexRoute
 }
 export interface FileRouteTypes {
@@ -479,6 +509,7 @@ export interface FileRouteTypes {
     | '/admin/forms'
     | '/admin/gallery'
     | '/admin/home-blocks'
+    | '/admin/home-slides'
     | '/admin/integrations'
     | '/admin/partner-applications'
     | '/admin/product-stats'
@@ -491,6 +522,7 @@ export interface FileRouteTypes {
     | '/admin/apartment/discounts'
     | '/admin/fabrics/$id'
     | '/admin/fabrics/categories'
+    | '/admin/page-blocks/$pageKey'
     | '/admin/partners/$id'
     | '/admin/partners/categories'
     | '/admin/partners/content'
@@ -498,6 +530,7 @@ export interface FileRouteTypes {
     | '/api/public/photo/$'
     | '/admin/apartment/'
     | '/admin/fabrics/'
+    | '/admin/page-blocks/'
     | '/admin/partners/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -525,6 +558,7 @@ export interface FileRouteTypes {
     | '/admin/forms'
     | '/admin/gallery'
     | '/admin/home-blocks'
+    | '/admin/home-slides'
     | '/admin/integrations'
     | '/admin/partner-applications'
     | '/admin/product-stats'
@@ -537,6 +571,7 @@ export interface FileRouteTypes {
     | '/admin/apartment/discounts'
     | '/admin/fabrics/$id'
     | '/admin/fabrics/categories'
+    | '/admin/page-blocks/$pageKey'
     | '/admin/partners/$id'
     | '/admin/partners/categories'
     | '/admin/partners/content'
@@ -544,6 +579,7 @@ export interface FileRouteTypes {
     | '/api/public/photo/$'
     | '/admin/apartment'
     | '/admin/fabrics'
+    | '/admin/page-blocks'
     | '/admin/partners'
   id:
     | '__root__'
@@ -573,6 +609,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/forms'
     | '/_authenticated/admin/gallery'
     | '/_authenticated/admin/home-blocks'
+    | '/_authenticated/admin/home-slides'
     | '/_authenticated/admin/integrations'
     | '/_authenticated/admin/partner-applications'
     | '/_authenticated/admin/product-stats'
@@ -585,6 +622,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/apartment/discounts'
     | '/_authenticated/admin/fabrics/$id'
     | '/_authenticated/admin/fabrics/categories'
+    | '/_authenticated/admin/page-blocks/$pageKey'
     | '/_authenticated/admin/partners/$id'
     | '/_authenticated/admin/partners/categories'
     | '/_authenticated/admin/partners/content'
@@ -592,6 +630,7 @@ export interface FileRouteTypes {
     | '/api/public/photo/$'
     | '/_authenticated/admin/apartment/'
     | '/_authenticated/admin/fabrics/'
+    | '/_authenticated/admin/page-blocks/'
     | '/_authenticated/admin/partners/'
   fileRoutesById: FileRoutesById
 }
@@ -784,6 +823,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIntegrationsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/home-slides': {
+      id: '/_authenticated/admin/home-slides'
+      path: '/admin/home-slides'
+      fullPath: '/admin/home-slides'
+      preLoaderRoute: typeof AuthenticatedAdminHomeSlidesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/home-blocks': {
       id: '/_authenticated/admin/home-blocks'
       path: '/admin/home-blocks'
@@ -854,6 +900,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminPartnersIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/page-blocks/': {
+      id: '/_authenticated/admin/page-blocks/'
+      path: '/admin/page-blocks'
+      fullPath: '/admin/page-blocks/'
+      preLoaderRoute: typeof AuthenticatedAdminPageBlocksIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/fabrics/': {
       id: '/_authenticated/admin/fabrics/'
       path: '/admin/fabrics'
@@ -901,6 +954,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/partners/$id'
       fullPath: '/admin/partners/$id'
       preLoaderRoute: typeof AuthenticatedAdminPartnersIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/page-blocks/$pageKey': {
+      id: '/_authenticated/admin/page-blocks/$pageKey'
+      path: '/admin/page-blocks/$pageKey'
+      fullPath: '/admin/page-blocks/$pageKey'
+      preLoaderRoute: typeof AuthenticatedAdminPageBlocksPageKeyRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/fabrics/categories': {
@@ -975,6 +1035,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminFormsRoute: typeof AuthenticatedAdminFormsRoute
   AuthenticatedAdminGalleryRoute: typeof AuthenticatedAdminGalleryRoute
   AuthenticatedAdminHomeBlocksRoute: typeof AuthenticatedAdminHomeBlocksRoute
+  AuthenticatedAdminHomeSlidesRoute: typeof AuthenticatedAdminHomeSlidesRoute
   AuthenticatedAdminIntegrationsRoute: typeof AuthenticatedAdminIntegrationsRoute
   AuthenticatedAdminPartnerApplicationsRoute: typeof AuthenticatedAdminPartnerApplicationsRoute
   AuthenticatedAdminProductStatsRoute: typeof AuthenticatedAdminProductStatsRoute
@@ -984,11 +1045,13 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedAdminFabricsIdRoute: typeof AuthenticatedAdminFabricsIdRoute
   AuthenticatedAdminFabricsCategoriesRoute: typeof AuthenticatedAdminFabricsCategoriesRoute
+  AuthenticatedAdminPageBlocksPageKeyRoute: typeof AuthenticatedAdminPageBlocksPageKeyRoute
   AuthenticatedAdminPartnersIdRoute: typeof AuthenticatedAdminPartnersIdRoute
   AuthenticatedAdminPartnersCategoriesRoute: typeof AuthenticatedAdminPartnersCategoriesRoute
   AuthenticatedAdminPartnersContentRoute: typeof AuthenticatedAdminPartnersContentRoute
   AuthenticatedAdminProductsIdRoute: typeof AuthenticatedAdminProductsIdRoute
   AuthenticatedAdminFabricsIndexRoute: typeof AuthenticatedAdminFabricsIndexRoute
+  AuthenticatedAdminPageBlocksIndexRoute: typeof AuthenticatedAdminPageBlocksIndexRoute
   AuthenticatedAdminPartnersIndexRoute: typeof AuthenticatedAdminPartnersIndexRoute
 }
 
@@ -1003,6 +1066,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminFormsRoute: AuthenticatedAdminFormsRoute,
   AuthenticatedAdminGalleryRoute: AuthenticatedAdminGalleryRoute,
   AuthenticatedAdminHomeBlocksRoute: AuthenticatedAdminHomeBlocksRoute,
+  AuthenticatedAdminHomeSlidesRoute: AuthenticatedAdminHomeSlidesRoute,
   AuthenticatedAdminIntegrationsRoute: AuthenticatedAdminIntegrationsRoute,
   AuthenticatedAdminPartnerApplicationsRoute:
     AuthenticatedAdminPartnerApplicationsRoute,
@@ -1014,6 +1078,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminFabricsIdRoute: AuthenticatedAdminFabricsIdRoute,
   AuthenticatedAdminFabricsCategoriesRoute:
     AuthenticatedAdminFabricsCategoriesRoute,
+  AuthenticatedAdminPageBlocksPageKeyRoute:
+    AuthenticatedAdminPageBlocksPageKeyRoute,
   AuthenticatedAdminPartnersIdRoute: AuthenticatedAdminPartnersIdRoute,
   AuthenticatedAdminPartnersCategoriesRoute:
     AuthenticatedAdminPartnersCategoriesRoute,
@@ -1021,6 +1087,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedAdminPartnersContentRoute,
   AuthenticatedAdminProductsIdRoute: AuthenticatedAdminProductsIdRoute,
   AuthenticatedAdminFabricsIndexRoute: AuthenticatedAdminFabricsIndexRoute,
+  AuthenticatedAdminPageBlocksIndexRoute:
+    AuthenticatedAdminPageBlocksIndexRoute,
   AuthenticatedAdminPartnersIndexRoute: AuthenticatedAdminPartnersIndexRoute,
 }
 
