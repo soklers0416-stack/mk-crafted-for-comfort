@@ -98,6 +98,38 @@ export type CustomerPhoto = { id: string; photo: string; city: string; model: st
 export type GalleryItem = { id: string; photo: string; category: string; caption: string; sort_order: number };
 export type Faq = { id: string; question: string; answer: string; sort_order: number };
 
+export type PartnerCategory = { id: string; slug: string; title: string; sort_order: number };
+export type PartnerSocial = { type: string; url: string };
+export type Partner = {
+  id: string;
+  title: string;
+  category_slug: string;
+  description: string;
+  advantages: string[];
+  phone: string;
+  email: string;
+  website: string;
+  socials: PartnerSocial[];
+  logo: string | null;
+  main_photo: string | null;
+  gallery: string[];
+  recommended_for: string[];
+  is_active: boolean;
+  sort_order: number;
+};
+export type PartnerApplication = {
+  id: string;
+  name: string;
+  company: string;
+  phone: string;
+  email: string;
+  website: string;
+  category_slug: string;
+  comment: string;
+  status: string;
+  created_at: string;
+};
+
 export function getGallery(p: Product): string[] {
   return [p.photo1, p.photo2, p.photo3, p.photo4, p.photo5, p.photo6].filter(
     (x): x is string => Boolean(x),

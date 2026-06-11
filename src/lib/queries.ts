@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type {
   Category, Product, Review, Fabric, FabricCategory, ProductFabric,
   AboutContent, AboutAdvantage, AboutStat, AboutStep, CustomerPhoto, GalleryItem, Faq,
+  Partner, PartnerCategory,
 } from "./db";
 
 const sb = supabase as any;
