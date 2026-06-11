@@ -55,6 +55,10 @@ export function Header() {
               <LayoutDashboard className="h-5 w-5" />
             </Link>
           )}
+          <Link to="/favorites" aria-label="Избранное" title="Избранное"
+            className="grid h-10 w-10 place-items-center rounded-full hover:bg-surface-muted">
+            <Heart className="h-5 w-5" />
+          </Link>
           <Link
             to="/cart"
             aria-label="Корзина"
