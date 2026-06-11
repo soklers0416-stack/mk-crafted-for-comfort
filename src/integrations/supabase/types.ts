@@ -260,6 +260,36 @@ export type Database = {
         }
         Relationships: []
       }
+      form_configs: {
+        Row: {
+          button_text: string
+          description: string
+          fields: Json
+          key: string
+          success_text: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          button_text?: string
+          description?: string
+          fields?: Json
+          key: string
+          success_text?: string
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          button_text?: string
+          description?: string
+          fields?: Json
+          key?: string
+          success_text?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       gallery_items: {
         Row: {
           caption: string
@@ -284,6 +314,42 @@ export type Database = {
           id?: string
           photo?: string
           sort_order?: number
+        }
+        Relationships: []
+      }
+      integrations: {
+        Row: {
+          apps_script_url: string
+          enabled: boolean
+          id: number
+          last_test_at: string | null
+          last_test_message: string
+          last_test_status: string
+          sheets_url: string
+          updated_at: string
+          webhook_url: string
+        }
+        Insert: {
+          apps_script_url?: string
+          enabled?: boolean
+          id?: number
+          last_test_at?: string | null
+          last_test_message?: string
+          last_test_status?: string
+          sheets_url?: string
+          updated_at?: string
+          webhook_url?: string
+        }
+        Update: {
+          apps_script_url?: string
+          enabled?: boolean
+          id?: number
+          last_test_at?: string | null
+          last_test_message?: string
+          last_test_status?: string
+          sheets_url?: string
+          updated_at?: string
+          webhook_url?: string
         }
         Relationships: []
       }
@@ -746,7 +812,21 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      all_applications: {
+        Row: {
+          created_at: string | null
+          data: Json | null
+          email: string | null
+          form_key: string | null
+          id: string | null
+          name: string | null
+          origin: string | null
+          phone: string | null
+          status: string | null
+          title: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_role: {
