@@ -409,3 +409,23 @@ function ProductPage() {
     </div>
   );
 }
+
+function RecentlyViewedSection({ excludeId }: { excludeId: string }) {
+  const [ids, setIds] = useState<string[]>([]);
+  useEffect(() => {
+    const update = () => setIds(getRecentlyViewed().filter((x) => x !== excludeId).slice(0, 4));
+    update();
+    return subscribeRecent(update);
+  }, [excludeId]);
+  const { data: all = [] } = useQuery(productsQuery);
+  const items = ids.map((id) => all.find((p) => p.id === id)).filter(Boolean) as any[];
+  if (items.length === 0) return null;
+  return (
+    <section className="mt-16">
+      <h2 className="font-display text-2xl font-bold md:text-3xl">Вы недавно смотрели</h2>
+      <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {items.map((p) => <ProductCard key={p.id} product={p} />)}
+      </div>
+    </section>
+  );
+}
