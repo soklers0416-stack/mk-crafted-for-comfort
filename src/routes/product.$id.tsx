@@ -68,7 +68,9 @@ function ProductPage() {
   const gallery = getGallery(product);
   const currentImg = activeImg ?? gallery[0] ?? null;
   const sale = product.sale_enabled ? product : null;
-  const displayPrice = sale?.sale_new_price ?? product.price;
+  const basePrice = sale?.sale_new_price ?? product.price;
+  const surcharge = selectedFabric?.surcharge ?? 0;
+  const displayPrice = basePrice + surcharge;
   const category = categories.find((c) => c.slug === product.category_slug);
   const similar = allProducts.filter((p) => p.category_slug === product.category_slug && p.id !== product.id).slice(0, 4);
 
