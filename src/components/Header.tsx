@@ -10,6 +10,7 @@ const nav = [
   { to: "/fabrics", label: "Ткани" },
   { to: "/promotions", label: "Акции" },
   { to: "/apartment", label: "Квартира под ключ" },
+  { to: "/partners", label: "Партнёры" },
   { to: "/reviews", label: "Отзывы" },
   { to: "/about", label: "О компании" },
   { to: "/delivery", label: "Доставка и оплата" },
