@@ -267,7 +267,7 @@ function PickerList({
   category, products, selected, onPick, onUnpick,
 }: {
   category: ApartmentCategory;
-  products: ReturnType<typeof useQuery<typeof productsQuery extends { queryFn: infer F } ? F extends () => Promise<infer R> ? R : never : never>>["data"] extends infer T ? NonNullable<T> : never;
+  products: Product[];
   selected: string[];
   onPick: (id: string) => void;
   onUnpick: (id: string) => void;
