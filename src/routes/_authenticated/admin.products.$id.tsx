@@ -201,6 +201,32 @@ function EditProduct() {
             </div>
           </Section>
 
+          {/* Доступные ткани */}
+          <Section title="Доступные ткани">
+            <p className="text-xs text-muted-foreground">Отметьте ткани, доступные для выбора в этом товаре. Если ничего не отметить — будут доступны все ткани.</p>
+            {fabCats.map((c) => {
+              const list = fabrics.filter((f) => f.category_slug === c.slug);
+              if (list.length === 0) return null;
+              return (
+                <div key={c.slug} className="mt-3">
+                  <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{c.title}</div>
+                  <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                    {list.map((f) => (
+                      <label key={f.id} className="flex items-center gap-2 rounded-lg border border-border bg-background px-2 py-1.5 text-xs">
+                        <input type="checkbox" checked={selectedFabrics.has(f.id)} onChange={() => toggleFabric(f.id)} />
+                        {f.sample_photo && <img src={f.sample_photo} alt="" className="h-6 w-6 rounded object-cover" />}
+                        <span className="truncate">{f.title}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+            {fabrics.length === 0 && <p className="text-sm text-muted-foreground">Сначала добавьте ткани в разделе «Ткани».</p>}
+          </Section>
+
+
+
           {/* Размеры */}
           <Section
             title="Размеры и цены"
