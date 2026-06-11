@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as ReviewsRouteImport } from './routes/reviews'
 import { Route as PromotionsRouteImport } from './routes/promotions'
 import { Route as PartnersRouteImport } from './routes/partners'
+import { Route as FavoritesRouteImport } from './routes/favorites'
 import { Route as FabricsRouteImport } from './routes/fabrics'
 import { Route as DeliveryRouteImport } from './routes/delivery'
 import { Route as ContactsRouteImport } from './routes/contacts'
@@ -29,8 +30,10 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminSpecsRouteImport } from './routes/_authenticated/admin.specs'
 import { Route as AuthenticatedAdminReviewsRouteImport } from './routes/_authenticated/admin.reviews'
 import { Route as AuthenticatedAdminRequestsRouteImport } from './routes/_authenticated/admin.requests'
+import { Route as AuthenticatedAdminProductStatsRouteImport } from './routes/_authenticated/admin.product-stats'
 import { Route as AuthenticatedAdminPartnerApplicationsRouteImport } from './routes/_authenticated/admin.partner-applications'
 import { Route as AuthenticatedAdminIntegrationsRouteImport } from './routes/_authenticated/admin.integrations'
+import { Route as AuthenticatedAdminHomeBlocksRouteImport } from './routes/_authenticated/admin.home-blocks'
 import { Route as AuthenticatedAdminGalleryRouteImport } from './routes/_authenticated/admin.gallery'
 import { Route as AuthenticatedAdminFormsRouteImport } from './routes/_authenticated/admin.forms'
 import { Route as AuthenticatedAdminFaqsRouteImport } from './routes/_authenticated/admin.faqs'
@@ -66,6 +69,11 @@ const PromotionsRoute = PromotionsRouteImport.update({
 const PartnersRoute = PartnersRouteImport.update({
   id: '/partners',
   path: '/partners',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FavoritesRoute = FavoritesRouteImport.update({
+  id: '/favorites',
+  path: '/favorites',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FabricsRoute = FabricsRouteImport.update({
@@ -154,6 +162,12 @@ const AuthenticatedAdminRequestsRoute =
     path: '/admin/requests',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminProductStatsRoute =
+  AuthenticatedAdminProductStatsRouteImport.update({
+    id: '/admin/product-stats',
+    path: '/admin/product-stats',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminPartnerApplicationsRoute =
   AuthenticatedAdminPartnerApplicationsRouteImport.update({
     id: '/admin/partner-applications',
@@ -164,6 +178,12 @@ const AuthenticatedAdminIntegrationsRoute =
   AuthenticatedAdminIntegrationsRouteImport.update({
     id: '/admin/integrations',
     path: '/admin/integrations',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminHomeBlocksRoute =
+  AuthenticatedAdminHomeBlocksRouteImport.update({
+    id: '/admin/home-blocks',
+    path: '/admin/home-blocks',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAdminGalleryRoute =
@@ -299,6 +319,7 @@ export interface FileRoutesByFullPath {
   '/contacts': typeof ContactsRoute
   '/delivery': typeof DeliveryRoute
   '/fabrics': typeof FabricsRouteWithChildren
+  '/favorites': typeof FavoritesRoute
   '/partners': typeof PartnersRouteWithChildren
   '/promotions': typeof PromotionsRoute
   '/reviews': typeof ReviewsRoute
@@ -313,8 +334,10 @@ export interface FileRoutesByFullPath {
   '/admin/faqs': typeof AuthenticatedAdminFaqsRoute
   '/admin/forms': typeof AuthenticatedAdminFormsRoute
   '/admin/gallery': typeof AuthenticatedAdminGalleryRoute
+  '/admin/home-blocks': typeof AuthenticatedAdminHomeBlocksRoute
   '/admin/integrations': typeof AuthenticatedAdminIntegrationsRoute
   '/admin/partner-applications': typeof AuthenticatedAdminPartnerApplicationsRoute
+  '/admin/product-stats': typeof AuthenticatedAdminProductStatsRoute
   '/admin/requests': typeof AuthenticatedAdminRequestsRoute
   '/admin/reviews': typeof AuthenticatedAdminReviewsRoute
   '/admin/specs': typeof AuthenticatedAdminSpecsRoute
@@ -343,6 +366,7 @@ export interface FileRoutesByTo {
   '/contacts': typeof ContactsRoute
   '/delivery': typeof DeliveryRoute
   '/fabrics': typeof FabricsRouteWithChildren
+  '/favorites': typeof FavoritesRoute
   '/partners': typeof PartnersRouteWithChildren
   '/promotions': typeof PromotionsRoute
   '/reviews': typeof ReviewsRoute
@@ -356,8 +380,10 @@ export interface FileRoutesByTo {
   '/admin/faqs': typeof AuthenticatedAdminFaqsRoute
   '/admin/forms': typeof AuthenticatedAdminFormsRoute
   '/admin/gallery': typeof AuthenticatedAdminGalleryRoute
+  '/admin/home-blocks': typeof AuthenticatedAdminHomeBlocksRoute
   '/admin/integrations': typeof AuthenticatedAdminIntegrationsRoute
   '/admin/partner-applications': typeof AuthenticatedAdminPartnerApplicationsRoute
+  '/admin/product-stats': typeof AuthenticatedAdminProductStatsRoute
   '/admin/requests': typeof AuthenticatedAdminRequestsRoute
   '/admin/reviews': typeof AuthenticatedAdminReviewsRoute
   '/admin/specs': typeof AuthenticatedAdminSpecsRoute
@@ -388,6 +414,7 @@ export interface FileRoutesById {
   '/contacts': typeof ContactsRoute
   '/delivery': typeof DeliveryRoute
   '/fabrics': typeof FabricsRouteWithChildren
+  '/favorites': typeof FavoritesRoute
   '/partners': typeof PartnersRouteWithChildren
   '/promotions': typeof PromotionsRoute
   '/reviews': typeof ReviewsRoute
@@ -402,8 +429,10 @@ export interface FileRoutesById {
   '/_authenticated/admin/faqs': typeof AuthenticatedAdminFaqsRoute
   '/_authenticated/admin/forms': typeof AuthenticatedAdminFormsRoute
   '/_authenticated/admin/gallery': typeof AuthenticatedAdminGalleryRoute
+  '/_authenticated/admin/home-blocks': typeof AuthenticatedAdminHomeBlocksRoute
   '/_authenticated/admin/integrations': typeof AuthenticatedAdminIntegrationsRoute
   '/_authenticated/admin/partner-applications': typeof AuthenticatedAdminPartnerApplicationsRoute
+  '/_authenticated/admin/product-stats': typeof AuthenticatedAdminProductStatsRoute
   '/_authenticated/admin/requests': typeof AuthenticatedAdminRequestsRoute
   '/_authenticated/admin/reviews': typeof AuthenticatedAdminReviewsRoute
   '/_authenticated/admin/specs': typeof AuthenticatedAdminSpecsRoute
@@ -434,6 +463,7 @@ export interface FileRouteTypes {
     | '/contacts'
     | '/delivery'
     | '/fabrics'
+    | '/favorites'
     | '/partners'
     | '/promotions'
     | '/reviews'
@@ -448,8 +478,10 @@ export interface FileRouteTypes {
     | '/admin/faqs'
     | '/admin/forms'
     | '/admin/gallery'
+    | '/admin/home-blocks'
     | '/admin/integrations'
     | '/admin/partner-applications'
+    | '/admin/product-stats'
     | '/admin/requests'
     | '/admin/reviews'
     | '/admin/specs'
@@ -478,6 +510,7 @@ export interface FileRouteTypes {
     | '/contacts'
     | '/delivery'
     | '/fabrics'
+    | '/favorites'
     | '/partners'
     | '/promotions'
     | '/reviews'
@@ -491,8 +524,10 @@ export interface FileRouteTypes {
     | '/admin/faqs'
     | '/admin/forms'
     | '/admin/gallery'
+    | '/admin/home-blocks'
     | '/admin/integrations'
     | '/admin/partner-applications'
+    | '/admin/product-stats'
     | '/admin/requests'
     | '/admin/reviews'
     | '/admin/specs'
@@ -522,6 +557,7 @@ export interface FileRouteTypes {
     | '/contacts'
     | '/delivery'
     | '/fabrics'
+    | '/favorites'
     | '/partners'
     | '/promotions'
     | '/reviews'
@@ -536,8 +572,10 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/faqs'
     | '/_authenticated/admin/forms'
     | '/_authenticated/admin/gallery'
+    | '/_authenticated/admin/home-blocks'
     | '/_authenticated/admin/integrations'
     | '/_authenticated/admin/partner-applications'
+    | '/_authenticated/admin/product-stats'
     | '/_authenticated/admin/requests'
     | '/_authenticated/admin/reviews'
     | '/_authenticated/admin/specs'
@@ -568,6 +606,7 @@ export interface RootRouteChildren {
   ContactsRoute: typeof ContactsRoute
   DeliveryRoute: typeof DeliveryRoute
   FabricsRoute: typeof FabricsRouteWithChildren
+  FavoritesRoute: typeof FavoritesRoute
   PartnersRoute: typeof PartnersRouteWithChildren
   PromotionsRoute: typeof PromotionsRoute
   ReviewsRoute: typeof ReviewsRoute
@@ -596,6 +635,13 @@ declare module '@tanstack/react-router' {
       path: '/partners'
       fullPath: '/partners'
       preLoaderRoute: typeof PartnersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/favorites': {
+      id: '/favorites'
+      path: '/favorites'
+      fullPath: '/favorites'
+      preLoaderRoute: typeof FavoritesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/fabrics': {
@@ -717,6 +763,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRequestsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/product-stats': {
+      id: '/_authenticated/admin/product-stats'
+      path: '/admin/product-stats'
+      fullPath: '/admin/product-stats'
+      preLoaderRoute: typeof AuthenticatedAdminProductStatsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/partner-applications': {
       id: '/_authenticated/admin/partner-applications'
       path: '/admin/partner-applications'
@@ -729,6 +782,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/integrations'
       fullPath: '/admin/integrations'
       preLoaderRoute: typeof AuthenticatedAdminIntegrationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/home-blocks': {
+      id: '/_authenticated/admin/home-blocks'
+      path: '/admin/home-blocks'
+      fullPath: '/admin/home-blocks'
+      preLoaderRoute: typeof AuthenticatedAdminHomeBlocksRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/gallery': {
@@ -914,8 +974,10 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminFaqsRoute: typeof AuthenticatedAdminFaqsRoute
   AuthenticatedAdminFormsRoute: typeof AuthenticatedAdminFormsRoute
   AuthenticatedAdminGalleryRoute: typeof AuthenticatedAdminGalleryRoute
+  AuthenticatedAdminHomeBlocksRoute: typeof AuthenticatedAdminHomeBlocksRoute
   AuthenticatedAdminIntegrationsRoute: typeof AuthenticatedAdminIntegrationsRoute
   AuthenticatedAdminPartnerApplicationsRoute: typeof AuthenticatedAdminPartnerApplicationsRoute
+  AuthenticatedAdminProductStatsRoute: typeof AuthenticatedAdminProductStatsRoute
   AuthenticatedAdminRequestsRoute: typeof AuthenticatedAdminRequestsRoute
   AuthenticatedAdminReviewsRoute: typeof AuthenticatedAdminReviewsRoute
   AuthenticatedAdminSpecsRoute: typeof AuthenticatedAdminSpecsRoute
@@ -940,9 +1002,11 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminFaqsRoute: AuthenticatedAdminFaqsRoute,
   AuthenticatedAdminFormsRoute: AuthenticatedAdminFormsRoute,
   AuthenticatedAdminGalleryRoute: AuthenticatedAdminGalleryRoute,
+  AuthenticatedAdminHomeBlocksRoute: AuthenticatedAdminHomeBlocksRoute,
   AuthenticatedAdminIntegrationsRoute: AuthenticatedAdminIntegrationsRoute,
   AuthenticatedAdminPartnerApplicationsRoute:
     AuthenticatedAdminPartnerApplicationsRoute,
+  AuthenticatedAdminProductStatsRoute: AuthenticatedAdminProductStatsRoute,
   AuthenticatedAdminRequestsRoute: AuthenticatedAdminRequestsRoute,
   AuthenticatedAdminReviewsRoute: AuthenticatedAdminReviewsRoute,
   AuthenticatedAdminSpecsRoute: AuthenticatedAdminSpecsRoute,
@@ -997,6 +1061,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactsRoute: ContactsRoute,
   DeliveryRoute: DeliveryRoute,
   FabricsRoute: FabricsRouteWithChildren,
+  FavoritesRoute: FavoritesRoute,
   PartnersRoute: PartnersRouteWithChildren,
   PromotionsRoute: PromotionsRoute,
   ReviewsRoute: ReviewsRoute,

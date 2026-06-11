@@ -54,6 +54,8 @@ function AdminLayout() {
     { to: "/admin/reviews", label: "Отзывы" },
     { to: "/admin/applications", label: "Заявки" },
     { to: "/admin/forms", label: "Формы заявок" },
+    { to: "/admin/home-blocks", label: "Блоки главной" },
+    { to: "/admin/product-stats", label: "Статистика товаров" },
     { to: "/admin/integrations", label: "Интеграции" },
   ];
 

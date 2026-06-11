@@ -14,6 +14,9 @@ import { formatPrice, useCart } from "@/lib/cart";
 import { categoriesQuery, productsQuery, productQuery, fabricsQuery, specMechanismsQuery, specFillingsQuery } from "@/lib/queries";
 import { getGallery } from "@/lib/db";
 import { getSelectedFabric, setSelectedFabric, subscribeFabric } from "@/lib/productFabric";
+import { incrementStat } from "@/lib/favorites";
+import { pushRecentlyViewed, getRecentlyViewed, subscribeRecent } from "@/lib/recentlyViewed";
+import { ShareButton } from "@/components/ShareButton";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/product/$id")({
@@ -52,6 +55,12 @@ function ProductPage() {
     setFabricId(getSelectedFabric(id));
     return subscribeFabric(() => setFabricId(getSelectedFabric(id)));
   }, [id]);
+
+  useEffect(() => {
+    incrementStat(id, "views");
+    pushRecentlyViewed(id);
+  }, [id]);
+
 
   const selectedFabric = fabrics.find((f) => f.id === fabricId) ?? null;
   const mechanismInfo = useMemo(() => mechanisms.find((m) => m.id === product?.mechanism_id) ?? null, [mechanisms, product?.mechanism_id]);
@@ -241,11 +250,12 @@ function ProductPage() {
             {sale?.sale_text && <p className="mt-1 text-sm font-medium text-red-600">{sale.sale_text}</p>}
 
             <div className="mt-6 flex flex-wrap items-center gap-3">
-              <button onClick={() => { add(product.id); toast.success("Добавлено в корзину"); }}
+              <button onClick={() => { add(product.id); incrementStat(product.id, "cart_adds"); toast.success("Добавлено в корзину"); }}
                 className="inline-flex h-12 items-center gap-2 rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground transition hover:bg-primary/90">
                 <ShoppingBag className="h-4 w-4" />В корзину
               </button>
               <FavoriteButton id={product.id} className="h-12 w-12" />
+              <ShareButton title={product.title} />
               <button onClick={() => setQuestionOpen(true)} className="inline-flex h-12 items-center rounded-full border border-border bg-card px-6 text-sm font-medium transition hover:border-primary hover:text-primary">Я просто спросить</button>
               <button onClick={() => setDeliveryOpen(true)} className="inline-flex h-12 items-center rounded-full border border-border bg-card px-6 text-sm font-medium transition hover:border-primary hover:text-primary">Рассчитать доставку</button>
               <button onClick={() => setInstallmentOpen(true)} className="inline-flex h-12 items-center gap-2 rounded-full border border-border bg-card px-6 text-sm font-medium transition hover:border-primary hover:text-primary"><CreditCard className="h-4 w-4" />Рассрочка</button>
@@ -340,6 +350,8 @@ function ProductPage() {
             </div>
           </section>
         )}
+
+        <RecentlyViewedSection excludeId={id} />
       </div>
 
       <Footer />
@@ -396,5 +408,25 @@ function ProductPage() {
         onSelect={(f) => { setSelectedFabric(product.id, f.id); toast.success(`Ткань выбрана: ${f.title}`); }}
       />
     </div>
+  );
+}
+
+function RecentlyViewedSection({ excludeId }: { excludeId: string }) {
+  const [ids, setIds] = useState<string[]>([]);
+  useEffect(() => {
+    const update = () => setIds(getRecentlyViewed().filter((x) => x !== excludeId).slice(0, 4));
+    update();
+    return subscribeRecent(update);
+  }, [excludeId]);
+  const { data: all = [] } = useQuery(productsQuery);
+  const items = ids.map((id) => all.find((p) => p.id === id)).filter(Boolean) as any[];
+  if (items.length === 0) return null;
+  return (
+    <section className="mt-16">
+      <h2 className="font-display text-2xl font-bold md:text-3xl">Вы недавно смотрели</h2>
+      <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {items.map((p) => <ProductCard key={p.id} product={p} />)}
+      </div>
+    </section>
   );
 }

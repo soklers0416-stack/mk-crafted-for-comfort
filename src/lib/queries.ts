@@ -240,3 +240,23 @@ export const specFillingsQuery = queryOptions({
   },
 });
 
+
+export type ProductStat = { product_id: string; views: number; likes: number; cart_adds: number };
+export const productStatsQuery = queryOptions({
+  queryKey: ["product_stats"],
+  queryFn: async (): Promise<ProductStat[]> => {
+    const { data, error } = await sb.from("product_stats").select("*");
+    if (error) throw error;
+    return (data ?? []) as ProductStat[];
+  },
+});
+
+export type HomeBlock = { key: string; title: string; enabled: boolean; sort_order: number };
+export const homeBlocksQuery = queryOptions({
+  queryKey: ["home_blocks"],
+  queryFn: async (): Promise<HomeBlock[]> => {
+    const { data, error } = await sb.from("home_blocks").select("*").order("sort_order");
+    if (error) throw error;
+    return (data ?? []) as HomeBlock[];
+  },
+});

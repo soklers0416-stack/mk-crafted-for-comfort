@@ -8,7 +8,9 @@ import { ProductCard } from "@/components/ProductCard";
 import { ContactDialog } from "@/components/ContactDialog";
 import { advantages, heroFeatures } from "@/lib/data";
 import { useQuery } from "@tanstack/react-query";
-import { productsQuery, reviewsQuery } from "@/lib/queries";
+import { productsQuery, reviewsQuery, productStatsQuery, homeBlocksQuery } from "@/lib/queries";
+import { getRecentlyViewed, subscribeRecent } from "@/lib/recentlyViewed";
+import { useEffect as useEffectReact } from "react";
 import hero from "@/assets/hero-living.jpg";
 import apartmentImg from "@/assets/apartment.jpg";
 import factory from "@/assets/factory.jpg";
@@ -37,7 +39,35 @@ function HomePage() {
   const [contactOpen, setContactOpen] = useState(false);
   const { data: allProducts = [] } = useQuery(productsQuery);
   const { data: reviews = [] } = useQuery(reviewsQuery);
-  const bestsellers = allProducts.filter((p) => p.is_bestseller).slice(0, 4);
+  const { data: stats = [] } = useQuery(productStatsQuery);
+  const { data: blocks = [] } = useQuery(homeBlocksQuery);
+  const statMap = new Map(stats.map((s) => [s.product_id, s]));
+  const likesOf = (id: string) => statMap.get(id)?.likes ?? 0;
+  const viewsOf = (id: string) => statMap.get(id)?.views ?? 0;
+  const manualHits = allProducts.filter((p) => p.is_bestseller);
+  const autoHits = [...allProducts].sort((a, b) => likesOf(b.id) - likesOf(a.id)).filter((p) => likesOf(p.id) > 0);
+  const seen = new Set<string>();
+  const bestsellers = [...manualHits, ...autoHits].filter((p) => (seen.has(p.id) ? false : (seen.add(p.id), true))).slice(0, 4);
+  const popular = [...allProducts]
+    .map((p) => ({ p, score: viewsOf(p.id) * 1 + likesOf(p.id) * 3 }))
+    .sort((a, b) => b.score - a.score)
+    .filter((x) => x.score > 0)
+    .slice(0, 4)
+    .map((x) => x.p);
+
+  const [recentIds, setRecentIds] = useState<string[]>([]);
+  useEffectReact(() => {
+    const upd = () => setRecentIds(getRecentlyViewed());
+    upd();
+    return subscribeRecent(upd);
+  }, []);
+  const recent = recentIds.map((id) => allProducts.find((p) => p.id === id)).filter(Boolean).slice(0, 4) as typeof allProducts;
+
+  const blockEnabled = (key: string) => {
+    const b = blocks.find((x) => x.key === key);
+    return b ? b.enabled : true;
+  };
+  const blockTitle = (key: string, fallback: string) => blocks.find((x) => x.key === key)?.title ?? fallback;
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -129,24 +159,54 @@ function HomePage() {
       </section>
 
       {/* BESTSELLERS */}
-      <section className="mx-auto mt-24 max-w-7xl px-4 md:px-8">
-        <div className="flex items-end justify-between gap-4">
-          <div>
-            <p className="text-sm font-medium uppercase tracking-wider text-primary">Популярное</p>
-            <h2 className="mt-2 font-display text-3xl font-bold tracking-tight md:text-4xl">
-              Хиты продаж
-            </h2>
+      {blockEnabled("bestsellers") && bestsellers.length > 0 && (
+        <section className="mx-auto mt-24 max-w-7xl px-4 md:px-8">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <p className="text-sm font-medium uppercase tracking-wider text-primary">Популярное</p>
+              <h2 className="mt-2 font-display text-3xl font-bold tracking-tight md:text-4xl">
+                {blockTitle("bestsellers", "Хиты продаж")}
+              </h2>
+            </div>
+            <Link to="/catalog" className="hidden sm:inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
+              Весь каталог <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
-          <Link to="/catalog" className="hidden sm:inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
-            Весь каталог <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
-        <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {bestsellers.map((p) => (
-            <ProductCard key={p.id} product={p} />
-          ))}
-        </div>
-      </section>
+          <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {bestsellers.map((p) => (<ProductCard key={p.id} product={p} />))}
+          </div>
+        </section>
+      )}
+
+      {/* POPULAR NOW */}
+      {blockEnabled("popular") && popular.length > 0 && (
+        <section className="mx-auto mt-24 max-w-7xl px-4 md:px-8">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <p className="text-sm font-medium uppercase tracking-wider text-primary">Тренд</p>
+              <h2 className="mt-2 font-display text-3xl font-bold tracking-tight md:text-4xl">
+                {blockTitle("popular", "Популярное сейчас")}
+              </h2>
+            </div>
+          </div>
+          <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {popular.map((p) => (<ProductCard key={p.id} product={p} />))}
+          </div>
+        </section>
+      )}
+
+      {/* RECENTLY VIEWED */}
+      {blockEnabled("recently_viewed") && recent.length > 0 && (
+        <section className="mx-auto mt-24 max-w-7xl px-4 md:px-8">
+          <h2 className="font-display text-3xl font-bold tracking-tight md:text-4xl">
+            {blockTitle("recently_viewed", "Вы недавно смотрели")}
+          </h2>
+          <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {recent.map((p) => (<ProductCard key={p.id} product={p} />))}
+          </div>
+        </section>
+      )}
+
 
       {/* ADVANTAGES */}
       <section className="mx-auto mt-24 max-w-7xl px-4 md:px-8">

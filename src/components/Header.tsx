@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Menu, ShoppingBag, X, LayoutDashboard } from "lucide-react";
+import { Menu, ShoppingBag, X, LayoutDashboard, Heart } from "lucide-react";
 import { useState } from "react";
 import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
@@ -55,6 +55,10 @@ export function Header() {
               <LayoutDashboard className="h-5 w-5" />
             </Link>
           )}
+          <Link to="/favorites" aria-label="Избранное" title="Избранное"
+            className="grid h-10 w-10 place-items-center rounded-full hover:bg-surface-muted">
+            <Heart className="h-5 w-5" />
+          </Link>
           <Link
             to="/cart"
             aria-label="Корзина"

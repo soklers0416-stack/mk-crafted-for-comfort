@@ -4,6 +4,7 @@ import { ShoppingBag } from "lucide-react";
 import { formatPrice, useCart } from "@/lib/cart";
 import type { Product } from "@/lib/db";
 import { FavoriteButton } from "@/components/FavoriteButton";
+import { incrementStat } from "@/lib/favorites";
 import { toast } from "sonner";
 
 export function ProductCard({ product }: { product: Product }) {
@@ -97,7 +98,7 @@ export function ProductCard({ product }: { product: Product }) {
             Подробнее
           </Link>
           <button
-            onClick={() => { add(product.id); toast.success("Добавлено в корзину"); }}
+            onClick={() => { add(product.id); incrementStat(product.id, "cart_adds"); toast.success("Добавлено в корзину"); }}
             className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition hover:bg-primary/90"
           >
             <ShoppingBag className="h-4 w-4" />
