@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type {
   Category, Product, Review, Fabric, FabricCategory, ProductFabric,
   AboutContent, AboutAdvantage, AboutStat, AboutStep, CustomerPhoto, GalleryItem, Faq,
+  Partner, PartnerCategory,
 } from "./db";
 
 const sb = supabase as any;
@@ -149,5 +150,73 @@ export const faqsQuery = queryOptions({
     const { data, error } = await sb.from("faqs").select("*").order("sort_order");
     if (error) throw error;
     return (data ?? []) as Faq[];
+  },
+});
+
+export const partnerCategoriesQuery = queryOptions({
+  queryKey: ["partner_categories"],
+  queryFn: async (): Promise<PartnerCategory[]> => {
+    const { data, error } = await sb.from("partner_categories").select("*").order("sort_order");
+    if (error) throw error;
+    return (data ?? []) as PartnerCategory[];
+  },
+});
+
+function normalizePartner(p: any): Partner {
+  return {
+    ...p,
+    advantages: Array.isArray(p.advantages) ? p.advantages : [],
+    socials: Array.isArray(p.socials) ? p.socials : [],
+    gallery: Array.isArray(p.gallery) ? p.gallery : [],
+    recommended_for: Array.isArray(p.recommended_for) ? p.recommended_for : [],
+  };
+}
+
+export const partnersQuery = queryOptions({
+  queryKey: ["partners"],
+  queryFn: async (): Promise<Partner[]> => {
+    const { data, error } = await sb.from("partners").select("*").order("sort_order");
+    if (error) throw error;
+    return ((data ?? []) as any[]).map(normalizePartner);
+  },
+});
+
+export const publicPartnersQuery = queryOptions({
+  queryKey: ["partners", "public"],
+  queryFn: async (): Promise<Partner[]> => {
+    const { data, error } = await sb.from("partners").select("*").eq("is_active", true).order("sort_order");
+    if (error) throw error;
+    return ((data ?? []) as any[]).map(normalizePartner);
+  },
+});
+
+export function partnerQuery(id: string) {
+  return queryOptions({
+    queryKey: ["partner", id],
+    queryFn: async (): Promise<Partner | null> => {
+      const { data, error } = await sb.from("partners").select("*").eq("id", id).maybeSingle();
+      if (error) throw error;
+      return data ? normalizePartner(data) : null;
+    },
+  });
+}
+
+export const partnersContentQuery = queryOptions({
+  queryKey: ["partners_content"],
+  queryFn: async (): Promise<Record<string, string>> => {
+    const { data, error } = await sb.from("partners_content").select("key,value");
+    if (error) throw error;
+    const map: Record<string, string> = {};
+    for (const r of (data ?? []) as { key: string; value: string }[]) map[r.key] = r.value ?? "";
+    return map;
+  },
+});
+
+export const partnerApplicationsQuery = queryOptions({
+  queryKey: ["partner_applications"],
+  queryFn: async () => {
+    const { data, error } = await sb.from("partner_applications").select("*").order("created_at", { ascending: false });
+    if (error) throw error;
+    return (data ?? []) as any[];
   },
 });
