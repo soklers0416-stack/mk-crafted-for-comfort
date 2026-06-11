@@ -109,13 +109,19 @@ function CartPage() {
                       </button>
                     </div>
                     <p className="mt-1 line-clamp-2 text-xs text-muted-foreground md:text-sm">{it.product.description}</p>
+                    {it.fabric && (
+                      <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs text-primary">
+                        {it.fabric.sample_photo && <img src={it.fabric.sample_photo} className="h-4 w-4 rounded-full object-cover" alt="" />}
+                        Ткань: {it.fabric.title}{it.fabric.surcharge > 0 ? ` (+${formatPrice(it.fabric.surcharge)})` : ""}
+                      </div>
+                    )}
                     <div className="mt-auto flex items-center justify-between gap-3 pt-3">
                       <div className="inline-flex items-center rounded-full border border-border">
                         <button onClick={() => setQty(it.id, it.qty - 1)} className="grid h-9 w-9 place-items-center hover:text-primary"><Minus className="h-3.5 w-3.5" /></button>
                         <span className="w-8 text-center text-sm font-medium">{it.qty}</span>
                         <button onClick={() => setQty(it.id, it.qty + 1)} className="grid h-9 w-9 place-items-center hover:text-primary"><Plus className="h-3.5 w-3.5" /></button>
                       </div>
-                      <div className="font-display text-lg font-semibold">{formatPrice(it.product.price * it.qty)}</div>
+                      <div className="font-display text-lg font-semibold">{formatPrice(((it.product.sale_enabled && it.product.sale_new_price) ? it.product.sale_new_price : it.product.price + (it.fabric?.surcharge ?? 0)) * it.qty)}</div>
                     </div>
                   </div>
                 </div>
