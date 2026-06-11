@@ -32,6 +32,7 @@ import { Route as AuthenticatedAdminReviewsRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminRequestsRouteImport } from './routes/_authenticated/admin.requests'
 import { Route as AuthenticatedAdminPartnerApplicationsRouteImport } from './routes/_authenticated/admin.partner-applications'
 import { Route as AuthenticatedAdminIntegrationsRouteImport } from './routes/_authenticated/admin.integrations'
+import { Route as AuthenticatedAdminHomeBlocksRouteImport } from './routes/_authenticated/admin.home-blocks'
 import { Route as AuthenticatedAdminGalleryRouteImport } from './routes/_authenticated/admin.gallery'
 import { Route as AuthenticatedAdminFormsRouteImport } from './routes/_authenticated/admin.forms'
 import { Route as AuthenticatedAdminFaqsRouteImport } from './routes/_authenticated/admin.faqs'
@@ -170,6 +171,12 @@ const AuthenticatedAdminIntegrationsRoute =
   AuthenticatedAdminIntegrationsRouteImport.update({
     id: '/admin/integrations',
     path: '/admin/integrations',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminHomeBlocksRoute =
+  AuthenticatedAdminHomeBlocksRouteImport.update({
+    id: '/admin/home-blocks',
+    path: '/admin/home-blocks',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAdminGalleryRoute =
@@ -320,6 +327,7 @@ export interface FileRoutesByFullPath {
   '/admin/faqs': typeof AuthenticatedAdminFaqsRoute
   '/admin/forms': typeof AuthenticatedAdminFormsRoute
   '/admin/gallery': typeof AuthenticatedAdminGalleryRoute
+  '/admin/home-blocks': typeof AuthenticatedAdminHomeBlocksRoute
   '/admin/integrations': typeof AuthenticatedAdminIntegrationsRoute
   '/admin/partner-applications': typeof AuthenticatedAdminPartnerApplicationsRoute
   '/admin/requests': typeof AuthenticatedAdminRequestsRoute
@@ -364,6 +372,7 @@ export interface FileRoutesByTo {
   '/admin/faqs': typeof AuthenticatedAdminFaqsRoute
   '/admin/forms': typeof AuthenticatedAdminFormsRoute
   '/admin/gallery': typeof AuthenticatedAdminGalleryRoute
+  '/admin/home-blocks': typeof AuthenticatedAdminHomeBlocksRoute
   '/admin/integrations': typeof AuthenticatedAdminIntegrationsRoute
   '/admin/partner-applications': typeof AuthenticatedAdminPartnerApplicationsRoute
   '/admin/requests': typeof AuthenticatedAdminRequestsRoute
@@ -411,6 +420,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/faqs': typeof AuthenticatedAdminFaqsRoute
   '/_authenticated/admin/forms': typeof AuthenticatedAdminFormsRoute
   '/_authenticated/admin/gallery': typeof AuthenticatedAdminGalleryRoute
+  '/_authenticated/admin/home-blocks': typeof AuthenticatedAdminHomeBlocksRoute
   '/_authenticated/admin/integrations': typeof AuthenticatedAdminIntegrationsRoute
   '/_authenticated/admin/partner-applications': typeof AuthenticatedAdminPartnerApplicationsRoute
   '/_authenticated/admin/requests': typeof AuthenticatedAdminRequestsRoute
@@ -458,6 +468,7 @@ export interface FileRouteTypes {
     | '/admin/faqs'
     | '/admin/forms'
     | '/admin/gallery'
+    | '/admin/home-blocks'
     | '/admin/integrations'
     | '/admin/partner-applications'
     | '/admin/requests'
@@ -502,6 +513,7 @@ export interface FileRouteTypes {
     | '/admin/faqs'
     | '/admin/forms'
     | '/admin/gallery'
+    | '/admin/home-blocks'
     | '/admin/integrations'
     | '/admin/partner-applications'
     | '/admin/requests'
@@ -548,6 +560,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/faqs'
     | '/_authenticated/admin/forms'
     | '/_authenticated/admin/gallery'
+    | '/_authenticated/admin/home-blocks'
     | '/_authenticated/admin/integrations'
     | '/_authenticated/admin/partner-applications'
     | '/_authenticated/admin/requests'
@@ -751,6 +764,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIntegrationsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/home-blocks': {
+      id: '/_authenticated/admin/home-blocks'
+      path: '/admin/home-blocks'
+      fullPath: '/admin/home-blocks'
+      preLoaderRoute: typeof AuthenticatedAdminHomeBlocksRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/gallery': {
       id: '/_authenticated/admin/gallery'
       path: '/admin/gallery'
@@ -934,6 +954,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminFaqsRoute: typeof AuthenticatedAdminFaqsRoute
   AuthenticatedAdminFormsRoute: typeof AuthenticatedAdminFormsRoute
   AuthenticatedAdminGalleryRoute: typeof AuthenticatedAdminGalleryRoute
+  AuthenticatedAdminHomeBlocksRoute: typeof AuthenticatedAdminHomeBlocksRoute
   AuthenticatedAdminIntegrationsRoute: typeof AuthenticatedAdminIntegrationsRoute
   AuthenticatedAdminPartnerApplicationsRoute: typeof AuthenticatedAdminPartnerApplicationsRoute
   AuthenticatedAdminRequestsRoute: typeof AuthenticatedAdminRequestsRoute
@@ -960,6 +981,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminFaqsRoute: AuthenticatedAdminFaqsRoute,
   AuthenticatedAdminFormsRoute: AuthenticatedAdminFormsRoute,
   AuthenticatedAdminGalleryRoute: AuthenticatedAdminGalleryRoute,
+  AuthenticatedAdminHomeBlocksRoute: AuthenticatedAdminHomeBlocksRoute,
   AuthenticatedAdminIntegrationsRoute: AuthenticatedAdminIntegrationsRoute,
   AuthenticatedAdminPartnerApplicationsRoute:
     AuthenticatedAdminPartnerApplicationsRoute,
@@ -1027,3 +1049,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
