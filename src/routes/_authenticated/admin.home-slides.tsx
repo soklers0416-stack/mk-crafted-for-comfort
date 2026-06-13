@@ -196,9 +196,9 @@ function SlideRow({
           )}
         </div>
         <div className="grid flex-1 gap-2 md:grid-cols-2">
-          <input className="rounded-lg border border-border bg-background px-3 py-2 text-sm" placeholder="Заголовок"
+          <textarea rows={2} className="rounded-lg border border-border bg-background px-3 py-2 text-sm resize-y" placeholder="Заголовок (Enter — новая строка)"
             value={slide.title} onChange={(e) => onPatch({ title: e.target.value })} onBlur={(e) => saveField("title", e.target.value)} />
-          <input className="rounded-lg border border-border bg-background px-3 py-2 text-sm" placeholder="Подпись"
+          <textarea rows={2} className="rounded-lg border border-border bg-background px-3 py-2 text-sm resize-y" placeholder="Подпись (Enter — новая строка)"
             value={slide.subtitle ?? ""} onChange={(e) => onPatch({ subtitle: e.target.value })} onBlur={(e) => saveField("subtitle", e.target.value)} />
           <input className="rounded-lg border border-border bg-background px-3 py-2 text-sm" placeholder="Текст кнопки"
             value={slide.button_text ?? ""} onChange={(e) => onPatch({ button_text: e.target.value })} onBlur={(e) => saveField("button_text", e.target.value)} />
