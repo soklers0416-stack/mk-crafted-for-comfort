@@ -22,8 +22,20 @@ const sb = supabase as any;
 function Page() {
   const qc = useQueryClient();
   const { data: slides = [] } = useQuery(homeSlidesQuery);
+  const { data: settings } = useQuery(heroSliderSettingsQuery);
   const [items, setItems] = useState<HomeSlide[]>([]);
   useEffect(() => { setItems(slides); }, [slides]);
+
+  const saveSettings = useMutation({
+    mutationFn: async (autoplay_seconds: number) => {
+      const { error } = await sb.from("site_settings").upsert({
+        key: "hero_slider",
+        value: { autoplay_seconds },
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["site_settings", "hero_slider"] }),
+  });
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
 
