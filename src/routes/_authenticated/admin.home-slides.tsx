@@ -108,11 +108,11 @@ function Page() {
 }
 
 function SlideRow({
-  slide, onPatch, onSave, onDelete,
+  slide, onPatch, onSavePatch, onDelete,
 }: {
   slide: HomeSlide;
   onPatch: (p: Partial<HomeSlide>) => void;
-  onSave: () => void;
+  onSavePatch: (p: Partial<HomeSlide>) => void;
   onDelete: () => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: slide.id });
@@ -125,12 +125,15 @@ function SlideRow({
     setUploading(true);
     try {
       const url = await uploadPhoto(f);
-      onPatch({ image_url: url });
-      setTimeout(onSave, 50);
+      onSavePatch({ image_url: url });
       toast.success("Фото загружено");
     } catch (err: any) {
       toast.error(err.message ?? "Ошибка загрузки");
     } finally { setUploading(false); }
+  }
+
+  function saveField<K extends keyof HomeSlide>(k: K, v: HomeSlide[K]) {
+    onSavePatch({ [k]: v } as Partial<HomeSlide>);
   }
 
   return (
@@ -148,13 +151,13 @@ function SlideRow({
         </div>
         <div className="grid flex-1 gap-2 md:grid-cols-2">
           <input className="rounded-lg border border-border bg-background px-3 py-2 text-sm" placeholder="Заголовок"
-            value={slide.title} onChange={(e) => onPatch({ title: e.target.value })} onBlur={onSave} />
+            value={slide.title} onChange={(e) => onPatch({ title: e.target.value })} onBlur={(e) => saveField("title", e.target.value)} />
           <input className="rounded-lg border border-border bg-background px-3 py-2 text-sm" placeholder="Подпись"
-            value={slide.subtitle ?? ""} onChange={(e) => onPatch({ subtitle: e.target.value })} onBlur={onSave} />
+            value={slide.subtitle ?? ""} onChange={(e) => onPatch({ subtitle: e.target.value })} onBlur={(e) => saveField("subtitle", e.target.value)} />
           <input className="rounded-lg border border-border bg-background px-3 py-2 text-sm" placeholder="Текст кнопки"
-            value={slide.button_text ?? ""} onChange={(e) => onPatch({ button_text: e.target.value })} onBlur={onSave} />
+            value={slide.button_text ?? ""} onChange={(e) => onPatch({ button_text: e.target.value })} onBlur={(e) => saveField("button_text", e.target.value)} />
           <input className="rounded-lg border border-border bg-background px-3 py-2 text-sm" placeholder="Ссылка кнопки, напр. /catalog"
-            value={slide.button_link ?? ""} onChange={(e) => onPatch({ button_link: e.target.value })} onBlur={onSave} />
+            value={slide.button_link ?? ""} onChange={(e) => onPatch({ button_link: e.target.value })} onBlur={(e) => saveField("button_link", e.target.value)} />
         </div>
         <div className="flex flex-col gap-2">
           <label className="inline-flex h-9 cursor-pointer items-center gap-1 rounded-lg border border-border px-3 text-xs">
@@ -162,7 +165,7 @@ function SlideRow({
             <input type="file" accept="image/*" className="hidden" onChange={onUpload} />
           </label>
           <button
-            onClick={() => { onPatch({ is_visible: !slide.is_visible }); setTimeout(onSave, 50); }}
+            onClick={() => onSavePatch({ is_visible: !slide.is_visible })}
             className="inline-flex h-9 items-center gap-1 rounded-lg border border-border px-3 text-xs"
           >
             {slide.is_visible ? <><Eye className="h-3.5 w-3.5" /> Виден</> : <><EyeOff className="h-3.5 w-3.5" /> Скрыт</>}
