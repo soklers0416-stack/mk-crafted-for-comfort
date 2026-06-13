@@ -76,6 +76,22 @@ export const homeSlidesQuery = queryOptions({
   },
 });
 
+export type HeroSliderSettings = { autoplay_seconds: number };
+
+export const heroSliderSettingsQuery = queryOptions({
+  queryKey: ["site_settings", "hero_slider"],
+  queryFn: async (): Promise<HeroSliderSettings> => {
+    const { data, error } = await sb
+      .from("site_settings")
+      .select("value")
+      .eq("key", "hero_slider")
+      .maybeSingle();
+    if (error) throw error;
+    const v = (data?.value ?? {}) as Partial<HeroSliderSettings>;
+    return { autoplay_seconds: typeof v.autoplay_seconds === "number" ? v.autoplay_seconds : 6 };
+  },
+});
+
 export const PAGE_KEYS: { key: string; label: string }[] = [
   { key: "about", label: "О компании" },
   { key: "partners", label: "Партнёры" },
