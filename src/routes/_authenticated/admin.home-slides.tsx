@@ -27,9 +27,8 @@ function Page() {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
 
   const save = useMutation({
-    mutationFn: async (s: HomeSlide) => {
-      const { id, ...rest } = s;
-      const { error } = await sb.from("home_slides").update(rest).eq("id", id);
+    mutationFn: async ({ id, patch }: { id: string; patch: Partial<HomeSlide> }) => {
+      const { error } = await sb.from("home_slides").update(patch).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["home_slides"] }),
