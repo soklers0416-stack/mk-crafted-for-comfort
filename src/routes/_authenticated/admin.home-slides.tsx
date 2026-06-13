@@ -101,6 +101,39 @@ function Page() {
         </button>
       </div>
 
+      <div className="mt-6 rounded-2xl border border-border bg-card p-4">
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="text-sm font-medium">Автопрокрутка:</span>
+          {[
+            { v: 0, l: "Выкл" },
+            { v: 3, l: "3 сек" },
+            { v: 5, l: "5 сек" },
+            { v: 7, l: "7 сек" },
+            { v: 10, l: "10 сек" },
+          ].map((o) => {
+            const active = (settings?.autoplay_seconds ?? 6) === o.v;
+            return (
+              <button
+                key={o.v}
+                onClick={() => saveSettings.mutate(o.v)}
+                className={`h-9 rounded-full border px-4 text-xs transition ${active ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background hover:bg-muted"}`}
+              >
+                {o.l}
+              </button>
+            );
+          })}
+          <span className="ml-auto text-xs text-muted-foreground">
+            На сайте: {(settings?.autoplay_seconds ?? 6) > 0 ? `${settings?.autoplay_seconds} сек` : "выключена"}
+          </span>
+        </div>
+      </div>
+
+      <div className="mt-6 overflow-hidden rounded-2xl border border-border">
+        <div className="bg-muted/40 px-4 py-2 text-xs text-muted-foreground">Предпросмотр (автопрокрутка выключена)</div>
+        <HeroSlider autoplay={false} />
+      </div>
+
+
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
         <SortableContext items={items.map((x) => x.id)} strategy={verticalListSortingStrategy}>
           <div className="mt-6 space-y-3">
