@@ -3,8 +3,9 @@ import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { GripVertical, Plus, Trash2, Eye, EyeOff, Upload } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { homeSlidesQuery, type HomeSlide } from "@/lib/pageBlocks";
+import { homeSlidesQuery, heroSliderSettingsQuery, type HomeSlide } from "@/lib/pageBlocks";
 import { uploadPhoto } from "@/lib/uploadPhoto";
+import { HeroSlider } from "@/components/HeroSlider";
 import { toast } from "sonner";
 import {
   DndContext, PointerSensor, useSensor, useSensors, closestCenter,
