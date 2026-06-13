@@ -96,7 +96,7 @@ function Page() {
                 key={s.id}
                 slide={s}
                 onPatch={(p) => patch(s.id, p)}
-                onSave={() => save.mutate(items.find((x) => x.id === s.id)!)}
+                onSavePatch={(p) => { patch(s.id, p); save.mutate({ id: s.id, patch: p }); }}
                 onDelete={() => del.mutate(s.id)}
               />
             ))}
