@@ -58,11 +58,11 @@ export function HeroSlider({ autoplay: autoplayProp }: { autoplay?: boolean } = 
                           <span className="h-1.5 w-1.5 rounded-full bg-primary" />
                           МК Мебель · Краснодар
                         </span>
-                        <h1 className="mt-5 font-display text-3xl font-bold leading-[1.1] tracking-tight text-foreground md:text-white sm:text-4xl md:text-5xl lg:text-6xl md:drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)]">
+                        <h1 className="mt-5 font-display text-3xl font-bold leading-[1.1] tracking-tight text-foreground md:text-white sm:text-4xl md:text-5xl lg:text-6xl md:drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)] whitespace-pre-line">
                           {s.title}
                         </h1>
                         {s.subtitle && (
-                          <p className="mt-5 max-w-lg text-base text-foreground/75 md:text-white/90 md:text-lg md:drop-shadow-[0_1px_8px_rgba(0,0,0,0.35)]">{s.subtitle}</p>
+                          <p className="mt-5 max-w-lg text-base text-foreground/75 md:text-white/90 md:text-lg md:drop-shadow-[0_1px_8px_rgba(0,0,0,0.35)] whitespace-pre-line">{s.subtitle}</p>
                         )}
                         {s.button_text && s.button_link && (
                           <div className="mt-7">
