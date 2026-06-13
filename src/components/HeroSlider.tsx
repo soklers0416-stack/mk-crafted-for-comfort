@@ -32,20 +32,32 @@ export function HeroSlider() {
               {visible.map((s, i) => (
                 <div key={s.id} className="relative min-w-0 flex-[0_0_100%]">
                   <div
-                    className="relative grid h-[520px] grid-cols-1 md:h-[640px] md:grid-cols-2"
+                    className="relative flex flex-col md:block md:h-[640px]"
                     style={{ background: s.bg_color || "#f5f3ee" }}
                   >
-                    <div className="z-10 flex items-center px-6 md:px-14">
+                    {/* Image: bottom on mobile, full-cover on desktop */}
+                    <div className="order-2 md:order-none md:absolute md:inset-0 h-[260px] md:h-full w-full overflow-hidden">
+                      <img
+                        src={s.image_url || hero}
+                        alt={s.title}
+                        className={`h-full w-full object-cover object-center transition-transform duration-1000 ${index === i ? "scale-100" : "scale-105"}`}
+                      />
+                      {/* Gradient overlay only on desktop, behind text on the left */}
+                      <div className="pointer-events-none absolute inset-0 hidden md:block bg-gradient-to-r from-black/55 via-black/25 to-transparent" />
+                    </div>
+
+                    {/* Text: top on mobile, overlay-left on desktop */}
+                    <div className="order-1 md:order-none relative md:absolute md:inset-y-0 md:left-0 z-10 flex items-center px-6 py-8 md:px-14 md:py-0 md:w-1/2">
                       <div className={`max-w-xl ${index === i ? "animate-fade-in" : "opacity-0"}`}>
-                        <span className="inline-flex items-center gap-2 rounded-full bg-white/85 px-3 py-1.5 text-xs font-medium text-foreground/80 backdrop-blur">
+                        <span className="inline-flex items-center gap-2 rounded-full bg-white/85 px-3 py-1.5 text-xs font-medium text-foreground/80 backdrop-blur md:bg-white/90">
                           <span className="h-1.5 w-1.5 rounded-full bg-primary" />
                           МК Мебель · Краснодар
                         </span>
-                        <h1 className="mt-5 font-display text-3xl font-bold leading-[1.1] tracking-tight text-foreground sm:text-4xl md:text-5xl lg:text-6xl">
+                        <h1 className="mt-5 font-display text-3xl font-bold leading-[1.1] tracking-tight text-foreground md:text-white sm:text-4xl md:text-5xl lg:text-6xl md:drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)]">
                           {s.title}
                         </h1>
                         {s.subtitle && (
-                          <p className="mt-5 max-w-lg text-base text-foreground/75 md:text-lg">{s.subtitle}</p>
+                          <p className="mt-5 max-w-lg text-base text-foreground/75 md:text-white/90 md:text-lg md:drop-shadow-[0_1px_8px_rgba(0,0,0,0.35)]">{s.subtitle}</p>
                         )}
                         {s.button_text && s.button_link && (
                           <div className="mt-7">
@@ -60,16 +72,10 @@ export function HeroSlider() {
                         )}
                       </div>
                     </div>
-                    <div className="relative h-full min-h-[260px] overflow-hidden">
-                      <img
-                        src={s.image_url || hero}
-                        alt={s.title}
-                        className={`h-full w-full object-cover transition-transform duration-1000 ${index === i ? "scale-100" : "scale-105"}`}
-                      />
-                    </div>
                   </div>
                 </div>
               ))}
+
             </div>
           </div>
 
