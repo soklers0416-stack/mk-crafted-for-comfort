@@ -3,23 +3,28 @@ import useEmblaCarousel from "embla-carousel-react";
 import { Link } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { homeSlidesQuery } from "@/lib/pageBlocks";
+import { homeSlidesQuery, heroSliderSettingsQuery } from "@/lib/pageBlocks";
 import hero from "@/assets/hero-living.jpg";
 
-export function HeroSlider() {
+export function HeroSlider({ autoplay: autoplayProp }: { autoplay?: boolean } = {}) {
   const { data: slides = [] } = useQuery(homeSlidesQuery);
+  const { data: settings } = useQuery(heroSliderSettingsQuery);
   const visible = slides.filter((s) => s.is_visible);
   const [emblaRef, embla] = useEmblaCarousel({ loop: true, duration: 30 });
   const [index, setIndex] = useState(0);
+
+  const seconds = settings?.autoplay_seconds ?? 6;
+  const autoplay = autoplayProp ?? seconds > 0;
 
   useEffect(() => {
     if (!embla) return;
     const onSelect = () => setIndex(embla.selectedScrollSnap());
     embla.on("select", onSelect);
     onSelect();
-    const t = setInterval(() => embla.scrollNext(), 6000);
+    if (!autoplay || seconds <= 0) return () => embla.off("select", onSelect);
+    const t = setInterval(() => embla.scrollNext(), seconds * 1000);
     return () => { clearInterval(t); embla.off("select", onSelect); };
-  }, [embla]);
+  }, [embla, autoplay, seconds]);
 
   if (visible.length === 0) return null;
 

@@ -3,8 +3,9 @@ import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { GripVertical, Plus, Trash2, Eye, EyeOff, Upload } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { homeSlidesQuery, type HomeSlide } from "@/lib/pageBlocks";
+import { homeSlidesQuery, heroSliderSettingsQuery, type HomeSlide } from "@/lib/pageBlocks";
 import { uploadPhoto } from "@/lib/uploadPhoto";
+import { HeroSlider } from "@/components/HeroSlider";
 import { toast } from "sonner";
 import {
   DndContext, PointerSensor, useSensor, useSensors, closestCenter,
@@ -21,8 +22,20 @@ const sb = supabase as any;
 function Page() {
   const qc = useQueryClient();
   const { data: slides = [] } = useQuery(homeSlidesQuery);
+  const { data: settings } = useQuery(heroSliderSettingsQuery);
   const [items, setItems] = useState<HomeSlide[]>([]);
   useEffect(() => { setItems(slides); }, [slides]);
+
+  const saveSettings = useMutation({
+    mutationFn: async (autoplay_seconds: number) => {
+      const { error } = await sb.from("site_settings").upsert({
+        key: "hero_slider",
+        value: { autoplay_seconds },
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["site_settings", "hero_slider"] }),
+  });
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
 
@@ -87,6 +100,39 @@ function Page() {
           <Plus className="h-4 w-4" /> Добавить слайд
         </button>
       </div>
+
+      <div className="mt-6 rounded-2xl border border-border bg-card p-4">
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="text-sm font-medium">Автопрокрутка:</span>
+          {[
+            { v: 0, l: "Выкл" },
+            { v: 3, l: "3 сек" },
+            { v: 5, l: "5 сек" },
+            { v: 7, l: "7 сек" },
+            { v: 10, l: "10 сек" },
+          ].map((o) => {
+            const active = (settings?.autoplay_seconds ?? 6) === o.v;
+            return (
+              <button
+                key={o.v}
+                onClick={() => saveSettings.mutate(o.v)}
+                className={`h-9 rounded-full border px-4 text-xs transition ${active ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background hover:bg-muted"}`}
+              >
+                {o.l}
+              </button>
+            );
+          })}
+          <span className="ml-auto text-xs text-muted-foreground">
+            На сайте: {(settings?.autoplay_seconds ?? 6) > 0 ? `${settings?.autoplay_seconds} сек` : "выключена"}
+          </span>
+        </div>
+      </div>
+
+      <div className="mt-6 overflow-hidden rounded-2xl border border-border">
+        <div className="bg-muted/40 px-4 py-2 text-xs text-muted-foreground">Предпросмотр (автопрокрутка выключена)</div>
+        <HeroSlider autoplay={false} />
+      </div>
+
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
         <SortableContext items={items.map((x) => x.id)} strategy={verticalListSortingStrategy}>
