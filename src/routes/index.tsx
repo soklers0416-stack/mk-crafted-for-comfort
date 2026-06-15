@@ -189,8 +189,8 @@ function HomePage() {
 
       {/* APARTMENT */}
       {(() => {
-        const headline = (apt as any).home_headline?.trim() || "Квартира под ключ";
-        const subtext = (apt as any).home_subtext?.trim() || "Подберите мебель для всей квартиры в одном месте. Соберите свой комплект и отправьте заявку менеджеру.";
+        const headline = (apt as any).home_headline?.trim() || "Поможем завершить весь интерьер";
+        const subtext = (apt as any).home_subtext?.trim() || "Мы поможем не только подобрать мебель, но и завершить интерьер вашей квартиры \n\n\nЧерез наших проверенных партнёров вы сможете заказать всё необходимое для комфортного переезда:\n дизайн-проект, текстиль, освещение, декор, ремонтные работы и другие услуги для обустройства квартиры \n\n\n Один магазин. Проверенные специалисты. Готовый результат";
         const cta = (apt as any).home_cta?.trim() || "Начать подбор";
         const img = (apt as any).home_image?.trim() || apartmentImgFallback;
         let listItems: string[] = ["Диван", "Кровать", "Матрас", "Шкаф", "Прихожая", "Стол и стулья"];
