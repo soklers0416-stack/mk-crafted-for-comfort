@@ -188,44 +188,57 @@ function HomePage() {
       </section>
 
       {/* APARTMENT */}
-      <section className="mx-auto mt-24 max-w-7xl px-4 md:px-8">
-        <div className="relative overflow-hidden rounded-[28px] bg-surface md:rounded-[40px]">
-          <div className="grid md:grid-cols-2">
-            <div className="order-2 p-8 md:order-1 md:p-14">
-              <p className="text-sm font-medium uppercase tracking-wider text-primary">Сервис</p>
-              <h2 className="mt-3 font-display text-3xl font-bold tracking-tight md:text-5xl">
-                Квартира под ключ
-              </h2>
-              <p className="mt-5 max-w-md text-base text-muted-foreground md:text-lg">
-                Подберите мебель для всей квартиры в одном месте. Соберите свой комплект и отправьте заявку менеджеру.
-              </p>
-              <ul className="mt-6 space-y-2 text-sm">
-                {["Диван", "Кровать", "Матрас", "Шкаф", "Прихожая", "Стол и стулья"].map((s) => (
-                  <li key={s} className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-primary" />
-                    {s}
-                  </li>
-                ))}
-              </ul>
-              <Link
-                to="/apartment"
-                className="mt-8 inline-flex h-12 items-center gap-2 rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground transition hover:bg-primary/90"
-              >
-                Начать подбор
-                <ArrowRight className="h-4 w-4" />
-              </Link>
+      {(() => {
+        const headline = (apt as any).home_headline?.trim() || "Квартира под ключ";
+        const subtext = (apt as any).home_subtext?.trim() || "Подберите мебель для всей квартиры в одном месте. Соберите свой комплект и отправьте заявку менеджеру.";
+        const cta = (apt as any).home_cta?.trim() || "Начать подбор";
+        const img = (apt as any).home_image?.trim() || apartmentImgFallback;
+        let listItems: string[] = ["Диван", "Кровать", "Матрас", "Шкаф", "Прихожая", "Стол и стулья"];
+        try {
+          const parsed = JSON.parse((apt as any).home_items || "[]");
+          if (Array.isArray(parsed) && parsed.length > 0) listItems = parsed.filter((x: any) => typeof x === "string" && x.trim());
+        } catch { /* fallback */ }
+        return (
+          <section className="mx-auto mt-24 max-w-7xl px-4 md:px-8">
+            <div className="relative overflow-hidden rounded-[28px] bg-surface md:rounded-[40px]">
+              <div className="grid md:grid-cols-2">
+                <div className="order-2 p-8 md:order-1 md:p-14">
+                  <p className="text-sm font-medium uppercase tracking-wider text-primary">Сервис</p>
+                  <h2 className="mt-3 font-display text-3xl font-bold tracking-tight md:text-5xl whitespace-pre-line">
+                    {headline}
+                  </h2>
+                  <p className="mt-5 max-w-md text-base text-muted-foreground md:text-lg whitespace-pre-line">
+                    {subtext}
+                  </p>
+                  <ul className="mt-6 space-y-2 text-sm">
+                    {listItems.map((s) => (
+                      <li key={s} className="flex items-center gap-2">
+                        <Check className="h-4 w-4 text-primary" />
+                        {s}
+                      </li>
+                    ))}
+                  </ul>
+                  <Link
+                    to="/apartment"
+                    className="mt-8 inline-flex h-12 items-center gap-2 rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground transition hover:bg-primary/90"
+                  >
+                    {cta}
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </div>
+                <div className="order-1 md:order-2">
+                  <img
+                    src={img}
+                    alt="Современная квартира"
+                    loading="lazy"
+                    className="h-full max-h-[520px] w-full object-cover"
+                  />
+                </div>
+              </div>
             </div>
-            <div className="order-1 md:order-2">
-              <img
-                src={apartmentImg}
-                alt="Современная квартира"
-                loading="lazy"
-                className="h-full max-h-[520px] w-full object-cover"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
+          </section>
+        );
+      })()}
 
       {/* REVIEWS */}
       <section className="mx-auto mt-24 max-w-7xl px-4 md:px-8">
