@@ -35,6 +35,8 @@ function HomePage() {
   const { data: reviews = [] } = useQuery(reviewsQuery);
   const { data: stats = [] } = useQuery(productStatsQuery);
   const { data: blocks = [] } = useQuery(homeBlocksQuery);
+  const { data: categories = [] } = useQuery(categoriesQuery);
+  const { data: apt = {} } = useQuery(apartmentContentQuery);
   const statMap = new Map(stats.map((s) => [s.product_id, s]));
   const likesOf = (id: string) => statMap.get(id)?.likes ?? 0;
   const viewsOf = (id: string) => statMap.get(id)?.views ?? 0;
