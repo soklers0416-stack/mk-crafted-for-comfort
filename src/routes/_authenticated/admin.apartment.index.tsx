@@ -25,8 +25,8 @@ const FIELDS: { key: string; label: string; multi?: boolean }[] = [
 ];
 
 const HOME_FIELDS: { key: string; label: string; multi?: boolean; placeholder?: string }[] = [
-  { key: "home_headline", label: "Заголовок", placeholder: "Квартира под ключ" },
-  { key: "home_subtext", label: "Подзаголовок", multi: true, placeholder: "Подберите мебель для всей квартиры в одном месте…" },
+  { key: "home_headline", label: "Заголовок", placeholder: "Поможем завершить весь интерьер" },
+  { key: "home_subtext", label: "Подзаголовок", multi: true, placeholder: "Мы поможем не только подобрать мебель, но и завершить интерьер вашей квартиры…" },
   { key: "home_cta", label: "Текст кнопки", placeholder: "Начать подбор" },
 ];
 
