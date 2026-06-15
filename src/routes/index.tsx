@@ -97,13 +97,15 @@ function HomePage() {
           </Link>
         </div>
         <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-5 lg:grid-cols-4">
-          <CategoryCard slug="sofas" title="Диваны" image={catSofa} large />
-          <CategoryCard slug="beds" title="Кровати" image={catBed} />
-          <CategoryCard slug="mattresses" title="Матрасы" image={catMattress} />
-          <CategoryCard slug="wardrobes" title="Шкафы" image={catWardrobe} />
-          <CategoryCard slug="hallways" title="Прихожие" image={catHallway} />
-          <CategoryCard slug="dining" title="Столы и стулья" image={catDining} />
-          <CategoryCard slug="kids" title="Детские кровати" image={catKids} />
+          {categories.map((c, i) => (
+            <CategoryCard
+              key={c.id}
+              slug={c.slug}
+              title={c.title}
+              image={c.image_url || apartmentImgFallback}
+              large={i === 0 && categories.length >= 5}
+            />
+          ))}
         </div>
       </section>
 
