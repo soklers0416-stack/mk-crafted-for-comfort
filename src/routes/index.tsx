@@ -9,20 +9,13 @@ import { ContactDialog } from "@/components/ContactDialog";
 import { HeroSlider } from "@/components/HeroSlider";
 import { advantages, heroFeatures } from "@/lib/data";
 import { useQuery } from "@tanstack/react-query";
-import { productsQuery, reviewsQuery, productStatsQuery, homeBlocksQuery } from "@/lib/queries";
+import { productsQuery, reviewsQuery, productStatsQuery, homeBlocksQuery, categoriesQuery } from "@/lib/queries";
+import { apartmentContentQuery } from "@/lib/apartment";
 import { getRecentlyViewed, subscribeRecent } from "@/lib/recentlyViewed";
 import { useEffect as useEffectReact } from "react";
-import hero from "@/assets/hero-living.jpg";
-import apartmentImg from "@/assets/apartment.jpg";
+import apartmentImgFallback from "@/assets/apartment.jpg";
 import factory from "@/assets/factory.jpg";
 import showroom from "@/assets/showroom.jpg";
-import catSofa from "@/assets/cat-sofa.jpg";
-import catBed from "@/assets/cat-bed.jpg";
-import catMattress from "@/assets/cat-mattress.jpg";
-import catWardrobe from "@/assets/cat-wardrobe.jpg";
-import catHallway from "@/assets/cat-hallway.jpg";
-import catDining from "@/assets/cat-dining.jpg";
-import catKids from "@/assets/cat-kids.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
