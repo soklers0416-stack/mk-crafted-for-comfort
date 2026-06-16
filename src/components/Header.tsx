@@ -43,8 +43,8 @@ export function Header() {
         <nav className="hidden lg:flex items-center gap-7 text-sm">
           {nav.map((n) => (
             <Link
-              key={n.to}
-              to={n.to}
+              key={n.id}
+              to={n.href as any}
               className="text-foreground/75 transition hover:text-primary"
               activeProps={{ className: "text-primary font-medium" }}
             >
