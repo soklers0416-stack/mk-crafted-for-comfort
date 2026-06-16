@@ -1,21 +1,24 @@
 import { Link } from "@tanstack/react-router";
 import { Menu, ShoppingBag, X, LayoutDashboard, Heart } from "lucide-react";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
+import { visibleNavItemsQuery } from "@/lib/queries";
 import { ContactDialog } from "./ContactDialog";
 
-const nav = [
-  { to: "/catalog", label: "Каталог" },
-  { to: "/fabrics", label: "Ткани" },
-  { to: "/promotions", label: "Акции" },
-  { to: "/apartment", label: "МК Подбор" },
-  { to: "/partners", label: "Партнёры" },
-  { to: "/reviews", label: "Отзывы" },
-  { to: "/about", label: "О компании" },
-  { to: "/delivery", label: "Доставка и оплата" },
-  { to: "/contacts", label: "Контакты" },
-] as const;
+const fallbackNav = [
+  { id: "f1", href: "/catalog", label: "Каталог" },
+  { id: "f2", href: "/fabrics", label: "Ткани" },
+  { id: "f3", href: "/promotions", label: "Акции" },
+  { id: "f4", href: "/apartment", label: "МК Подбор" },
+  { id: "f5", href: "/partners", label: "Партнёры" },
+  { id: "f6", href: "/reviews", label: "Отзывы" },
+  { id: "f7", href: "/about", label: "О компании" },
+  { id: "f8", href: "/delivery", label: "Доставка и оплата" },
+  { id: "f9", href: "/contacts", label: "Контакты" },
+];
+
 
 export function Header() {
   const [open, setOpen] = useState(false);
