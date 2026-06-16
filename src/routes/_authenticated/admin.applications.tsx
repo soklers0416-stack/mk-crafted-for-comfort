@@ -158,6 +158,16 @@ function AdminApplications() {
 function Row({ row, onStatus, onDelete }: { row: AppRow; onStatus: (s: ApplicationStatus) => void; onDelete: () => void }) {
   const [open, setOpen] = useState(false);
   const status = (row.status as ApplicationStatus) || "new";
+  const d = row.data ?? {};
+  const button = d.button as string | undefined;
+  const section = d.section as string | undefined;
+  const productName = d.product_name as string | undefined;
+  const productPrice = d.product_price as string | undefined;
+  const productCategory = d.product_category as string | undefined;
+  // Поля, уже вынесенные в шапку, в детальный список не дублируем.
+  const detailEntries = Object.entries(d).filter(
+    ([k]) => !["name", "phone", "email", "button", "section", "page_url"].includes(k),
+  );
   return (
     <div className="rounded-2xl border border-border/60 bg-card">
       <div className="flex flex-wrap items-start gap-3 p-4">
@@ -167,6 +177,12 @@ function Row({ row, onStatus, onDelete }: { row: AppRow; onStatus: (s: Applicati
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-full bg-primary/10 px-3 py-0.5 text-xs font-medium text-primary">{formTypeLabel(row.form_key)}</span>
+            {button && (
+              <span className="rounded-full bg-emerald-100 px-3 py-0.5 text-xs font-medium text-emerald-700">Кнопка: {button}</span>
+            )}
+            {section && (
+              <span className="rounded-full bg-amber-100 px-3 py-0.5 text-xs font-medium text-amber-700">Раздел: {section}</span>
+            )}
             <span className={`rounded-full px-3 py-0.5 text-xs font-medium ${STATUS_COLORS[status] ?? ""}`}>{STATUS_LABELS[status] ?? row.status}</span>
             <span className="text-xs text-muted-foreground">{new Date(row.created_at).toLocaleString("ru-RU")}</span>
           </div>
@@ -175,6 +191,13 @@ function Row({ row, onStatus, onDelete }: { row: AppRow; onStatus: (s: Applicati
             <Cell label="Телефон" value={row.phone} />
             <Cell label="Email" value={row.email} />
           </div>
+          {productName && (
+            <div className="mt-2 rounded-xl bg-surface-muted/60 px-3 py-2 text-sm">
+              <span className="font-semibold">Товар:</span> {productName}
+              {productCategory && <span className="text-muted-foreground"> · {productCategory}</span>}
+              {productPrice && <span className="text-muted-foreground"> · {productPrice}</span>}
+            </div>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <select value={status} onChange={(e) => onStatus(e.target.value as ApplicationStatus)}
@@ -187,18 +210,29 @@ function Row({ row, onStatus, onDelete }: { row: AppRow; onStatus: (s: Applicati
       {open && (
         <div className="border-t border-border/60 bg-surface-muted/40 px-4 py-3">
           <dl className="grid gap-x-6 gap-y-1.5 text-sm sm:grid-cols-2">
-            {Object.entries(row.data ?? {}).map(([k, v]) => (
+            {detailEntries.map(([k, v]) => (
               <div key={k} className="flex gap-2">
-                <dt className="min-w-[120px] text-muted-foreground">{fieldLabel(k)}:</dt>
+                <dt className="min-w-[140px] text-muted-foreground">{fieldLabel(k)}:</dt>
                 <dd className="font-medium whitespace-pre-wrap break-words">{formatValue(v)}</dd>
               </div>
             ))}
+            {d.page_url && (
+              <div className="flex gap-2 sm:col-span-2">
+                <dt className="min-w-[140px] text-muted-foreground">{fieldLabel("page_url")}:</dt>
+                <dd className="font-medium break-all">
+                  <a href={String(d.page_url)} target="_blank" rel="noreferrer" className="text-primary hover:underline">
+                    {String(d.page_url)}
+                  </a>
+                </dd>
+              </div>
+            )}
           </dl>
         </div>
       )}
     </div>
   );
 }
+
 
 function Cell({ label, value }: { label: string; value: string }) {
   return (
