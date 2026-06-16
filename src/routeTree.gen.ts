@@ -32,6 +32,7 @@ import { Route as AuthenticatedAdminReviewsRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminRequestsRouteImport } from './routes/_authenticated/admin.requests'
 import { Route as AuthenticatedAdminProductStatsRouteImport } from './routes/_authenticated/admin.product-stats'
 import { Route as AuthenticatedAdminPartnerApplicationsRouteImport } from './routes/_authenticated/admin.partner-applications'
+import { Route as AuthenticatedAdminNavRouteImport } from './routes/_authenticated/admin.nav'
 import { Route as AuthenticatedAdminIntegrationsRouteImport } from './routes/_authenticated/admin.integrations'
 import { Route as AuthenticatedAdminHomeSlidesRouteImport } from './routes/_authenticated/admin.home-slides'
 import { Route as AuthenticatedAdminHomeBlocksRouteImport } from './routes/_authenticated/admin.home-blocks'
@@ -177,6 +178,11 @@ const AuthenticatedAdminPartnerApplicationsRoute =
     path: '/admin/partner-applications',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminNavRoute = AuthenticatedAdminNavRouteImport.update({
+  id: '/admin/nav',
+  path: '/admin/nav',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAdminIntegrationsRoute =
   AuthenticatedAdminIntegrationsRouteImport.update({
     id: '/admin/integrations',
@@ -358,6 +364,7 @@ export interface FileRoutesByFullPath {
   '/admin/home-blocks': typeof AuthenticatedAdminHomeBlocksRoute
   '/admin/home-slides': typeof AuthenticatedAdminHomeSlidesRoute
   '/admin/integrations': typeof AuthenticatedAdminIntegrationsRoute
+  '/admin/nav': typeof AuthenticatedAdminNavRoute
   '/admin/partner-applications': typeof AuthenticatedAdminPartnerApplicationsRoute
   '/admin/product-stats': typeof AuthenticatedAdminProductStatsRoute
   '/admin/requests': typeof AuthenticatedAdminRequestsRoute
@@ -407,6 +414,7 @@ export interface FileRoutesByTo {
   '/admin/home-blocks': typeof AuthenticatedAdminHomeBlocksRoute
   '/admin/home-slides': typeof AuthenticatedAdminHomeSlidesRoute
   '/admin/integrations': typeof AuthenticatedAdminIntegrationsRoute
+  '/admin/nav': typeof AuthenticatedAdminNavRoute
   '/admin/partner-applications': typeof AuthenticatedAdminPartnerApplicationsRoute
   '/admin/product-stats': typeof AuthenticatedAdminProductStatsRoute
   '/admin/requests': typeof AuthenticatedAdminRequestsRoute
@@ -459,6 +467,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/home-blocks': typeof AuthenticatedAdminHomeBlocksRoute
   '/_authenticated/admin/home-slides': typeof AuthenticatedAdminHomeSlidesRoute
   '/_authenticated/admin/integrations': typeof AuthenticatedAdminIntegrationsRoute
+  '/_authenticated/admin/nav': typeof AuthenticatedAdminNavRoute
   '/_authenticated/admin/partner-applications': typeof AuthenticatedAdminPartnerApplicationsRoute
   '/_authenticated/admin/product-stats': typeof AuthenticatedAdminProductStatsRoute
   '/_authenticated/admin/requests': typeof AuthenticatedAdminRequestsRoute
@@ -511,6 +520,7 @@ export interface FileRouteTypes {
     | '/admin/home-blocks'
     | '/admin/home-slides'
     | '/admin/integrations'
+    | '/admin/nav'
     | '/admin/partner-applications'
     | '/admin/product-stats'
     | '/admin/requests'
@@ -560,6 +570,7 @@ export interface FileRouteTypes {
     | '/admin/home-blocks'
     | '/admin/home-slides'
     | '/admin/integrations'
+    | '/admin/nav'
     | '/admin/partner-applications'
     | '/admin/product-stats'
     | '/admin/requests'
@@ -611,6 +622,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/home-blocks'
     | '/_authenticated/admin/home-slides'
     | '/_authenticated/admin/integrations'
+    | '/_authenticated/admin/nav'
     | '/_authenticated/admin/partner-applications'
     | '/_authenticated/admin/product-stats'
     | '/_authenticated/admin/requests'
@@ -814,6 +826,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/partner-applications'
       fullPath: '/admin/partner-applications'
       preLoaderRoute: typeof AuthenticatedAdminPartnerApplicationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/nav': {
+      id: '/_authenticated/admin/nav'
+      path: '/admin/nav'
+      fullPath: '/admin/nav'
+      preLoaderRoute: typeof AuthenticatedAdminNavRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/integrations': {
@@ -1037,6 +1056,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminHomeBlocksRoute: typeof AuthenticatedAdminHomeBlocksRoute
   AuthenticatedAdminHomeSlidesRoute: typeof AuthenticatedAdminHomeSlidesRoute
   AuthenticatedAdminIntegrationsRoute: typeof AuthenticatedAdminIntegrationsRoute
+  AuthenticatedAdminNavRoute: typeof AuthenticatedAdminNavRoute
   AuthenticatedAdminPartnerApplicationsRoute: typeof AuthenticatedAdminPartnerApplicationsRoute
   AuthenticatedAdminProductStatsRoute: typeof AuthenticatedAdminProductStatsRoute
   AuthenticatedAdminRequestsRoute: typeof AuthenticatedAdminRequestsRoute
@@ -1068,6 +1088,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminHomeBlocksRoute: AuthenticatedAdminHomeBlocksRoute,
   AuthenticatedAdminHomeSlidesRoute: AuthenticatedAdminHomeSlidesRoute,
   AuthenticatedAdminIntegrationsRoute: AuthenticatedAdminIntegrationsRoute,
+  AuthenticatedAdminNavRoute: AuthenticatedAdminNavRoute,
   AuthenticatedAdminPartnerApplicationsRoute:
     AuthenticatedAdminPartnerApplicationsRoute,
   AuthenticatedAdminProductStatsRoute: AuthenticatedAdminProductStatsRoute,

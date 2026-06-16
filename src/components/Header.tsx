@@ -1,27 +1,32 @@
 import { Link } from "@tanstack/react-router";
 import { Menu, ShoppingBag, X, LayoutDashboard, Heart } from "lucide-react";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
+import { visibleNavItemsQuery } from "@/lib/queries";
 import { ContactDialog } from "./ContactDialog";
 
-const nav = [
-  { to: "/catalog", label: "Каталог" },
-  { to: "/fabrics", label: "Ткани" },
-  { to: "/promotions", label: "Акции" },
-  { to: "/apartment", label: "МК Подбор" },
-  { to: "/partners", label: "Партнёры" },
-  { to: "/reviews", label: "Отзывы" },
-  { to: "/about", label: "О компании" },
-  { to: "/delivery", label: "Доставка и оплата" },
-  { to: "/contacts", label: "Контакты" },
-] as const;
+const fallbackNav = [
+  { id: "f1", href: "/catalog", label: "Каталог" },
+  { id: "f2", href: "/fabrics", label: "Ткани" },
+  { id: "f3", href: "/promotions", label: "Акции" },
+  { id: "f4", href: "/apartment", label: "МК Подбор" },
+  { id: "f5", href: "/partners", label: "Партнёры" },
+  { id: "f6", href: "/reviews", label: "Отзывы" },
+  { id: "f7", href: "/about", label: "О компании" },
+  { id: "f8", href: "/delivery", label: "Доставка и оплата" },
+  { id: "f9", href: "/contacts", label: "Контакты" },
+];
+
 
 export function Header() {
   const [open, setOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
   const { count } = useCart();
   const { isAdmin } = useAuth();
+  const { data: navData } = useQuery(visibleNavItemsQuery);
+  const nav = (navData && navData.length > 0 ? navData : fallbackNav);
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur-md">
@@ -38,8 +43,8 @@ export function Header() {
         <nav className="hidden lg:flex items-center gap-7 text-sm">
           {nav.map((n) => (
             <Link
-              key={n.to}
-              to={n.to}
+              key={n.id}
+              to={n.href as any}
               className="text-foreground/75 transition hover:text-primary"
               activeProps={{ className: "text-primary font-medium" }}
             >
@@ -92,8 +97,8 @@ export function Header() {
           <nav className="mx-auto flex max-w-7xl flex-col px-4 py-4">
             {nav.map((n) => (
               <Link
-                key={n.to}
-                to={n.to}
+                key={n.id}
+                to={n.href as any}
                 onClick={() => setOpen(false)}
                 className="py-3 text-base text-foreground/85"
               >
