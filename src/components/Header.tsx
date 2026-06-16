@@ -25,6 +25,8 @@ export function Header() {
   const [contactOpen, setContactOpen] = useState(false);
   const { count } = useCart();
   const { isAdmin } = useAuth();
+  const { data: navData } = useQuery(visibleNavItemsQuery);
+  const nav = (navData && navData.length > 0 ? navData : fallbackNav);
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur-md">
