@@ -106,7 +106,10 @@ function ProductPage() {
     product_price: `${displayPrice.toLocaleString("ru-RU")} ₽`,
     product_id: product.id,
   };
-  if (selectedSize) productMeta.product_size = String((selectedSize as any).label ?? (selectedSize as any).size ?? "");
+  if (selectedSize) {
+    const sz = String((selectedSize as any).label ?? (selectedSize as any).size ?? "").trim();
+    if (sz) productMeta.product_size = sz;
+  }
   if (selectedFabric) productMeta.product_fabric = selectedFabric.title;
   if (product.mechanism && product.mechanism !== "—") productMeta.product_mechanism = product.mechanism;
   if (product.filling && product.filling !== "—") productMeta.product_filling = product.filling;
