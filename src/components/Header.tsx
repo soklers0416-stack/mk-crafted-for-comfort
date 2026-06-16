@@ -97,8 +97,8 @@ export function Header() {
           <nav className="mx-auto flex max-w-7xl flex-col px-4 py-4">
             {nav.map((n) => (
               <Link
-                key={n.to}
-                to={n.to}
+                key={n.id}
+                to={n.href as any}
                 onClick={() => setOpen(false)}
                 className="py-3 text-base text-foreground/85"
               >
