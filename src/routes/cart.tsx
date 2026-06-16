@@ -68,7 +68,15 @@ function CartPage() {
         data: {
           formKey: "cart",
           title: "Заказ из корзины",
-          data: { name, phone, comment, items: itemsSummary, total: formatPrice(total) },
+          data: {
+            name,
+            phone,
+            comment,
+            items: itemsSummary,
+            total: formatPrice(total),
+            button: "Оформить заказ",
+            section: "Корзина",
+          },
         },
       });
     },

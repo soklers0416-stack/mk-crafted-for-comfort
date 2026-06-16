@@ -242,6 +242,8 @@ function ApartmentPage() {
           <DynamicForm
             formKey="apartment"
             extraData={{
+              button: content.form_title || "Получить расчёт",
+              section: "МК Подбор",
               items: pickedItems.map((x) => `• ${x.catTitle}: ${x.product.title} — ${formatPrice(x.price)}`).join("\n"),
               subtotal: formatPrice(subtotal),
               discount_percent: discount ? `${discount.percent}%` : "—",
