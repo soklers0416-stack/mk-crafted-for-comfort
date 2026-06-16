@@ -260,3 +260,28 @@ export const homeBlocksQuery = queryOptions({
     return (data ?? []) as HomeBlock[];
   },
 });
+
+export type NavItem = {
+  id: string;
+  label: string;
+  href: string;
+  sort_order: number;
+  is_visible: boolean;
+};
+export const navItemsQuery = queryOptions({
+  queryKey: ["nav_items"],
+  queryFn: async (): Promise<NavItem[]> => {
+    const { data, error } = await sb.from("nav_items").select("*").order("sort_order");
+    if (error) throw error;
+    return (data ?? []) as NavItem[];
+  },
+});
+export const visibleNavItemsQuery = queryOptions({
+  queryKey: ["nav_items", "visible"],
+  queryFn: async (): Promise<NavItem[]> => {
+    const { data, error } = await sb.from("nav_items")
+      .select("*").eq("is_visible", true).order("sort_order");
+    if (error) throw error;
+    return (data ?? []) as NavItem[];
+  },
+});
