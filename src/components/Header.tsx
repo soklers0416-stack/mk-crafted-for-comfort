@@ -9,7 +9,7 @@ const nav = [
   { to: "/catalog", label: "Каталог" },
   { to: "/fabrics", label: "Ткани" },
   { to: "/promotions", label: "Акции" },
-  { to: "/apartment", label: "Квартира под ключ" },
+  { to: "/apartment", label: "МК Подбор" },
   { to: "/partners", label: "Партнёры" },
   { to: "/reviews", label: "Отзывы" },
   { to: "/about", label: "О компании" },
@@ -110,7 +110,7 @@ export function Header() {
         </div>
       )}
 
-      <ContactDialog open={contactOpen} onOpenChange={setContactOpen} />
+      <ContactDialog open={contactOpen} onOpenChange={setContactOpen} extraData={{ button: "Связаться", section: "Шапка сайта" }} />
     </header>
   );
 }

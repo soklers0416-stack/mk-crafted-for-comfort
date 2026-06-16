@@ -96,7 +96,9 @@ export function DynamicForm({
           data[f.name] = await uploadFile(v);
         }
       }
-      await submit({ data: { formKey, title: config.title, data: { ...data, ...(extraData ?? {}) } } });
+      const page_url = typeof window !== "undefined" ? window.location.href : "";
+      const payload = { ...data, ...(extraData ?? {}), page_url };
+      await submit({ data: { formKey, title: config.title, data: payload } });
       setSent(true);
       onSent?.();
     } catch (err: any) {
