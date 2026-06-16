@@ -30,7 +30,7 @@ export function Footer() {
             <li><Link to="/about" className="hover:text-primary">О нас</Link></li>
             <li><Link to="/delivery" className="hover:text-primary">Доставка и оплата</Link></li>
             <li><Link to="/reviews" className="hover:text-primary">Отзывы</Link></li>
-            <li><Link to="/apartment" className="hover:text-primary">Квартира под ключ</Link></li>
+            <li><Link to="/apartment" className="hover:text-primary">МК Подбор</Link></li>
           </ul>
         </div>
         <div>

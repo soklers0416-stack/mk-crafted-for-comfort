@@ -5,10 +5,12 @@ export function ContactDialog({
   open,
   onOpenChange,
   formKey = "callback",
+  extraData,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   formKey?: string;
+  extraData?: Record<string, unknown>;
 }) {
   const { data: config } = useFormConfig(formKey);
   return (
@@ -18,7 +20,7 @@ export function ContactDialog({
           <DialogTitle className="font-display text-2xl">{config?.title ?? "Оставить заявку"}</DialogTitle>
           {config?.description && <DialogDescription>{config.description}</DialogDescription>}
         </DialogHeader>
-        <DynamicForm formKey={formKey} />
+        <DynamicForm formKey={formKey} extraData={extraData} />
       </DialogContent>
     </Dialog>
   );

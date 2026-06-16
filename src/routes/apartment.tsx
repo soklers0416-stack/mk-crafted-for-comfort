@@ -18,9 +18,9 @@ import { Check, Plus, X, Sparkles, Info } from "lucide-react";
 export const Route = createFileRoute("/apartment")({
   head: () => ({
     meta: [
-      { title: "Квартира под ключ — МК Мебель" },
+      { title: "МК Подбор — МК Мебель" },
       { name: "description", content: "Соберите мебель для всей квартиры с дополнительной скидкой до 7%." },
-      { property: "og:title", content: "Квартира под ключ — МК Мебель" },
+      { property: "og:title", content: "МК Подбор — МК Мебель" },
       { property: "og:description", content: "Один комплект, одна доставка, одна выгодная цена." },
     ],
   }),
@@ -89,7 +89,7 @@ function ApartmentPage() {
             </span>
           )}
           <h1 className="mt-5 font-display text-4xl font-bold tracking-tight md:text-6xl">
-            {content.headline || "Квартира под ключ"}
+            {content.headline || "МК Подбор"}
           </h1>
           <p className="mt-4 max-w-2xl text-base text-muted-foreground md:text-lg whitespace-pre-line">
             {content.subtext}
@@ -242,6 +242,8 @@ function ApartmentPage() {
           <DynamicForm
             formKey="apartment"
             extraData={{
+              button: content.form_title || "Получить расчёт",
+              section: "МК Подбор",
               items: pickedItems.map((x) => `• ${x.catTitle}: ${x.product.title} — ${formatPrice(x.price)}`).join("\n"),
               subtotal: formatPrice(subtotal),
               discount_percent: discount ? `${discount.percent}%` : "—",

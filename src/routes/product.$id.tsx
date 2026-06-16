@@ -98,6 +98,23 @@ function ProductPage() {
   const category = categories.find((c) => c.slug === product.category_slug);
   const similar = allProducts.filter((p) => p.category_slug === product.category_slug && p.id !== product.id).slice(0, 4);
 
+  const selectedSize = hasSizes ? product.sizes[selectedSizeIdx] : null;
+  const productMeta: Record<string, string> = {
+    section: "Карточка товара",
+    product_name: product.title,
+    product_category: category?.title ?? product.category_slug ?? "",
+    product_price: `${displayPrice.toLocaleString("ru-RU")} ₽`,
+    product_id: product.id,
+  };
+  if (selectedSize) {
+    const sz = String((selectedSize as any).label ?? (selectedSize as any).size ?? "").trim();
+    if (sz) productMeta.product_size = sz;
+  }
+  if (selectedFabric) productMeta.product_fabric = selectedFabric.title;
+  if (product.mechanism && product.mechanism !== "—") productMeta.product_mechanism = product.mechanism;
+  if (product.filling && product.filling !== "—") productMeta.product_filling = product.filling;
+
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -362,6 +379,7 @@ function ProductPage() {
         description={`Изготовим ${product.title.toLowerCase()} в нужном вам размере.`}
         source={`custom-size:${product.id}`}
         submitLabel="Отправить заявку"
+        extraData={{ ...productMeta, button: "Нужен другой размер" }}
         fields={[
           { name: "name", label: "Имя" },
           { name: "phone", label: "Телефон", type: "tel" },
@@ -382,15 +400,19 @@ function ProductPage() {
         spec={fillingInfo ? { name: fillingInfo.name, description: fillingInfo.description, photo: fillingInfo.photo, recommendations: fillingInfo.recommendations } : (product.filling ? { name: product.filling } : null)}
       />
 
-      <ContactDialog open={contactOpen} onOpenChange={setContactOpen} />
+      <ContactDialog open={contactOpen} onOpenChange={setContactOpen} extraData={{ ...productMeta, button: "Связаться" }} />
 
       <RequestDialog open={questionOpen} onOpenChange={setQuestionOpen} title="Я просто спросить" description="Ответим на любые вопросы по товару." source={`question:${product.id}`}
+        extraData={{ ...productMeta, button: "Я просто спросить" }}
         fields={[{ name: "name", label: "Имя" },{ name: "phone", label: "Телефон", type: "tel" },{ name: "question", label: "Ваш вопрос", required: false }]} />
       <RequestDialog open={colorOpen} onOpenChange={setColorOpen} title="Другие цвета и ткани" description="Подберём вариант под ваш интерьер." source={`color:${product.id}`} submitLabel="Отправить запрос"
+        extraData={{ ...productMeta, button: "Другие цвета и ткани" }}
         fields={[{ name: "name", label: "Имя" },{ name: "phone", label: "Телефон", type: "tel" },{ name: "color", label: "Какой цвет интересует?" }]} />
       <RequestDialog open={deliveryOpen} onOpenChange={setDeliveryOpen} title="Рассчитать доставку" description="Сообщим точную стоимость и сроки." source={`delivery:${product.id}`}
+        extraData={{ ...productMeta, button: "Рассчитать доставку" }}
         fields={[{ name: "name", label: "Имя" },{ name: "phone", label: "Телефон", type: "tel" },{ name: "city", label: "Город доставки" }]} />
       <RequestDialog open={installmentOpen} onOpenChange={setInstallmentOpen} title="Рассрочка" description="Расскажем об условиях рассрочки Т-Банк и Халва." source={`installment:${product.id}`}
+        extraData={{ ...productMeta, button: "Рассрочка" }}
         fields={[{ name: "name", label: "Имя" },{ name: "phone", label: "Телефон", type: "tel" },{ name: "term", label: "Желаемый срок (мес.)", required: false }]} />
       <RequestDialog
         open={fabricExamplesOpen} onOpenChange={setFabricExamplesOpen}
@@ -398,6 +420,7 @@ function ProductPage() {
         description={`${product.title} · ${selectedFabric?.title ?? ""}`}
         source={`fabric-examples:${product.id}:${selectedFabric?.id ?? ""}`}
         submitLabel="Получить примеры"
+        extraData={{ ...productMeta, button: "Фото в выбранной ткани" }}
         fields={[{ name: "phone", label: "Телефон", type: "tel" }]}
       />
       <FabricPicker
@@ -410,6 +433,8 @@ function ProductPage() {
     </div>
   );
 }
+
+
 
 function RecentlyViewedSection({ excludeId }: { excludeId: string }) {
   const [ids, setIds] = useState<string[]>([]);
