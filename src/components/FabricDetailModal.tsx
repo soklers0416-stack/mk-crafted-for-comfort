@@ -16,6 +16,8 @@ import {
   Home,
   Armchair,
   DoorOpen,
+  PawPrint,
+  Droplets,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -85,6 +87,11 @@ export function FabricDetailModal({
   const charsList = allLabels
     .map((label) => ({ label, value: (fabric.characteristics || {})[label] }))
     .filter((c) => c.value && String(c.value).trim() !== "");
+  const flagChars: { label: string; Icon: typeof PawPrint }[] = [];
+  if (fabric.allow_pets) flagChars.push({ label: "Домашние животные", Icon: PawPrint });
+  if (fabric.washable) flagChars.push({ label: "Можно мыть", Icon: Droplets });
+  const hasChars = charsList.length > 0 || flagChars.length > 0;
+
 
   const recList = (fabric.recommendations || "")
     .split(/[\n,;]+/)
@@ -138,9 +145,9 @@ export function FabricDetailModal({
               </p>
             )}
 
-            {(charsList.length > 0 || recList.length > 0) && (
+            {(hasChars || recList.length > 0) && (
               <div className="mt-8 grid gap-8 sm:grid-cols-2">
-                {charsList.length > 0 && (
+                {hasChars && (
                   <div>
                     <h3 className="text-xs font-bold uppercase tracking-[0.15em] text-foreground">
                       Характеристики
@@ -160,9 +167,18 @@ export function FabricDetailModal({
                           </li>
                         );
                       })}
+                      {flagChars.map(({ label, Icon }) => (
+                        <li key={label} className="flex items-start gap-3 text-sm">
+                          <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
+                            <Icon className="h-4 w-4" />
+                          </span>
+                          <span className="font-medium leading-6 text-foreground">{label}</span>
+                        </li>
+                      ))}
                     </ul>
                   </div>
                 )}
+
 
                 {recList.length > 0 && (
                   <div>

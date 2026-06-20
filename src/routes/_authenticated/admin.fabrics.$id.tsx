@@ -21,6 +21,7 @@ const EMPTY: Omit<Fabric, "id"> = {
   code: "", title: "", category_slug: "", description: "",
   characteristics: {}, recommendations: "", surcharge: 0,
   sample_photo: null, furniture_photos: [], sort_order: 0,
+  allow_pets: false, washable: false,
 };
 
 function EditFabric() {
@@ -169,6 +170,16 @@ function EditFabric() {
                 </F>
               ))
             )}
+            <div className="mt-2 grid gap-2 sm:grid-cols-2 pt-3 border-t border-border/60">
+              <label className="flex items-center gap-2 text-sm cursor-pointer">
+                <input type="checkbox" checked={form.allow_pets} onChange={(e) => up("allow_pets", e.target.checked)} className="h-4 w-4" />
+                Подходит для домашних животных
+              </label>
+              <label className="flex items-center gap-2 text-sm cursor-pointer">
+                <input type="checkbox" checked={form.washable} onChange={(e) => up("washable", e.target.checked)} className="h-4 w-4" />
+                Можно мыть
+              </label>
+            </div>
           </Section>
 
           <Section title="Главное фото коллекции">
