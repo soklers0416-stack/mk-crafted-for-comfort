@@ -2,9 +2,11 @@ import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type {
   Category, Product, Review, Fabric, FabricCategory, ProductFabric,
+  FabricCharacteristicDef, FabricColor,
   AboutContent, AboutAdvantage, AboutStat, AboutStep, CustomerPhoto, GalleryItem, Faq,
   Partner, PartnerCategory, SpecItem,
 } from "./db";
+
 
 
 const sb = supabase as any;
