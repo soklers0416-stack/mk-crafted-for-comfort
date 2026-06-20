@@ -54,6 +54,7 @@ import { Route as AuthenticatedAdminPartnersContentRouteImport } from './routes/
 import { Route as AuthenticatedAdminPartnersCategoriesRouteImport } from './routes/_authenticated/admin.partners.categories'
 import { Route as AuthenticatedAdminPartnersIdRouteImport } from './routes/_authenticated/admin.partners.$id'
 import { Route as AuthenticatedAdminPageBlocksPageKeyRouteImport } from './routes/_authenticated/admin.page-blocks.$pageKey'
+import { Route as AuthenticatedAdminFabricsCharacteristicsRouteImport } from './routes/_authenticated/admin.fabrics.characteristics'
 import { Route as AuthenticatedAdminFabricsCategoriesRouteImport } from './routes/_authenticated/admin.fabrics.categories'
 import { Route as AuthenticatedAdminFabricsIdRouteImport } from './routes/_authenticated/admin.fabrics.$id'
 import { Route as AuthenticatedAdminApartmentDiscountsRouteImport } from './routes/_authenticated/admin.apartment.discounts'
@@ -305,6 +306,12 @@ const AuthenticatedAdminPageBlocksPageKeyRoute =
     path: '/admin/page-blocks/$pageKey',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminFabricsCharacteristicsRoute =
+  AuthenticatedAdminFabricsCharacteristicsRouteImport.update({
+    id: '/admin/fabrics/characteristics',
+    path: '/admin/fabrics/characteristics',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminFabricsCategoriesRoute =
   AuthenticatedAdminFabricsCategoriesRouteImport.update({
     id: '/admin/fabrics/categories',
@@ -376,6 +383,7 @@ export interface FileRoutesByFullPath {
   '/admin/apartment/discounts': typeof AuthenticatedAdminApartmentDiscountsRoute
   '/admin/fabrics/$id': typeof AuthenticatedAdminFabricsIdRoute
   '/admin/fabrics/categories': typeof AuthenticatedAdminFabricsCategoriesRoute
+  '/admin/fabrics/characteristics': typeof AuthenticatedAdminFabricsCharacteristicsRoute
   '/admin/page-blocks/$pageKey': typeof AuthenticatedAdminPageBlocksPageKeyRoute
   '/admin/partners/$id': typeof AuthenticatedAdminPartnersIdRoute
   '/admin/partners/categories': typeof AuthenticatedAdminPartnersCategoriesRoute
@@ -426,6 +434,7 @@ export interface FileRoutesByTo {
   '/admin/apartment/discounts': typeof AuthenticatedAdminApartmentDiscountsRoute
   '/admin/fabrics/$id': typeof AuthenticatedAdminFabricsIdRoute
   '/admin/fabrics/categories': typeof AuthenticatedAdminFabricsCategoriesRoute
+  '/admin/fabrics/characteristics': typeof AuthenticatedAdminFabricsCharacteristicsRoute
   '/admin/page-blocks/$pageKey': typeof AuthenticatedAdminPageBlocksPageKeyRoute
   '/admin/partners/$id': typeof AuthenticatedAdminPartnersIdRoute
   '/admin/partners/categories': typeof AuthenticatedAdminPartnersCategoriesRoute
@@ -479,6 +488,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/apartment/discounts': typeof AuthenticatedAdminApartmentDiscountsRoute
   '/_authenticated/admin/fabrics/$id': typeof AuthenticatedAdminFabricsIdRoute
   '/_authenticated/admin/fabrics/categories': typeof AuthenticatedAdminFabricsCategoriesRoute
+  '/_authenticated/admin/fabrics/characteristics': typeof AuthenticatedAdminFabricsCharacteristicsRoute
   '/_authenticated/admin/page-blocks/$pageKey': typeof AuthenticatedAdminPageBlocksPageKeyRoute
   '/_authenticated/admin/partners/$id': typeof AuthenticatedAdminPartnersIdRoute
   '/_authenticated/admin/partners/categories': typeof AuthenticatedAdminPartnersCategoriesRoute
@@ -532,6 +542,7 @@ export interface FileRouteTypes {
     | '/admin/apartment/discounts'
     | '/admin/fabrics/$id'
     | '/admin/fabrics/categories'
+    | '/admin/fabrics/characteristics'
     | '/admin/page-blocks/$pageKey'
     | '/admin/partners/$id'
     | '/admin/partners/categories'
@@ -582,6 +593,7 @@ export interface FileRouteTypes {
     | '/admin/apartment/discounts'
     | '/admin/fabrics/$id'
     | '/admin/fabrics/categories'
+    | '/admin/fabrics/characteristics'
     | '/admin/page-blocks/$pageKey'
     | '/admin/partners/$id'
     | '/admin/partners/categories'
@@ -634,6 +646,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/apartment/discounts'
     | '/_authenticated/admin/fabrics/$id'
     | '/_authenticated/admin/fabrics/categories'
+    | '/_authenticated/admin/fabrics/characteristics'
     | '/_authenticated/admin/page-blocks/$pageKey'
     | '/_authenticated/admin/partners/$id'
     | '/_authenticated/admin/partners/categories'
@@ -982,6 +995,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminPageBlocksPageKeyRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/fabrics/characteristics': {
+      id: '/_authenticated/admin/fabrics/characteristics'
+      path: '/admin/fabrics/characteristics'
+      fullPath: '/admin/fabrics/characteristics'
+      preLoaderRoute: typeof AuthenticatedAdminFabricsCharacteristicsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/fabrics/categories': {
       id: '/_authenticated/admin/fabrics/categories'
       path: '/admin/fabrics/categories'
@@ -1065,6 +1085,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedAdminFabricsIdRoute: typeof AuthenticatedAdminFabricsIdRoute
   AuthenticatedAdminFabricsCategoriesRoute: typeof AuthenticatedAdminFabricsCategoriesRoute
+  AuthenticatedAdminFabricsCharacteristicsRoute: typeof AuthenticatedAdminFabricsCharacteristicsRoute
   AuthenticatedAdminPageBlocksPageKeyRoute: typeof AuthenticatedAdminPageBlocksPageKeyRoute
   AuthenticatedAdminPartnersIdRoute: typeof AuthenticatedAdminPartnersIdRoute
   AuthenticatedAdminPartnersCategoriesRoute: typeof AuthenticatedAdminPartnersCategoriesRoute
@@ -1099,6 +1120,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminFabricsIdRoute: AuthenticatedAdminFabricsIdRoute,
   AuthenticatedAdminFabricsCategoriesRoute:
     AuthenticatedAdminFabricsCategoriesRoute,
+  AuthenticatedAdminFabricsCharacteristicsRoute:
+    AuthenticatedAdminFabricsCharacteristicsRoute,
   AuthenticatedAdminPageBlocksPageKeyRoute:
     AuthenticatedAdminPageBlocksPageKeyRoute,
   AuthenticatedAdminPartnersIdRoute: AuthenticatedAdminPartnersIdRoute,
