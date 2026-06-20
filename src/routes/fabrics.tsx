@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Search, Info, PawPrint, Droplets } from "lucide-react";
+import { Search, Info, PawPrint, Droplets, X } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { fabricsQuery, fabricCategoriesQuery, fabricColorsByCollectionQuery } from "@/lib/queries";
