@@ -4,7 +4,12 @@ import { useQuery } from "@tanstack/react-query";
 import { ChevronRight } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { fabricQuery, fabricCategoriesQuery } from "@/lib/queries";
+import {
+  fabricQuery,
+  fabricCategoriesQuery,
+  fabricCharacteristicsQuery,
+  fabricColorsByCollectionQuery,
+} from "@/lib/queries";
 import { formatPrice } from "@/lib/cart";
 
 export const Route = createFileRoute("/fabrics/$id")({
@@ -15,6 +20,8 @@ function FabricDetail() {
   const { id } = Route.useParams();
   const { data: f, isLoading } = useQuery(fabricQuery(id));
   const { data: cats = [] } = useQuery(fabricCategoriesQuery);
+  const { data: charDefs = [] } = useQuery(fabricCharacteristicsQuery);
+  const { data: colors = [] } = useQuery(fabricColorsByCollectionQuery(id));
   const [lightbox, setLightbox] = useState<string | null>(null);
 
   if (isLoading) return <div className="min-h-screen bg-background"><Header /><div className="p-12 text-center text-muted-foreground">Загрузка…</div><Footer /></div>;
@@ -25,6 +32,12 @@ function FabricDetail() {
       </div><Footer /></div>
   );
   const cat = cats.find((c) => c.slug === f.category_slug);
+
+  const orderedLabels = charDefs.map((d) => d.label);
+  const extra = Object.keys(f.characteristics || {}).filter((k) => !orderedLabels.includes(k));
+  const charsList = [...orderedLabels, ...extra]
+    .map((label) => ({ label, value: (f.characteristics || {})[label] }))
+    .filter((c) => c.value && String(c.value).trim() !== "");
 
   return (
     <div className="min-h-screen bg-background">
@@ -49,18 +62,21 @@ function FabricDetail() {
             {f.code && <p className="mt-1 text-sm text-muted-foreground">Код: {f.code}</p>}
             {f.description && <p className="mt-4 text-base text-muted-foreground">{f.description}</p>}
 
-            <dl className="mt-6 grid gap-x-6 gap-y-2 text-sm">
-              {f.characteristics.for_children && <div className="flex justify-between border-b border-dashed py-2"><dt className="text-muted-foreground">Подходит для детей</dt><dd>Да</dd></div>}
-              {f.characteristics.for_pets && <div className="flex justify-between border-b border-dashed py-2"><dt className="text-muted-foreground">Подходит для животных</dt><dd>Да</dd></div>}
-              {f.characteristics.easy_care && <div className="flex justify-between border-b border-dashed py-2"><dt className="text-muted-foreground">Лёгкость ухода</dt><dd>{f.characteristics.easy_care}</dd></div>}
-              {f.characteristics.durability && <div className="flex justify-between border-b border-dashed py-2"><dt className="text-muted-foreground">Износостойкость</dt><dd>{f.characteristics.durability}</dd></div>}
-              {f.characteristics.features && <div className="flex justify-between gap-3 border-b border-dashed py-2"><dt className="text-muted-foreground">Особенности</dt><dd className="text-right">{f.characteristics.features}</dd></div>}
-            </dl>
+            {charsList.length > 0 && (
+              <dl className="mt-6 grid gap-x-6 gap-y-2 text-sm">
+                {charsList.map((c) => (
+                  <div key={c.label} className="flex justify-between gap-3 border-b border-dashed py-2">
+                    <dt className="text-muted-foreground">{c.label}</dt>
+                    <dd className="text-right font-medium">{c.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            )}
 
             {f.recommendations && (
               <div className="mt-5 rounded-2xl bg-primary/5 p-4 text-sm">
-                <div className="font-medium">Рекомендации</div>
-                <p className="mt-1 text-muted-foreground">{f.recommendations}</p>
+                <div className="font-semibold">Подходит для</div>
+                <p className="mt-1 whitespace-pre-line text-muted-foreground">{f.recommendations}</p>
               </div>
             )}
 
@@ -71,6 +87,25 @@ function FabricDetail() {
             )}
           </div>
         </div>
+
+        {colors.length > 0 && (
+          <section className="mt-14">
+            <h2 className="font-display text-2xl font-bold md:text-3xl">Цвета коллекции</h2>
+            <div className="mt-6 grid grid-cols-3 gap-4 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
+              {colors.map((color) => (
+                <div key={color.id} className="group cursor-pointer text-center">
+                  <div className="aspect-square overflow-hidden rounded-2xl bg-surface-muted transition-all duration-300 group-hover:scale-110 group-hover:shadow-card">
+                    {color.photo ? (
+                      <img src={color.photo} alt={color.name} loading="lazy" className="h-full w-full object-cover" />
+                    ) : null}
+                  </div>
+                  <p className="mt-2 text-xs font-medium leading-tight">{color.name}</p>
+                  {color.code && <p className="text-[11px] text-muted-foreground">{color.code}</p>}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {f.furniture_photos.length > 0 && (
           <section className="mt-16">
