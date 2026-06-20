@@ -88,12 +88,23 @@ export type FabricCategory = {
   sort_order: number;
 };
 
-export type FabricCharacteristics = {
-  for_children?: boolean;
-  for_pets?: boolean;
-  easy_care?: string; // например "высокая"
-  durability?: string; // например "30 000 циклов"
-  features?: string; // свободное описание
+// Dynamic characteristic name list (admin-managed). Each key = label.
+export type FabricCharacteristicDef = {
+  id: string;
+  label: string;
+  sort_order: number;
+};
+
+// Characteristic values on a collection are stored as { [label]: string }
+export type FabricCharacteristics = Record<string, string>;
+
+export type FabricColor = {
+  id: string;
+  fabric_id: string;
+  name: string;
+  code: string;
+  photo: string | null;
+  sort_order: number;
 };
 
 export type Fabric = {
@@ -109,6 +120,7 @@ export type Fabric = {
   furniture_photos: string[];
   sort_order: number;
 };
+
 
 export type ProductFabric = { product_id: string; fabric_id: string };
 

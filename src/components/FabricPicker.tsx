@@ -62,12 +62,16 @@ export function FabricPicker({
               <div className="mt-3 rounded-xl bg-primary/5 p-3 text-sm">{view.recommendations}</div>
             )}
             <dl className="mt-4 space-y-1 text-sm">
-              {view.characteristics.for_children && <div className="flex justify-between"><dt className="text-muted-foreground">Для детей</dt><dd>да</dd></div>}
-              {view.characteristics.for_pets && <div className="flex justify-between"><dt className="text-muted-foreground">Для животных</dt><dd>да</dd></div>}
-              {view.characteristics.easy_care && <div className="flex justify-between"><dt className="text-muted-foreground">Уход</dt><dd>{view.characteristics.easy_care}</dd></div>}
-              {view.characteristics.durability && <div className="flex justify-between"><dt className="text-muted-foreground">Износостойкость</dt><dd>{view.characteristics.durability}</dd></div>}
-              {view.characteristics.features && <div className="flex justify-between gap-3"><dt className="text-muted-foreground">Особенности</dt><dd className="text-right">{view.characteristics.features}</dd></div>}
+              {Object.entries(view.characteristics || {})
+                .filter(([, v]) => v && String(v).trim() !== "")
+                .map(([k, v]) => (
+                  <div key={k} className="flex justify-between gap-3">
+                    <dt className="text-muted-foreground">{k}</dt>
+                    <dd className="text-right">{String(v)}</dd>
+                  </div>
+                ))}
             </dl>
+
             {view.surcharge > 0 && <p className="mt-3 text-sm font-medium text-primary">Доплата: {formatPrice(view.surcharge)}</p>}
             <button onClick={() => { onSelect(view); onOpenChange(false); }}
               className="mt-6 w-full rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90">

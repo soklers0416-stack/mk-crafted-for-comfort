@@ -290,6 +290,71 @@ export type Database = {
         }
         Relationships: []
       }
+      fabric_characteristics: {
+        Row: {
+          created_at: string
+          id: string
+          label: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      fabric_colors: {
+        Row: {
+          code: string
+          created_at: string
+          fabric_id: string
+          id: string
+          name: string
+          photo: string | null
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          code?: string
+          created_at?: string
+          fabric_id: string
+          id?: string
+          name?: string
+          photo?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          fabric_id?: string
+          id?: string
+          name?: string
+          photo?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fabric_colors_fabric_id_fkey"
+            columns: ["fabric_id"]
+            isOneToOne: false
+            referencedRelation: "fabrics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fabrics: {
         Row: {
           category_slug: string

@@ -2,9 +2,11 @@ import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type {
   Category, Product, Review, Fabric, FabricCategory, ProductFabric,
+  FabricCharacteristicDef, FabricColor,
   AboutContent, AboutAdvantage, AboutStat, AboutStep, CustomerPhoto, GalleryItem, Faq,
   Partner, PartnerCategory, SpecItem,
 } from "./db";
+
 
 
 const sb = supabase as any;
@@ -81,6 +83,35 @@ export function fabricQuery(id: string) {
         characteristics: data.characteristics ?? {},
         furniture_photos: Array.isArray(data.furniture_photos) ? data.furniture_photos : [],
       } as Fabric;
+    },
+  });
+}
+
+export const fabricCharacteristicsQuery = queryOptions({
+  queryKey: ["fabric_characteristics"],
+  queryFn: async (): Promise<FabricCharacteristicDef[]> => {
+    const { data, error } = await sb.from("fabric_characteristics").select("*").order("sort_order");
+    if (error) throw error;
+    return (data ?? []) as FabricCharacteristicDef[];
+  },
+});
+
+export const fabricColorsQuery = queryOptions({
+  queryKey: ["fabric_colors"],
+  queryFn: async (): Promise<FabricColor[]> => {
+    const { data, error } = await sb.from("fabric_colors").select("*").order("sort_order");
+    if (error) throw error;
+    return (data ?? []) as FabricColor[];
+  },
+});
+
+export function fabricColorsByCollectionQuery(fabricId: string) {
+  return queryOptions({
+    queryKey: ["fabric_colors", fabricId],
+    queryFn: async (): Promise<FabricColor[]> => {
+      const { data, error } = await sb.from("fabric_colors").select("*").eq("fabric_id", fabricId).order("sort_order");
+      if (error) throw error;
+      return (data ?? []) as FabricColor[];
     },
   });
 }

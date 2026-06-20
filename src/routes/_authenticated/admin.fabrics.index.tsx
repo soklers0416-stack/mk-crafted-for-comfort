@@ -27,16 +27,18 @@ function AdminFabrics() {
     <div>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display text-2xl font-bold">Ткани</h1>
+          <h1 className="font-display text-2xl font-bold">Коллекции тканей</h1>
           <p className="mt-1 text-sm text-muted-foreground">Всего: {fabrics.length}</p>
         </div>
-        <div className="flex gap-2">
-          <Link to="/admin/fabrics/categories" className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-4 py-2 text-sm font-medium">Категории</Link>
+        <div className="flex flex-wrap gap-2">
+          <Link to="/admin/fabrics/categories" className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-4 py-2 text-sm font-medium">Типы тканей</Link>
+          <Link to="/admin/fabrics/characteristics" className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-4 py-2 text-sm font-medium">Характеристики</Link>
           <Link to="/admin/fabrics/$id" params={{ id: "new" }} className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90">
-            <Plus className="h-4 w-4" /> Добавить ткань
+            <Plus className="h-4 w-4" /> Новая коллекция
           </Link>
         </div>
       </div>
+
 
       <div className="mt-6 overflow-hidden rounded-2xl border border-border/60 bg-card">
         <table className="w-full text-sm">
