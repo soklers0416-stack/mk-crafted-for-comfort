@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Search } from "lucide-react";
+import { Search, Info } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { fabricsQuery, fabricCategoriesQuery } from "@/lib/queries";
+import { fabricsQuery, fabricCategoriesQuery, fabricColorsByCollectionQuery } from "@/lib/queries";
 import { PageBanner, PageBlocksRenderer } from "@/components/PageBlocks";
 import { FabricDetailModal } from "@/components/FabricDetailModal";
 import type { Fabric } from "@/lib/db";
