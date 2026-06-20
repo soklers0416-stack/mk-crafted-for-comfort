@@ -18,10 +18,11 @@ import {
   DoorOpen,
   PawPrint,
   Droplets,
+  Check,
+  Minus,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import {
-  fabricColorsByCollectionQuery,
   fabricCharacteristicsQuery,
   fabricCategoriesQuery,
 } from "@/lib/queries";
