@@ -21,7 +21,7 @@ const EMPTY: Omit<Fabric, "id"> = {
   code: "", title: "", category_slug: "", description: "",
   characteristics: {}, recommendations: "", surcharge: 0,
   sample_photo: null, furniture_photos: [], sort_order: 0,
-  allow_pets: false, washable: false,
+  allow_pets: false, washable: false, pros: "", cons: "",
 };
 
 function EditFabric() {
