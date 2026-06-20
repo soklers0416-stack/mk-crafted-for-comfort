@@ -87,6 +87,35 @@ export function fabricQuery(id: string) {
   });
 }
 
+export const fabricCharacteristicsQuery = queryOptions({
+  queryKey: ["fabric_characteristics"],
+  queryFn: async (): Promise<FabricCharacteristicDef[]> => {
+    const { data, error } = await sb.from("fabric_characteristics").select("*").order("sort_order");
+    if (error) throw error;
+    return (data ?? []) as FabricCharacteristicDef[];
+  },
+});
+
+export const fabricColorsQuery = queryOptions({
+  queryKey: ["fabric_colors"],
+  queryFn: async (): Promise<FabricColor[]> => {
+    const { data, error } = await sb.from("fabric_colors").select("*").order("sort_order");
+    if (error) throw error;
+    return (data ?? []) as FabricColor[];
+  },
+});
+
+export function fabricColorsByCollectionQuery(fabricId: string) {
+  return queryOptions({
+    queryKey: ["fabric_colors", fabricId],
+    queryFn: async (): Promise<FabricColor[]> => {
+      const { data, error } = await sb.from("fabric_colors").select("*").eq("fabric_id", fabricId).order("sort_order");
+      if (error) throw error;
+      return (data ?? []) as FabricColor[];
+    },
+  });
+}
+
 export const productFabricsQuery = queryOptions({
   queryKey: ["product_fabrics"],
   queryFn: async (): Promise<ProductFabric[]> => {
