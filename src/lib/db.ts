@@ -121,6 +121,8 @@ export type Fabric = {
   sort_order: number;
   allow_pets: boolean;
   washable: boolean;
+  pros: string;
+  cons: string;
 };
 
 
