@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Search, Info, PawPrint, Droplets } from "lucide-react";
+import { Search, Info, PawPrint, Droplets, X } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { fabricsQuery, fabricCategoriesQuery, fabricColorsByCollectionQuery } from "@/lib/queries";
@@ -79,6 +79,7 @@ function FabricCollectionRow({ fabric, onOpen }: { fabric: Fabric; onOpen: () =>
   const { data: colors = [] } = useQuery(fabricColorsByCollectionQuery(fabric.id));
   const { data: cats = [] } = useQuery(fabricCategoriesQuery);
   const cat = cats.find((c) => c.slug === fabric.category_slug);
+  const [lb, setLb] = useState<{ photo: string; name?: string | null; code?: string | null } | null>(null);
 
   return (
     <article className="overflow-visible rounded-3xl border border-border/60 bg-card p-6 transition hover:shadow-card md:p-8">
@@ -124,27 +125,71 @@ function FabricCollectionRow({ fabric, onOpen }: { fabric: Fabric; onOpen: () =>
         {colors.length > 0 ? (
           <div className="-mx-1 flex snap-x snap-mandatory gap-4 overflow-x-auto px-1 pb-2 md:grid md:grid-cols-5 md:overflow-visible lg:grid-cols-7 xl:grid-cols-8">
             {colors.map((c) => (
-              <FabricSwatch key={c.id} photo={c.photo} name={c.name} code={c.code} />
+              <FabricSwatch
+                key={c.id}
+                photo={c.photo}
+                name={c.name}
+                code={c.code}
+                onOpen={() => c.photo && setLb({ photo: c.photo, name: c.name, code: c.code })}
+              />
             ))}
           </div>
         ) : (
           <p className="text-sm text-muted-foreground">Цвета пока не добавлены</p>
         )}
       </div>
+
+      {lb && <SwatchLightbox photo={lb.photo} name={lb.name} code={lb.code} onClose={() => setLb(null)} />}
     </article>
   );
 }
 
-function FabricSwatch({ photo, name, code }: { photo?: string | null; name?: string | null; code?: string | null }) {
+function SwatchLightbox({ photo, name, code, onClose }: { photo: string; name?: string | null; code?: string | null; onClose: () => void }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    document.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 grid place-items-center bg-black/80 p-4 animate-fade-in backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <button
+        onClick={(e) => { e.stopPropagation(); onClose(); }}
+        aria-label="Закрыть"
+        className="absolute right-4 top-4 z-10 grid h-10 w-10 place-items-center rounded-full bg-white/10 text-white backdrop-blur hover:bg-white/20 transition"
+      >
+        <X className="h-5 w-5" />
+      </button>
+      <div className="relative max-h-[90vh] max-w-[90vw]">
+        <img
+          src={photo}
+          alt={name || code || ""}
+          className="max-h-[90vh] max-w-[90vw] rounded-2xl object-contain shadow-2xl animate-scale-in"
+        />
+        {(code || name) && (
+          <p className="mt-3 text-center text-sm font-medium text-white">{code || name}</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function FabricSwatch({ photo, name, code, onOpen }: { photo?: string | null; name?: string | null; code?: string | null; onOpen?: () => void }) {
   const [hover, setHover] = useState(false);
-  const [tap, setTap] = useState(false);
-  const show = hover || tap;
   return (
     <div
       className="group relative w-28 shrink-0 snap-start md:w-auto"
       onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => { setHover(false); setTap(false); }}
-      onClick={() => setTap((v) => !v)}
+      onMouseLeave={() => setHover(false)}
+      onClick={() => onOpen?.()}
     >
       <div className="aspect-square overflow-hidden rounded-xl bg-surface-muted ring-1 ring-border transition-transform duration-200 group-hover:scale-[1.03]">
         {photo && <img src={photo} alt={name || code || ""} loading="lazy" className="h-full w-full object-cover" />}
@@ -152,7 +197,7 @@ function FabricSwatch({ photo, name, code }: { photo?: string | null; name?: str
       {(code || name) && (
         <p className="mt-2 truncate text-center text-xs font-medium text-foreground">{code || name}</p>
       )}
-      {photo && show && (
+      {photo && hover && (
         <div className="pointer-events-none absolute left-1/2 top-1/2 z-30 hidden -translate-x-1/2 -translate-y-1/2 sm:block">
           <div className="h-[300px] w-[300px] overflow-hidden rounded-2xl bg-background shadow-2xl ring-1 ring-border animate-scale-in">
             <img src={photo} alt={name || code || ""} className="h-full w-full object-cover" />
