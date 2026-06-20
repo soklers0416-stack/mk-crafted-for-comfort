@@ -16,6 +16,8 @@ import {
   Home,
   Armchair,
   DoorOpen,
+  PawPrint,
+  Droplets,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import {
