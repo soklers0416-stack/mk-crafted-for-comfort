@@ -119,6 +119,8 @@ export type Fabric = {
   sample_photo: string | null;
   furniture_photos: string[];
   sort_order: number;
+  allow_pets: boolean;
+  washable: boolean;
 };
 
 
