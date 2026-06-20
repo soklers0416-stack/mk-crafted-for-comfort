@@ -74,3 +74,60 @@ function FabricsPage() {
     </div>
   );
 }
+
+function FabricCollectionCard({ fabric, onOpen }: { fabric: Fabric; onOpen: () => void }) {
+  const { data: colors = [] } = useQuery(fabricColorsByCollectionQuery(fabric.id));
+  const { data: cats = [] } = useQuery(fabricCategoriesQuery);
+  const cat = cats.find((c) => c.slug === fabric.category_slug);
+
+  return (
+    <article className="group flex flex-col overflow-hidden rounded-3xl border border-border/60 bg-card transition hover:shadow-card">
+      <div className="flex items-start justify-between gap-3 p-5 pb-3">
+        <div className="min-w-0">
+          {cat && (
+            <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+              {cat.title}
+            </p>
+          )}
+          <h3 className="mt-1 font-display text-xl font-semibold leading-tight">{fabric.title}</h3>
+        </div>
+        <button
+          onClick={onOpen}
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary transition hover:bg-primary hover:text-primary-foreground"
+        >
+          <Info className="h-3.5 w-3.5" />
+          Подробнее
+        </button>
+      </div>
+
+      {colors.length > 0 ? (
+        <div className="grid grid-cols-3 gap-3 p-5 pt-2 sm:grid-cols-4">
+          {colors.map((c) => (
+            <div key={c.id} className="group/color">
+              <div className="aspect-square overflow-hidden rounded-xl bg-surface-muted ring-1 ring-border transition-all duration-300 group-hover/color:scale-105 group-hover/color:shadow-card">
+                {c.photo && (
+                  <img src={c.photo} alt={c.name} loading="lazy" className="h-full w-full object-cover" />
+                )}
+              </div>
+              {(c.code || c.name) && (
+                <p className="mt-1.5 truncate text-center text-[11px] font-medium text-muted-foreground">
+                  {c.code || c.name}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="px-5 pb-5">
+          {fabric.sample_photo ? (
+            <div className="aspect-[4/3] overflow-hidden rounded-xl bg-surface-muted">
+              <img src={fabric.sample_photo} alt={fabric.title} loading="lazy" className="h-full w-full object-cover" />
+            </div>
+          ) : (
+            <p className="text-xs text-muted-foreground">Цвета пока не добавлены</p>
+          )}
+        </div>
+      )}
+    </article>
+  );
+}
