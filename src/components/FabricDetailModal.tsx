@@ -87,6 +87,11 @@ export function FabricDetailModal({
   const charsList = allLabels
     .map((label) => ({ label, value: (fabric.characteristics || {})[label] }))
     .filter((c) => c.value && String(c.value).trim() !== "");
+  const flagChars: { label: string; Icon: typeof PawPrint }[] = [];
+  if (fabric.allow_pets) flagChars.push({ label: "Домашние животные", Icon: PawPrint });
+  if (fabric.washable) flagChars.push({ label: "Можно мыть", Icon: Droplets });
+  const hasChars = charsList.length > 0 || flagChars.length > 0;
+
 
   const recList = (fabric.recommendations || "")
     .split(/[\n,;]+/)
