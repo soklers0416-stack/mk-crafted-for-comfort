@@ -157,14 +157,6 @@ export function FabricDetailModal({
                           </li>
                         );
                       })}
-                      {flagChars.map(({ label, Icon }) => (
-                        <li key={label} className="flex items-start gap-3 text-sm">
-                          <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
-                            <Icon className="h-4 w-4" />
-                          </span>
-                          <span className="font-medium leading-6 text-foreground">{label}</span>
-                        </li>
-                      ))}
                     </ul>
                   </div>
                 ) : <div />}
