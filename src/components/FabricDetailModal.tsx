@@ -18,6 +18,8 @@ import {
   DoorOpen,
   Check,
   Minus,
+  UtensilsCrossed,
+  Bath,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -43,6 +45,8 @@ function iconForRecommendation(text: string): LucideIcon {
   if (l.includes("гостин")) return Sofa;
   if (l.includes("спальн")) return Bed;
   if (l.includes("дет")) return Baby;
+  if (l.includes("кухн")) return UtensilsCrossed;
+  if (l.includes("ванн")) return Bath;
   if (l.includes("кресл")) return Armchair;
   if (l.includes("прихож") || l.includes("кориод")) return DoorOpen;
   return Home;
