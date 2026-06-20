@@ -91,13 +91,33 @@ function FabricCollectionRow({ fabric, onOpen }: { fabric: Fabric; onOpen: () =>
           )}
           <h3 className="mt-1 font-display text-3xl font-bold leading-tight md:text-4xl">{fabric.title}</h3>
         </div>
-        <button
-          onClick={onOpen}
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-primary/10 px-4 py-2 text-xs font-medium text-primary transition hover:bg-primary hover:text-primary-foreground"
-        >
-          <Info className="h-3.5 w-3.5" />
-          Подробнее о ткани
-        </button>
+        <div className="flex shrink-0 items-center gap-2">
+          {fabric.allow_pets && (
+            <span
+              title="Подходит для домашних животных"
+              aria-label="Подходит для домашних животных"
+              className="grid h-9 w-9 place-items-center rounded-full bg-primary/10 text-primary transition hover:bg-primary hover:text-primary-foreground"
+            >
+              <PawPrint className="h-4 w-4" />
+            </span>
+          )}
+          {fabric.washable && (
+            <span
+              title="Можно мыть"
+              aria-label="Можно мыть"
+              className="grid h-9 w-9 place-items-center rounded-full bg-primary/10 text-primary transition hover:bg-primary hover:text-primary-foreground"
+            >
+              <Droplets className="h-4 w-4" />
+            </span>
+          )}
+          <button
+            onClick={onOpen}
+            className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-4 py-2 text-xs font-medium text-primary transition hover:bg-primary hover:text-primary-foreground"
+          >
+            <Info className="h-3.5 w-3.5" />
+            Подробнее о ткани
+          </button>
+        </div>
       </header>
 
       <div className="mt-6">
