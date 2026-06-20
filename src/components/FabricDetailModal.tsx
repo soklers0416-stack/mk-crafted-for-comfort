@@ -143,13 +143,13 @@ export function FabricDetailModal({
             )}
 
             {(hasChars || recList.length > 0) && (
-              <div className="mt-8 grid gap-8 sm:grid-cols-2">
-                {hasChars && (
+              <div className="mt-8 grid gap-8 sm:grid-cols-[1fr_auto_1fr] sm:items-start">
+                {hasChars ? (
                   <div>
                     <h3 className="text-xs font-bold uppercase tracking-[0.15em] text-foreground">
                       Характеристики
                     </h3>
-                    <ul className="mt-4 space-y-3">
+                    <ul className="mt-4 flex flex-col gap-3">
                       {charsList.map((c) => {
                         const Icon = iconForChar(c.label);
                         return (
@@ -174,15 +174,18 @@ export function FabricDetailModal({
                       ))}
                     </ul>
                   </div>
-                )}
+                ) : <div />}
 
+                {hasChars && recList.length > 0 && (
+                  <div className="hidden sm:block h-full w-px self-stretch bg-border" aria-hidden />
+                )}
 
                 {recList.length > 0 && (
                   <div>
                     <h3 className="text-xs font-bold uppercase tracking-[0.15em] text-foreground">
                       Подходит для
                     </h3>
-                    <ul className="mt-4 space-y-3">
+                    <ul className="mt-4 flex flex-col gap-3">
                       {recList.map((r) => {
                         const Icon = iconForRecommendation(r);
                         return (
@@ -200,31 +203,32 @@ export function FabricDetailModal({
               </div>
             )}
 
-            {colors.length > 0 && (
-              <div className="mt-8">
-                <h3 className="text-xs font-bold uppercase tracking-[0.15em] text-foreground">
-                  Цвета коллекции
-                </h3>
-                <div className="mt-4 flex flex-wrap gap-3">
-                  {colors.map((color) => (
-                    <div
-                      key={color.id}
-                      className="group cursor-pointer"
-                      title={color.code ? `${color.name} · ${color.code}` : color.name}
-                    >
-                      <div className="h-14 w-14 overflow-hidden rounded-xl bg-surface-muted ring-1 ring-border transition-all duration-300 group-hover:scale-110 group-hover:shadow-card">
-                        {color.photo ? (
-                          <img
-                            src={color.photo}
-                            alt={color.name}
-                            loading="lazy"
-                            className="h-full w-full object-cover"
-                          />
-                        ) : null}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+            {(fabric.pros?.trim() || fabric.cons?.trim()) && (
+              <div className="mt-8 grid gap-4 sm:grid-cols-2">
+                {fabric.pros?.trim() && (
+                  <div className="rounded-2xl border border-emerald-200/70 bg-emerald-50/60 p-5">
+                    <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.15em] text-emerald-800">
+                      <Check className="h-4 w-4" /> Преимущества
+                    </h3>
+                    <ul className="mt-3 space-y-2 text-sm text-emerald-900">
+                      {fabric.pros.split(/\n+/).map((s) => s.trim()).filter(Boolean).map((s, i) => (
+                        <li key={i} className="flex gap-2"><span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-emerald-600" /><span>{s}</span></li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {fabric.cons?.trim() && (
+                  <div className="rounded-2xl border border-rose-200/70 bg-rose-50/60 p-5">
+                    <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.15em] text-rose-800">
+                      <Minus className="h-4 w-4" /> Недостатки
+                    </h3>
+                    <ul className="mt-3 space-y-2 text-sm text-rose-900">
+                      {fabric.cons.split(/\n+/).map((s) => s.trim()).filter(Boolean).map((s, i) => (
+                        <li key={i} className="flex gap-2"><span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-rose-600" /><span>{s}</span></li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             )}
           </div>
