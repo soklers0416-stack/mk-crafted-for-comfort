@@ -143,7 +143,30 @@ function EditFabric() {
               </F>
             </div>
             <F label="Описание"><textarea value={form.description} onChange={(e) => up("description", e.target.value)} rows={3} className={I} /></F>
-            <F label="Подходит для"><textarea value={form.recommendations} onChange={(e) => up("recommendations", e.target.value)} rows={2} className={I} placeholder="Например: гостиная, спальня, детская" /></F>
+            <F label="Подходит для комнат">
+              <div className="grid gap-2 sm:grid-cols-2">
+                {ROOMS.map((r) => {
+                  const list = (form.recommendations || "").split(",").map((s) => s.trim()).filter(Boolean);
+                  const checked = list.includes(r);
+                  return (
+                    <label key={r} className="flex items-center gap-2 text-sm cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={(e) => {
+                          const next = e.target.checked
+                            ? [...list.filter((x) => x !== r), r]
+                            : list.filter((x) => x !== r);
+                          up("recommendations", next.join(", "));
+                        }}
+                        className="h-4 w-4"
+                      />
+                      {r}
+                    </label>
+                  );
+                })}
+              </div>
+            </F>
             <div className="grid gap-3 sm:grid-cols-2">
               <F label="Доплата, ₽"><input type="number" value={form.surcharge} onChange={(e) => up("surcharge", Number(e.target.value))} className={I} /></F>
               <F label="Порядок"><input type="number" value={form.sort_order} onChange={(e) => up("sort_order", Number(e.target.value))} className={I} /></F>
