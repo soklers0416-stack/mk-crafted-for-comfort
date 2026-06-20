@@ -16,8 +16,6 @@ import {
   Home,
   Armchair,
   DoorOpen,
-  PawPrint,
-  Droplets,
   Check,
   Minus,
 } from "lucide-react";
