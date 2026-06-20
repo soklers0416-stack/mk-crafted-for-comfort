@@ -357,6 +357,7 @@ export type Database = {
       }
       fabrics: {
         Row: {
+          allow_pets: boolean
           category_slug: string
           characteristics: Json
           code: string
@@ -370,8 +371,10 @@ export type Database = {
           surcharge: number
           title: string
           updated_at: string
+          washable: boolean
         }
         Insert: {
+          allow_pets?: boolean
           category_slug: string
           characteristics?: Json
           code?: string
@@ -385,8 +388,10 @@ export type Database = {
           surcharge?: number
           title: string
           updated_at?: string
+          washable?: boolean
         }
         Update: {
+          allow_pets?: boolean
           category_slug?: string
           characteristics?: Json
           code?: string
@@ -400,6 +405,7 @@ export type Database = {
           surcharge?: number
           title?: string
           updated_at?: string
+          washable?: boolean
         }
         Relationships: []
       }
