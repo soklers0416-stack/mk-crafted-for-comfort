@@ -17,6 +17,8 @@ export const Route = createFileRoute("/_authenticated/admin/fabrics/$id")({
   component: EditFabric,
 });
 
+const ROOMS = ["Гостиная", "Спальня", "Детская", "Кухня", "Ванна", "Прихожая"] as const;
+
 const EMPTY: Omit<Fabric, "id"> = {
   code: "", title: "", category_slug: "", description: "",
   characteristics: {}, recommendations: "", surcharge: 0,
