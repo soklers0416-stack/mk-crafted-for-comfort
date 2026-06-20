@@ -146,14 +146,12 @@ export function FabricDetailModal({
                       {charsList.map((c) => {
                         const Icon = iconForChar(c.label);
                         return (
-                          <li key={c.label} className="flex items-start gap-3 text-sm">
-                            <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
+                          <li key={c.label} className="flex items-center gap-3 text-sm">
+                            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
                               <Icon className="h-4 w-4" />
                             </span>
-                            <span className="leading-6">
-                              <span className="text-muted-foreground">{c.label}: </span>
-                              <span className="font-medium text-foreground">{c.value}</span>
-                            </span>
+                            <span className="min-w-0 flex-1 truncate text-muted-foreground">{c.label}:</span>
+                            <span className="shrink-0 whitespace-nowrap font-medium text-foreground">{c.value}</span>
                           </li>
                         );
                       })}
