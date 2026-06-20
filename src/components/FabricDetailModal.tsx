@@ -16,8 +16,6 @@ import {
   Home,
   Armchair,
   DoorOpen,
-  PawPrint,
-  Droplets,
   Check,
   Minus,
 } from "lucide-react";
@@ -80,10 +78,7 @@ export function FabricDetailModal({
   const charsList = charDefs
     .map((d) => ({ label: d.label, value: (fabric.characteristics || {})[d.label] }))
     .filter((c) => c.value !== undefined && c.value !== null && String(c.value).trim() !== "");
-  const flagChars: { label: string; Icon: typeof PawPrint }[] = [];
-  if (fabric.allow_pets) flagChars.push({ label: "Домашние животные", Icon: PawPrint });
-  if (fabric.washable) flagChars.push({ label: "Можно мыть", Icon: Droplets });
-  const hasChars = charsList.length > 0 || flagChars.length > 0;
+  const hasChars = charsList.length > 0;
 
 
   const recList = (fabric.recommendations || "")
@@ -149,25 +144,15 @@ export function FabricDetailModal({
                       {charsList.map((c) => {
                         const Icon = iconForChar(c.label);
                         return (
-                          <li key={c.label} className="flex items-start gap-3 text-sm">
-                            <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
+                          <li key={c.label} className="flex items-center gap-3 text-sm">
+                            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
                               <Icon className="h-4 w-4" />
                             </span>
-                            <span className="leading-6">
-                              <span className="text-muted-foreground">{c.label}: </span>
-                              <span className="font-medium text-foreground">{c.value}</span>
-                            </span>
+                            <span className="min-w-0 flex-1 truncate text-muted-foreground">{c.label}:</span>
+                            <span className="shrink-0 whitespace-nowrap font-medium text-foreground">{c.value}</span>
                           </li>
                         );
                       })}
-                      {flagChars.map(({ label, Icon }) => (
-                        <li key={label} className="flex items-start gap-3 text-sm">
-                          <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
-                            <Icon className="h-4 w-4" />
-                          </span>
-                          <span className="font-medium leading-6 text-foreground">{label}</span>
-                        </li>
-                      ))}
                     </ul>
                   </div>
                 ) : <div />}
