@@ -1,12 +1,51 @@
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { X } from "lucide-react";
+import {
+  X,
+  Layers,
+  Scale,
+  Activity,
+  Sparkles,
+  Droplet,
+  Sun,
+  Shield,
+  Circle,
+  Sofa,
+  Bed,
+  Baby,
+  Home,
+  Armchair,
+  DoorOpen,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import {
   fabricColorsByCollectionQuery,
   fabricCharacteristicsQuery,
   fabricCategoriesQuery,
 } from "@/lib/queries";
 import type { Fabric } from "@/lib/db";
+
+function iconForChar(label: string): LucideIcon {
+  const l = label.toLowerCase();
+  if (l.includes("состав")) return Layers;
+  if (l.includes("плотн")) return Scale;
+  if (l.includes("износ") || l.includes("мартин")) return Activity;
+  if (l.includes("уход") || l.includes("чист")) return Sparkles;
+  if (l.includes("вод") || l.includes("влаг")) return Droplet;
+  if (l.includes("свет") || l.includes("выгор")) return Sun;
+  if (l.includes("защит") || l.includes("антиког")) return Shield;
+  return Circle;
+}
+
+function iconForRecommendation(text: string): LucideIcon {
+  const l = text.toLowerCase();
+  if (l.includes("гостин")) return Sofa;
+  if (l.includes("спальн")) return Bed;
+  if (l.includes("дет")) return Baby;
+  if (l.includes("кресл")) return Armchair;
+  if (l.includes("прихож") || l.includes("кориод")) return DoorOpen;
+  return Home;
+}
 
 export function FabricDetailModal({
   fabric,
@@ -38,104 +77,145 @@ export function FabricDetailModal({
   if (!fabric) return null;
   const cat = cats.find((c) => c.slug === fabric.category_slug);
 
-  // Render characteristics in defined order, then any extras present on the fabric
   const orderedLabels = charDefs.map((d) => d.label);
-  const extra = Object.keys(fabric.characteristics || {}).filter((k) => !orderedLabels.includes(k));
+  const extra = Object.keys(fabric.characteristics || {}).filter(
+    (k) => !orderedLabels.includes(k),
+  );
   const allLabels = [...orderedLabels, ...extra];
   const charsList = allLabels
     .map((label) => ({ label, value: (fabric.characteristics || {})[label] }))
     .filter((c) => c.value && String(c.value).trim() !== "");
 
+  const recList = (fabric.recommendations || "")
+    .split(/[\n,;]+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+
   return (
     <div
-      className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-4 animate-fade-in backdrop-blur-sm"
+      className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-2 sm:p-4 animate-fade-in backdrop-blur-sm"
       onClick={onClose}
     >
       <div
-        className="relative max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-3xl bg-background p-6 shadow-2xl animate-scale-in md:p-8"
+        className="relative max-h-[95vh] w-full max-w-6xl overflow-hidden rounded-3xl bg-background shadow-2xl animate-scale-in"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           onClick={onClose}
           aria-label="Закрыть"
-          className="absolute right-4 top-4 grid h-10 w-10 place-items-center rounded-full bg-surface-muted hover:bg-surface transition"
+          className="absolute right-4 top-4 z-10 grid h-10 w-10 place-items-center rounded-full bg-background/80 backdrop-blur hover:bg-background transition shadow-sm"
         >
           <X className="h-5 w-5" />
         </button>
 
-        <div className="grid gap-8 md:grid-cols-2">
-          <div>
+        <div className="grid max-h-[95vh] overflow-y-auto md:grid-cols-2">
+          {/* Left: full-bleed image */}
+          <div className="bg-surface-muted md:sticky md:top-0 md:h-[95vh]">
             {fabric.sample_photo ? (
               <img
                 src={fabric.sample_photo}
                 alt={fabric.title}
-                className="aspect-square w-full rounded-2xl object-cover"
+                className="h-64 w-full object-cover md:h-full"
               />
             ) : (
-              <div className="aspect-square w-full rounded-2xl bg-surface-muted" />
+              <div className="h-64 w-full md:h-full" />
             )}
           </div>
-          <div>
+
+          {/* Right: content */}
+          <div className="p-6 md:p-10">
             {cat && (
-              <p className="text-sm font-medium uppercase tracking-wider text-primary">
+              <p className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">
                 {cat.title}
               </p>
             )}
-            <h2 className="mt-2 font-display text-3xl font-bold md:text-4xl">{fabric.title}</h2>
+            <h2 className="mt-1 font-display text-3xl font-bold tracking-tight md:text-4xl">
+              {fabric.title}
+            </h2>
             {fabric.description && (
-              <p className="mt-4 text-base text-muted-foreground">{fabric.description}</p>
+              <p className="mt-4 text-base leading-relaxed text-muted-foreground">
+                {fabric.description}
+              </p>
             )}
 
-            {charsList.length > 0 && (
-              <dl className="mt-6 grid gap-x-6 gap-y-2 text-sm">
-                {charsList.map((c) => (
-                  <div
-                    key={c.label}
-                    className="flex justify-between gap-3 border-b border-dashed py-2"
-                  >
-                    <dt className="text-muted-foreground">{c.label}</dt>
-                    <dd className="text-right font-medium">{c.value}</dd>
+            {(charsList.length > 0 || recList.length > 0) && (
+              <div className="mt-8 grid gap-8 sm:grid-cols-2">
+                {charsList.length > 0 && (
+                  <div>
+                    <h3 className="text-xs font-bold uppercase tracking-[0.15em] text-foreground">
+                      Характеристики
+                    </h3>
+                    <ul className="mt-4 space-y-3">
+                      {charsList.map((c) => {
+                        const Icon = iconForChar(c.label);
+                        return (
+                          <li key={c.label} className="flex items-start gap-3 text-sm">
+                            <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
+                              <Icon className="h-4 w-4" />
+                            </span>
+                            <span className="leading-6">
+                              <span className="text-muted-foreground">{c.label}: </span>
+                              <span className="font-medium text-foreground">{c.value}</span>
+                            </span>
+                          </li>
+                        );
+                      })}
+                    </ul>
                   </div>
-                ))}
-              </dl>
+                )}
+
+                {recList.length > 0 && (
+                  <div>
+                    <h3 className="text-xs font-bold uppercase tracking-[0.15em] text-foreground">
+                      Подходит для
+                    </h3>
+                    <ul className="mt-4 space-y-3">
+                      {recList.map((r) => {
+                        const Icon = iconForRecommendation(r);
+                        return (
+                          <li key={r} className="flex items-center gap-3 text-sm">
+                            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
+                              <Icon className="h-4 w-4" />
+                            </span>
+                            <span className="font-medium text-foreground">{r}</span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                )}
+              </div>
             )}
 
-            {fabric.recommendations && (
-              <div className="mt-5 rounded-2xl bg-primary/5 p-4 text-sm">
-                <div className="font-semibold">Подходит для</div>
-                <p className="mt-1 whitespace-pre-line text-muted-foreground">
-                  {fabric.recommendations}
-                </p>
+            {colors.length > 0 && (
+              <div className="mt-8">
+                <h3 className="text-xs font-bold uppercase tracking-[0.15em] text-foreground">
+                  Цвета коллекции
+                </h3>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  {colors.map((color) => (
+                    <div
+                      key={color.id}
+                      className="group cursor-pointer"
+                      title={color.code ? `${color.name} · ${color.code}` : color.name}
+                    >
+                      <div className="h-14 w-14 overflow-hidden rounded-xl bg-surface-muted ring-1 ring-border transition-all duration-300 group-hover:scale-110 group-hover:shadow-card">
+                        {color.photo ? (
+                          <img
+                            src={color.photo}
+                            alt={color.name}
+                            loading="lazy"
+                            className="h-full w-full object-cover"
+                          />
+                        ) : null}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
         </div>
-
-        {colors.length > 0 && (
-          <section className="mt-10">
-            <h3 className="font-display text-xl font-bold">Цвета коллекции</h3>
-            <div className="mt-5 grid grid-cols-3 gap-4 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
-              {colors.map((color) => (
-                <div key={color.id} className="group cursor-pointer text-center">
-                  <div className="aspect-square overflow-hidden rounded-2xl bg-surface-muted transition-all duration-300 group-hover:scale-110 group-hover:shadow-card">
-                    {color.photo ? (
-                      <img
-                        src={color.photo}
-                        alt={color.name}
-                        loading="lazy"
-                        className="h-full w-full object-cover"
-                      />
-                    ) : null}
-                  </div>
-                  <p className="mt-2 text-xs font-medium leading-tight">{color.name}</p>
-                  {color.code && (
-                    <p className="text-[11px] text-muted-foreground">{color.code}</p>
-                  )}
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
       </div>
     </div>
   );
