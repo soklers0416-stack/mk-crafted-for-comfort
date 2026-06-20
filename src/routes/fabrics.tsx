@@ -1,12 +1,13 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Search } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { fabricsQuery, fabricCategoriesQuery } from "@/lib/queries";
-import { formatPrice } from "@/lib/cart";
 import { PageBanner, PageBlocksRenderer } from "@/components/PageBlocks";
+import { FabricDetailModal } from "@/components/FabricDetailModal";
+import type { Fabric } from "@/lib/db";
 
 export const Route = createFileRoute("/fabrics")({
   head: () => ({
@@ -25,6 +26,7 @@ function FabricsPage() {
   const { data: cats = [] } = useQuery(fabricCategoriesQuery);
   const [cat, setCat] = useState("");
   const [q, setQ] = useState("");
+  const [active, setActive] = useState<Fabric | null>(null);
 
   const filtered = fabrics
     .filter((f) => !cat || f.category_slug === cat)
@@ -42,10 +44,10 @@ function FabricsPage() {
         </p>
 
         <div className="mt-8 flex flex-wrap gap-2">
-          <button onClick={() => setCat("")} className={`rounded-full px-4 py-2 text-sm font-medium ${!cat ? "bg-primary text-primary-foreground" : "bg-surface-muted"}`}>Все ткани</button>
+          <button onClick={() => setCat("")} className={`rounded-full px-4 py-2 text-sm font-medium transition ${!cat ? "bg-primary text-primary-foreground" : "bg-surface-muted hover:bg-surface"}`}>Все ткани</button>
           {cats.map((c) => (
             <button key={c.slug} onClick={() => setCat(c.slug)}
-              className={`rounded-full px-4 py-2 text-sm font-medium ${cat === c.slug ? "bg-primary text-primary-foreground" : "bg-surface-muted"}`}>{c.title}</button>
+              className={`rounded-full px-4 py-2 text-sm font-medium transition ${cat === c.slug ? "bg-primary text-primary-foreground" : "bg-surface-muted hover:bg-surface"}`}>{c.title}</button>
           ))}
         </div>
 
@@ -57,17 +59,22 @@ function FabricsPage() {
 
         <div className="mt-10 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
           {filtered.map((f) => (
-            <Link key={f.id} to="/fabrics/$id" params={{ id: f.id }}
-              className="group overflow-hidden rounded-3xl border border-border/60 bg-card transition hover:shadow-card">
+            <div key={f.id}
+              className="group flex flex-col overflow-hidden rounded-3xl border border-border/60 bg-card transition hover:shadow-card">
               <div className="aspect-square overflow-hidden bg-surface-muted">
-                {f.sample_photo && <img src={f.sample_photo} alt={f.title} loading="lazy" className="h-full w-full object-cover transition group-hover:scale-105" />}
+                {f.sample_photo && <img src={f.sample_photo} alt={f.title} loading="lazy" className="h-full w-full object-cover transition duration-300 group-hover:scale-105" />}
               </div>
-              <div className="p-4">
+              <div className="flex flex-1 flex-col p-4">
                 <h3 className="font-display text-base font-semibold leading-tight">{f.title}</h3>
                 {f.code && <p className="text-xs text-muted-foreground">Код: {f.code}</p>}
-                {f.surcharge > 0 && <p className="mt-1 text-sm font-medium text-primary">+{formatPrice(f.surcharge)}</p>}
+                <button
+                  onClick={() => setActive(f)}
+                  className="mt-3 inline-flex w-full items-center justify-center rounded-full bg-primary/10 px-4 py-2 text-xs font-medium text-primary transition hover:bg-primary hover:text-primary-foreground"
+                >
+                  Подробнее о ткани
+                </button>
               </div>
-            </Link>
+            </div>
           ))}
           {filtered.length === 0 && (
             <p className="col-span-full py-20 text-center text-muted-foreground">
@@ -78,6 +85,7 @@ function FabricsPage() {
       </div>
       <PageBlocksRenderer pageKey="fabrics" />
       <Footer />
+      <FabricDetailModal fabric={active} onClose={() => setActive(null)} />
     </div>
   );
 }
