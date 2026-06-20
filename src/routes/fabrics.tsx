@@ -57,24 +57,9 @@ function FabricsPage() {
             className="w-full rounded-full border border-border bg-background py-3 pl-10 pr-4 text-sm outline-none focus:border-primary" />
         </div>
 
-        <div className="mt-10 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
+        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((f) => (
-            <div key={f.id}
-              className="group flex flex-col overflow-hidden rounded-3xl border border-border/60 bg-card transition hover:shadow-card">
-              <div className="aspect-square overflow-hidden bg-surface-muted">
-                {f.sample_photo && <img src={f.sample_photo} alt={f.title} loading="lazy" className="h-full w-full object-cover transition duration-300 group-hover:scale-105" />}
-              </div>
-              <div className="flex flex-1 flex-col p-4">
-                <h3 className="font-display text-base font-semibold leading-tight">{f.title}</h3>
-                {f.code && <p className="text-xs text-muted-foreground">Код: {f.code}</p>}
-                <button
-                  onClick={() => setActive(f)}
-                  className="mt-3 inline-flex w-full items-center justify-center rounded-full bg-primary/10 px-4 py-2 text-xs font-medium text-primary transition hover:bg-primary hover:text-primary-foreground"
-                >
-                  Подробнее о ткани
-                </button>
-              </div>
-            </div>
+            <FabricCollectionCard key={f.id} fabric={f} onOpen={() => setActive(f)} />
           ))}
           {filtered.length === 0 && (
             <p className="col-span-full py-20 text-center text-muted-foreground">
