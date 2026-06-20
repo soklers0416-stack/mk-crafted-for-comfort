@@ -58,10 +58,6 @@ export function FabricDetailModal({
   onClose: () => void;
 }) {
   const open = !!fabric;
-  const { data: colors = [] } = useQuery({
-    ...fabricColorsByCollectionQuery(fabric?.id ?? ""),
-    enabled: open,
-  });
   const { data: charDefs = [] } = useQuery(fabricCharacteristicsQuery);
   const { data: cats = [] } = useQuery(fabricCategoriesQuery);
 
