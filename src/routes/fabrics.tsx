@@ -81,44 +81,35 @@ function FabricCollectionRow({ fabric, onOpen }: { fabric: Fabric; onOpen: () =>
   const cat = cats.find((c) => c.slug === fabric.category_slug);
 
   return (
-    <article className="overflow-visible rounded-3xl border border-border/60 bg-card transition hover:shadow-card">
-      <div className="grid gap-8 p-6 md:grid-cols-[320px_minmax(0,1fr)] md:p-8">
-        <div className="flex flex-col gap-4">
-          <div className="aspect-square overflow-hidden rounded-2xl bg-surface-muted ring-1 ring-border">
-            {fabric.sample_photo ? (
-              <img src={fabric.sample_photo} alt={fabric.title} loading="lazy" className="h-full w-full object-cover" />
-            ) : (
-              <div className="h-full w-full" />
-            )}
-          </div>
+    <article className="overflow-visible rounded-3xl border border-border/60 bg-card p-6 transition hover:shadow-card md:p-8">
+      <header className="flex flex-wrap items-end justify-between gap-4 border-b border-border/60 pb-5">
+        <div className="min-w-0">
           {cat && (
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
               {cat.title}
             </p>
           )}
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <h3 className="font-display text-3xl font-bold leading-tight md:text-4xl">{fabric.title}</h3>
-            <button
-              onClick={onOpen}
-              className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-primary/10 px-4 py-2 text-xs font-medium text-primary transition hover:bg-primary hover:text-primary-foreground"
-            >
-              <Info className="h-3.5 w-3.5" />
-              Подробнее о ткани
-            </button>
-          </div>
+          <h3 className="mt-1 font-display text-3xl font-bold leading-tight md:text-4xl">{fabric.title}</h3>
         </div>
+        <button
+          onClick={onOpen}
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-primary/10 px-4 py-2 text-xs font-medium text-primary transition hover:bg-primary hover:text-primary-foreground"
+        >
+          <Info className="h-3.5 w-3.5" />
+          Подробнее о ткани
+        </button>
+      </header>
 
-        <div className="min-w-0">
-          {colors.length > 0 ? (
-            <div className="-mx-1 flex snap-x snap-mandatory gap-4 overflow-x-auto px-1 pb-2 md:grid md:grid-cols-4 md:overflow-visible lg:grid-cols-5 xl:grid-cols-6">
-              {colors.map((c) => (
-                <FabricSwatch key={c.id} photo={c.photo} name={c.name} code={c.code} />
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm text-muted-foreground">Цвета пока не добавлены</p>
-          )}
-        </div>
+      <div className="mt-6">
+        {colors.length > 0 ? (
+          <div className="-mx-1 flex snap-x snap-mandatory gap-4 overflow-x-auto px-1 pb-2 md:grid md:grid-cols-5 md:overflow-visible lg:grid-cols-7 xl:grid-cols-8">
+            {colors.map((c) => (
+              <FabricSwatch key={c.id} photo={c.photo} name={c.name} code={c.code} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-muted-foreground">Цвета пока не добавлены</p>
+        )}
       </div>
     </article>
   );
@@ -130,7 +121,7 @@ function FabricSwatch({ photo, name, code }: { photo?: string | null; name?: str
   const show = hover || tap;
   return (
     <div
-      className="group relative w-32 shrink-0 snap-start md:w-auto"
+      className="group relative w-28 shrink-0 snap-start md:w-auto"
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => { setHover(false); setTap(false); }}
       onClick={() => setTap((v) => !v)}
@@ -142,12 +133,12 @@ function FabricSwatch({ photo, name, code }: { photo?: string | null; name?: str
         <p className="mt-2 truncate text-center text-xs font-medium text-foreground">{code || name}</p>
       )}
       {photo && show && (
-        <div className="pointer-events-none absolute left-1/2 bottom-full z-30 mb-3 hidden -translate-x-1/2 sm:block">
+        <div className="pointer-events-none absolute left-1/2 top-1/2 z-30 hidden -translate-x-1/2 -translate-y-1/2 sm:block">
           <div className="h-[300px] w-[300px] overflow-hidden rounded-2xl bg-background shadow-2xl ring-1 ring-border animate-scale-in">
             <img src={photo} alt={name || code || ""} className="h-full w-full object-cover" />
           </div>
           {(code || name) && (
-            <p className="mt-2 text-center text-xs font-semibold text-foreground">{code || name}</p>
+            <p className="mt-2 text-center text-xs font-semibold text-foreground drop-shadow">{code || name}</p>
           )}
         </div>
       )}
