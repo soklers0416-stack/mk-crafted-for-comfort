@@ -124,6 +124,33 @@ function EditFabric() {
     try { const url = await uploadPhoto(file); updColor(i, { photo: url }); }
     catch (e: any) { toast.error(e.message); }
   }
+  async function onBulkColorPhotos(files: FileList) {
+    const arr = Array.from(files);
+    if (!arr.length) return;
+    setBusy(true);
+    try {
+      const uploaded = await Promise.all(
+        arr.map(async (f) => {
+          const url = await uploadPhoto(f);
+          const base = f.name.replace(/\.[^.]+$/, "");
+          return { url, name: base };
+        })
+      );
+      setColors((cs) => [
+        ...cs,
+        ...uploaded.map((u, k) => ({
+          id: `tmp-${Math.random().toString(36).slice(2)}-${k}`,
+          fabric_id: id,
+          name: u.name,
+          code: "",
+          photo: u.url,
+          sort_order: (cs.length + k + 1) * 10,
+        })),
+      ]);
+      toast.success(`Загружено фото: ${uploaded.length}`);
+    } catch (e: any) { toast.error(e.message); }
+    finally { setBusy(false); }
+  }
 
   return (
     <div>
@@ -262,13 +289,26 @@ function EditFabric() {
                   <button onClick={() => delColor(i)} className="rounded-lg p-2 text-red-600 hover:bg-red-50"><Trash2 className="h-4 w-4" /></button>
                 </div>
               ))}
-              <button
-                onClick={addColor}
-                disabled={isNew}
-                className="inline-flex items-center gap-1 rounded-full border border-dashed border-border bg-card px-4 py-2 text-sm font-medium hover:border-primary hover:text-primary disabled:opacity-50"
-              >
-                <Plus className="h-4 w-4" /> Добавить цвет
-              </button>
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  onClick={addColor}
+                  disabled={isNew}
+                  className="inline-flex items-center gap-1 rounded-full border border-dashed border-border bg-card px-4 py-2 text-sm font-medium hover:border-primary hover:text-primary disabled:opacity-50"
+                >
+                  <Plus className="h-4 w-4" /> Добавить цвет
+                </button>
+                <label className={`inline-flex items-center gap-1 rounded-full border border-dashed border-border bg-card px-4 py-2 text-sm font-medium hover:border-primary hover:text-primary ${isNew ? "pointer-events-none opacity-50" : "cursor-pointer"}`}>
+                  <Upload className="h-4 w-4" /> Загрузить несколько фото
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    className="hidden"
+                    disabled={isNew}
+                    onChange={(e) => { if (e.target.files) { onBulkColorPhotos(e.target.files); e.target.value = ""; } }}
+                  />
+                </label>
+              </div>
             </div>
           </Section>
         </div>
