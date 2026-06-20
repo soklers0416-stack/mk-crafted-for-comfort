@@ -26,11 +26,18 @@ function FabricsPage() {
   const { data: cats = [] } = useQuery(fabricCategoriesQuery);
   const [cat, setCat] = useState("");
   const [q, setQ] = useState("");
+  const [pets, setPets] = useState(false);
+  const [wash, setWash] = useState(false);
   const [active, setActive] = useState<Fabric | null>(null);
 
   const filtered = fabrics
     .filter((f) => !cat || f.category_slug === cat)
+    .filter((f) => !pets || f.allow_pets)
+    .filter((f) => !wash || f.washable)
     .filter((f) => !q || f.title.toLowerCase().includes(q.toLowerCase()) || f.code.toLowerCase().includes(q.toLowerCase()));
+
+  const hasFilters = !!cat || pets || wash || !!q;
+  const reset = () => { setCat(""); setPets(false); setWash(false); setQ(""); };
 
   return (
     <div className="min-h-screen bg-background">
@@ -43,18 +50,47 @@ function FabricsPage() {
           Более 100 вариантов обивочных тканей. Используем проверенных российских и европейских поставщиков.
         </p>
 
-        <div className="mt-8 flex flex-wrap gap-2">
-          <button onClick={() => setCat("")} className={`rounded-full px-4 py-2 text-sm font-medium transition ${!cat ? "bg-primary text-primary-foreground" : "bg-surface-muted hover:bg-surface"}`}>Все ткани</button>
-          {cats.map((c) => (
-            <button key={c.slug} onClick={() => setCat(c.slug)}
-              className={`rounded-full px-4 py-2 text-sm font-medium transition ${cat === c.slug ? "bg-primary text-primary-foreground" : "bg-surface-muted hover:bg-surface"}`}>{c.title}</button>
-          ))}
-        </div>
+        <div className="mt-8 rounded-2xl border border-border/60 bg-card/50 p-4 md:p-5">
+          <div>
+            <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">Материал</p>
+            <div className="flex flex-wrap gap-2">
+              <button onClick={() => setCat("")} className={`rounded-full px-4 py-2 text-sm font-medium transition ${!cat ? "bg-primary text-primary-foreground" : "bg-surface-muted hover:bg-surface"}`}>Все</button>
+              {cats.map((c) => (
+                <button key={c.slug} onClick={() => setCat(c.slug)}
+                  className={`rounded-full px-4 py-2 text-sm font-medium transition ${cat === c.slug ? "bg-primary text-primary-foreground" : "bg-surface-muted hover:bg-surface"}`}>{c.title}</button>
+              ))}
+            </div>
+          </div>
 
-        <div className="relative mt-4 max-w-md">
-          <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Поиск ткани по названию или коду"
-            className="w-full rounded-full border border-border bg-background py-3 pl-10 pr-4 text-sm outline-none focus:border-primary" />
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <p className="mr-1 text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">Свойства</p>
+            <button
+              onClick={() => setPets((v) => !v)}
+              className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition ${pets ? "bg-primary text-primary-foreground" : "bg-surface-muted hover:bg-surface"}`}
+            >
+              <PawPrint className="h-3.5 w-3.5" /> Можно с животными
+            </button>
+            <button
+              onClick={() => setWash((v) => !v)}
+              className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition ${wash ? "bg-primary text-primary-foreground" : "bg-surface-muted hover:bg-surface"}`}
+            >
+              <Droplets className="h-3.5 w-3.5" /> Можно мыть
+            </button>
+            {hasFilters && (
+              <button
+                onClick={reset}
+                className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition hover:bg-surface-muted"
+              >
+                <X className="h-3.5 w-3.5" /> Показать все ткани
+              </button>
+            )}
+          </div>
+
+          <div className="relative mt-4">
+            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Поиск ткани по названию или коду"
+              className="w-full rounded-full border border-border bg-background py-3 pl-10 pr-4 text-sm outline-none focus:border-primary md:max-w-md" />
+          </div>
         </div>
 
         <div className="mt-10 flex flex-col gap-8">
@@ -63,7 +99,7 @@ function FabricsPage() {
           ))}
           {filtered.length === 0 && (
             <p className="py-20 text-center text-muted-foreground">
-              Тканей пока нет. Добавьте их через админ-панель.
+              По выбранным фильтрам ничего не найдено.
             </p>
           )}
         </div>
