@@ -18,6 +18,8 @@ import {
   DoorOpen,
   Check,
   Minus,
+  UtensilsCrossed,
+  Bath,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -43,6 +45,8 @@ function iconForRecommendation(text: string): LucideIcon {
   if (l.includes("гостин")) return Sofa;
   if (l.includes("спальн")) return Bed;
   if (l.includes("дет")) return Baby;
+  if (l.includes("кухн")) return UtensilsCrossed;
+  if (l.includes("ванн")) return Bath;
   if (l.includes("кресл")) return Armchair;
   if (l.includes("прихож") || l.includes("кориод")) return DoorOpen;
   return Home;
@@ -133,54 +137,51 @@ export function FabricDetailModal({
               </p>
             )}
 
-            {(hasChars || recList.length > 0) && (
-              <div className="mt-8 grid gap-8 sm:grid-cols-[1fr_auto_1fr] sm:items-start">
-                {hasChars ? (
-                  <div>
-                    <h3 className="text-xs font-bold uppercase tracking-[0.15em] text-foreground">
-                      Характеристики
-                    </h3>
-                    <ul className="mt-4 flex flex-col gap-3">
-                      {charsList.map((c) => {
-                        const Icon = iconForChar(c.label);
-                        return (
-                          <li key={c.label} className="flex items-center gap-3 text-sm">
-                            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
-                              <Icon className="h-4 w-4" />
-                            </span>
-                            <span className="min-w-0 flex-1 truncate text-muted-foreground">{c.label}:</span>
-                            <span className="shrink-0 whitespace-nowrap font-medium text-foreground">{c.value}</span>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </div>
-                ) : <div />}
+            {recList.length > 0 && (
+              <div className="mt-8">
+                <h3 className="text-xs font-bold uppercase tracking-[0.15em] text-foreground">
+                  Подходит для
+                </h3>
+                <ul className="mt-4 flex flex-wrap gap-3">
+                  {recList.map((r) => {
+                    const Icon = iconForRecommendation(r);
+                    return (
+                      <li
+                        key={r}
+                        title={r}
+                        aria-label={r}
+                        className="group relative grid h-11 w-11 place-items-center rounded-full bg-primary/10 text-primary"
+                      >
+                        <Icon className="h-5 w-5" />
+                        <span className="pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-foreground px-2 py-1 text-[11px] font-medium text-background opacity-0 shadow-lg transition group-hover:opacity-100">
+                          {r}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            )}
 
-                {hasChars && recList.length > 0 && (
-                  <div className="hidden sm:block h-full w-px self-stretch bg-border" aria-hidden />
-                )}
-
-                {recList.length > 0 && (
-                  <div>
-                    <h3 className="text-xs font-bold uppercase tracking-[0.15em] text-foreground">
-                      Подходит для
-                    </h3>
-                    <ul className="mt-4 flex flex-col gap-3">
-                      {recList.map((r) => {
-                        const Icon = iconForRecommendation(r);
-                        return (
-                          <li key={r} className="flex items-center gap-3 text-sm">
-                            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
-                              <Icon className="h-4 w-4" />
-                            </span>
-                            <span className="font-medium text-foreground">{r}</span>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </div>
-                )}
+            {hasChars && (
+              <div className="mt-8">
+                <h3 className="text-xs font-bold uppercase tracking-[0.15em] text-foreground">
+                  Характеристики
+                </h3>
+                <ul className="mt-4 flex flex-col gap-3">
+                  {charsList.map((c) => {
+                    const Icon = iconForChar(c.label);
+                    return (
+                      <li key={c.label} className="flex items-center gap-3 text-sm">
+                        <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
+                          <Icon className="h-4 w-4" />
+                        </span>
+                        <span className="min-w-0 flex-1 truncate text-muted-foreground">{c.label}:</span>
+                        <span className="shrink-0 whitespace-nowrap font-medium text-foreground">{c.value}</span>
+                      </li>
+                    );
+                  })}
+                </ul>
               </div>
             )}
 
