@@ -361,10 +361,12 @@ export type Database = {
           category_slug: string
           characteristics: Json
           code: string
+          cons: string
           created_at: string
           description: string
           furniture_photos: Json
           id: string
+          pros: string
           recommendations: string
           sample_photo: string | null
           sort_order: number
@@ -378,10 +380,12 @@ export type Database = {
           category_slug: string
           characteristics?: Json
           code?: string
+          cons?: string
           created_at?: string
           description?: string
           furniture_photos?: Json
           id?: string
+          pros?: string
           recommendations?: string
           sample_photo?: string | null
           sort_order?: number
@@ -395,10 +399,12 @@ export type Database = {
           category_slug?: string
           characteristics?: Json
           code?: string
+          cons?: string
           created_at?: string
           description?: string
           furniture_photos?: Json
           id?: string
+          pros?: string
           recommendations?: string
           sample_photo?: string | null
           sort_order?: number

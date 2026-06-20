@@ -21,7 +21,7 @@ const EMPTY: Omit<Fabric, "id"> = {
   code: "", title: "", category_slug: "", description: "",
   characteristics: {}, recommendations: "", surcharge: 0,
   sample_photo: null, furniture_photos: [], sort_order: 0,
-  allow_pets: false, washable: false,
+  allow_pets: false, washable: false, pros: "", cons: "",
 };
 
 function EditFabric() {
@@ -180,6 +180,16 @@ function EditFabric() {
                 Можно мыть
               </label>
             </div>
+          </Section>
+
+          <Section title="Преимущества и недостатки">
+            <p className="text-xs text-muted-foreground">Каждый пункт с новой строки. Пустые блоки не показываются на сайте.</p>
+            <F label="Преимущества">
+              <textarea value={form.pros} onChange={(e) => up("pros", e.target.value)} rows={4} className={I} placeholder="Например:&#10;Мягкая на ощупь&#10;Не выгорает" />
+            </F>
+            <F label="Недостатки">
+              <textarea value={form.cons} onChange={(e) => up("cons", e.target.value)} rows={4} className={I} placeholder="Например:&#10;Требует бережного ухода" />
+            </F>
           </Section>
 
           <Section title="Главное фото коллекции">
