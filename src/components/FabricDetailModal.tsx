@@ -76,14 +76,10 @@ export function FabricDetailModal({
   if (!fabric) return null;
   const cat = cats.find((c) => c.slug === fabric.category_slug);
 
-  const orderedLabels = charDefs.map((d) => d.label);
-  const extra = Object.keys(fabric.characteristics || {}).filter(
-    (k) => !orderedLabels.includes(k),
-  );
-  const allLabels = [...orderedLabels, ...extra];
-  const charsList = allLabels
-    .map((label) => ({ label, value: (fabric.characteristics || {})[label] }))
-    .filter((c) => c.value && String(c.value).trim() !== "");
+  // Only render characteristics that still exist in admin definitions AND have a value.
+  const charsList = charDefs
+    .map((d) => ({ label: d.label, value: (fabric.characteristics || {})[d.label] }))
+    .filter((c) => c.value !== undefined && c.value !== null && String(c.value).trim() !== "");
   const flagChars: { label: string; Icon: typeof PawPrint }[] = [];
   if (fabric.allow_pets) flagChars.push({ label: "Домашние животные", Icon: PawPrint });
   if (fabric.washable) flagChars.push({ label: "Можно мыть", Icon: Droplets });
