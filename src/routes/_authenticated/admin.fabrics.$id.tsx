@@ -124,6 +124,33 @@ function EditFabric() {
     try { const url = await uploadPhoto(file); updColor(i, { photo: url }); }
     catch (e: any) { toast.error(e.message); }
   }
+  async function onBulkColorPhotos(files: FileList) {
+    const arr = Array.from(files);
+    if (!arr.length) return;
+    setBusy(true);
+    try {
+      const uploaded = await Promise.all(
+        arr.map(async (f) => {
+          const url = await uploadPhoto(f);
+          const base = f.name.replace(/\.[^.]+$/, "");
+          return { url, name: base };
+        })
+      );
+      setColors((cs) => [
+        ...cs,
+        ...uploaded.map((u, k) => ({
+          id: `tmp-${Math.random().toString(36).slice(2)}-${k}`,
+          fabric_id: id,
+          name: u.name,
+          code: "",
+          photo: u.url,
+          sort_order: (cs.length + k + 1) * 10,
+        })),
+      ]);
+      toast.success(`Загружено фото: ${uploaded.length}`);
+    } catch (e: any) { toast.error(e.message); }
+    finally { setBusy(false); }
+  }
 
   return (
     <div>
