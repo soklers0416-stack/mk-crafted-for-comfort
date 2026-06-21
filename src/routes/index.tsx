@@ -9,7 +9,7 @@ import { ContactDialog } from "@/components/ContactDialog";
 import { HeroSlider } from "@/components/HeroSlider";
 import { advantages, heroFeatures } from "@/lib/data";
 import { useQuery } from "@tanstack/react-query";
-import { productsQuery, reviewsQuery, productStatsQuery, homeBlocksQuery, categoriesQuery } from "@/lib/queries";
+import { productsQuery, reviewsQuery, productStatsQuery, homeBlocksQuery, categoriesQuery, aboutContentQuery } from "@/lib/queries";
 import { apartmentContentQuery } from "@/lib/apartment";
 import { getRecentlyViewed, subscribeRecent } from "@/lib/recentlyViewed";
 import { useEffect as useEffectReact } from "react";
@@ -37,6 +37,7 @@ function HomePage() {
   const { data: blocks = [] } = useQuery(homeBlocksQuery);
   const { data: categories = [] } = useQuery(categoriesQuery);
   const { data: apt = {} } = useQuery(apartmentContentQuery);
+  const { data: aboutContent = {} } = useQuery(aboutContentQuery);
   const statMap = new Map(stats.map((s) => [s.product_id, s]));
   const likesOf = (id: string) => statMap.get(id)?.likes ?? 0;
   const viewsOf = (id: string) => statMap.get(id)?.views ?? 0;
@@ -292,10 +293,19 @@ function HomePage() {
               <div><div className="font-display text-3xl font-bold text-primary">2 нед.</div><div className="mt-1 text-xs text-muted-foreground">срок</div></div>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <img src={showroomAsset.url} alt="Шоурум МК Мебель" loading="lazy" className="aspect-[3/4] w-full rounded-3xl object-cover" />
-            <img src={showroom} alt="Шоурум" loading="lazy" className="mt-8 aspect-[3/4] w-full rounded-3xl object-cover" />
-          </div>
+          {(() => {
+            const aboutImgs: string[] = Array.isArray((aboutContent as any)?.showroom?.images)
+              ? (aboutContent as any).showroom.images
+              : [];
+            const list = aboutImgs.length > 0 ? aboutImgs : [showroomAsset.url, showroom];
+            return (
+              <div className="grid grid-cols-2 gap-3">
+                {list.slice(0, 2).map((src: string, i: number) => (
+                  <img key={i} src={src} alt="Шоурум МК Мебель" loading="lazy" className={`aspect-[3/4] w-full rounded-3xl object-cover ${i === 1 ? "mt-8" : ""}`} />
+                ))}
+              </div>
+            );
+          })()}
         </div>
       </section>
 
