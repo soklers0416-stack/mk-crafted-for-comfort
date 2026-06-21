@@ -14,6 +14,7 @@ export const Route = createFileRoute("/_authenticated/admin/products/$id")({
 
 const EMPTY: Omit<Product, "id"> = {
   category_slug: "",
+  category_slugs: [],
   title: "",
   description: "",
   price: 0,
