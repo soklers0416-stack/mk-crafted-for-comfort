@@ -296,8 +296,17 @@ function ProductPage() {
               );
             })()}
 
+            {hasSizes && product.custom_size_enabled && (
+              <button
+                onClick={() => setCustomSizeOpen(true)}
+                className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+              >
+                Нужен другой размер?
+              </button>
+            )}
 
             {hasSizes && boxesForSize.length > 1 && (
+
               <div className="mt-5">
                 <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Комплектация</div>
                 <div className="mt-2 flex flex-col gap-2">
