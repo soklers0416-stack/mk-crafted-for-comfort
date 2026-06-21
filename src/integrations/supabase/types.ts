@@ -901,6 +901,7 @@ export type Database = {
         Row: {
           availability: string | null
           category_slug: string
+          category_slugs: string[]
           created_at: string
           custom_size_enabled: boolean
           description: string
@@ -936,6 +937,7 @@ export type Database = {
         Insert: {
           availability?: string | null
           category_slug: string
+          category_slugs?: string[]
           created_at?: string
           custom_size_enabled?: boolean
           description?: string
@@ -971,6 +973,7 @@ export type Database = {
         Update: {
           availability?: string | null
           category_slug?: string
+          category_slugs?: string[]
           created_at?: string
           custom_size_enabled?: boolean
           description?: string

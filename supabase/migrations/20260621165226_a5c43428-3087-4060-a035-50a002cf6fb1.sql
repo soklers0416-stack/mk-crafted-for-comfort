@@ -1,0 +1,2 @@
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS category_slugs text[] NOT NULL DEFAULT '{}'::text[];
+CREATE INDEX IF NOT EXISTS products_category_slugs_idx ON public.products USING GIN (category_slugs);

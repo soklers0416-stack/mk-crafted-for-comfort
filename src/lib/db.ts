@@ -14,6 +14,7 @@ export type Spec = { label: string; value: string };
 export type Product = {
   id: string;
   category_slug: string;
+  category_slugs: string[];
   title: string;
   description: string;
   price: number;

@@ -14,6 +14,7 @@ export const Route = createFileRoute("/_authenticated/admin/products/$id")({
 
 const EMPTY: Omit<Product, "id"> = {
   category_slug: "",
+  category_slugs: [],
   title: "",
   description: "",
   price: 0,
@@ -203,7 +204,7 @@ function EditProduct() {
               <textarea value={form.description} onChange={(e) => update("description", e.target.value)} rows={3} className={inputCls} />
             </Field>
             <div className="grid gap-4 sm:grid-cols-3">
-              <Field label="Категория">
+              <Field label="Основная категория">
                 <select value={form.category_slug} onChange={(e) => update("category_slug", e.target.value)} className={inputCls}>
                   {categories.map((c) => <option key={c.slug} value={c.slug}>{c.title}</option>)}
                 </select>
@@ -215,6 +216,29 @@ function EditProduct() {
                 <Toggle on={form.price_from} onChange={(v) => update("price_from", v)} />
               </Field>
             </div>
+            <Field label="Дополнительные категории (товар будет показан и в них)">
+              <div className="flex flex-wrap gap-2">
+                {categories.filter((c) => c.slug !== form.category_slug).map((c) => {
+                  const checked = (form.category_slugs ?? []).includes(c.slug);
+                  return (
+                    <label key={c.slug} className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1.5 text-xs ${checked ? "border-primary bg-primary/10 text-primary" : "border-border bg-background"}`}>
+                      <input
+                        type="checkbox"
+                        className="hidden"
+                        checked={checked}
+                        onChange={(e) => {
+                          const cur = new Set(form.category_slugs ?? []);
+                          if (e.target.checked) cur.add(c.slug); else cur.delete(c.slug);
+                          update("category_slugs", Array.from(cur));
+                        }}
+                      />
+                      {c.title}
+                    </label>
+                  );
+                })}
+                {categories.length <= 1 && <span className="text-xs text-muted-foreground">Других категорий пока нет.</span>}
+              </div>
+            </Field>
           </Section>
 
           {/* Фото */}
