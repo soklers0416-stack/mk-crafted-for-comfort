@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState, useMemo } from "react";
 import { productsQuery, categoriesQuery } from "@/lib/queries";
 import { supabase } from "@/integrations/supabase/client";
 import { formatPriceRub } from "@/lib/db";
@@ -15,6 +16,11 @@ function AdminProductsList() {
   const qc = useQueryClient();
   const { data: products = [] } = useQuery(productsQuery);
   const { data: categories = [] } = useQuery(categoriesQuery);
+  const [catFilter, setCatFilter] = useState<string>("");
+  const filtered = useMemo(
+    () => (catFilter ? products.filter((p) => p.category_slug === catFilter) : products),
+    [products, catFilter],
+  );
 
   const del = useMutation({
     mutationFn: async (id: string) => {
@@ -39,7 +45,7 @@ function AdminProductsList() {
       <div className="flex items-center justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl font-bold">Товары</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Всего: {products.length}</p>
+          <p className="mt-1 text-sm text-muted-foreground">Всего: {filtered.length}{catFilter ? ` из ${products.length}` : ""}</p>
         </div>
         <Link
           to="/admin/products/$id" params={{ id: "new" }}
@@ -47,6 +53,29 @@ function AdminProductsList() {
         >
           <Plus className="h-4 w-4" /> Добавить товар
         </Link>
+      </div>
+
+      {/* Фильтр по категориям */}
+      <div className="mt-5 flex flex-wrap gap-2">
+        <button
+          onClick={() => setCatFilter("")}
+          className={`rounded-full border px-4 py-1.5 text-xs font-medium transition ${
+            catFilter === "" ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-muted-foreground hover:border-primary hover:text-foreground"
+          }`}
+        >
+          Все
+        </button>
+        {categories.map((c) => (
+          <button
+            key={c.slug}
+            onClick={() => setCatFilter(c.slug)}
+            className={`rounded-full border px-4 py-1.5 text-xs font-medium transition ${
+              catFilter === c.slug ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-muted-foreground hover:border-primary hover:text-foreground"
+            }`}
+          >
+            {c.title}
+          </button>
+        ))}
       </div>
 
       <div className="mt-6 overflow-hidden rounded-2xl border border-border/60 bg-card">
@@ -62,7 +91,7 @@ function AdminProductsList() {
             </tr>
           </thead>
           <tbody>
-            {products.map((p) => {
+            {filtered.map((p) => {
               const cat = categories.find((c) => c.slug === p.category_slug);
               return (
                 <tr key={p.id} className="border-t border-border/60">
@@ -102,8 +131,8 @@ function AdminProductsList() {
                 </tr>
               );
             })}
-            {products.length === 0 && (
-              <tr><td colSpan={6} className="px-4 py-12 text-center text-muted-foreground">Пока нет товаров</td></tr>
+            {filtered.length === 0 && (
+              <tr><td colSpan={6} className="px-4 py-12 text-center text-muted-foreground">{products.length === 0 ? "Пока нет товаров" : "В этой категории пока пусто"}</td></tr>
             )}
           </tbody>
         </table>

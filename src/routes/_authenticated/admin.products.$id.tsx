@@ -85,6 +85,46 @@ function EditProduct() {
     update(`photo${slot}` as any, `/api/public/photo/${path}`);
   }
 
+  async function uploadMultiplePhotos(files: FileList) {
+    const slots: (1 | 2 | 3 | 4 | 5 | 6)[] = [1, 2, 3, 4, 5, 6];
+    const empty = slots.filter((n) => !(form as any)[`photo${n}`]);
+    if (empty.length === 0) { toast.error("Все 6 слотов заняты"); return; }
+    const toUpload = Array.from(files).slice(0, empty.length);
+    if (files.length > empty.length) toast.message(`Загружаем ${empty.length} из ${files.length} — больше нет свободных слотов`);
+    setBusy(true);
+    try {
+      const uploaded: { slot: 1 | 2 | 3 | 4 | 5 | 6; url: string }[] = [];
+      await Promise.all(toUpload.map(async (file, i) => {
+        const slot = empty[i];
+        const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+        const path = `${crypto.randomUUID()}.${ext}`;
+        const { error } = await supabase.storage.from("product-photos").upload(path, file, { upsert: false, contentType: file.type });
+        if (error) throw error;
+        uploaded.push({ slot, url: `/api/public/photo/${path}` });
+      }));
+      setForm((f) => {
+        const next = { ...f } as any;
+        for (const u of uploaded) next[`photo${u.slot}`] = u.url;
+        return next;
+      });
+      toast.success(`Загружено: ${uploaded.length}`);
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function loadSizesTemplate() {
+    const tmpl = (qc.getQueryData(["products"]) as any[] | undefined)?.find(
+      (p: any) => p.id !== id && p.category_slug === form.category_slug && Array.isArray(p.sizes) && p.sizes.length > 0,
+    );
+    if (!tmpl) { toast.error("В этой категории ещё нет товара с размерами"); return; }
+    const rows = tmpl.sizes.map((s: any) => ({ size: s.size ?? "", sleeping: s.sleeping ?? "", box: s.box ?? "", price: "" }));
+    update("sizes", rows);
+    toast.success(`Подгружено ${rows.length} строк — впишите цены`);
+  }
+
   async function save() {
     if (!form.title.trim()) return toast.error("Введите название");
     if (!form.category_slug) return toast.error("Выберите категорию");
@@ -161,7 +201,17 @@ function EditProduct() {
           </Section>
 
           {/* Фото */}
-          <Section title="Фотографии (до 6)">
+          <Section
+            title="Фотографии (до 6)"
+            action={
+              <label className="inline-flex cursor-pointer items-center gap-1 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/15">
+                <Upload className="h-3 w-3" /> Загрузить несколько
+                <input type="file" accept="image/*" multiple className="hidden"
+                  onChange={(e) => { const fs = e.target.files; if (fs && fs.length) { uploadMultiplePhotos(fs); e.currentTarget.value = ""; } }}
+                />
+              </label>
+            }
+          >
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
               {photoSlots.map((n) => {
                 const url = (form as any)[`photo${n}`] as string | null;
@@ -276,18 +326,45 @@ function EditProduct() {
           <Section
             title="Размеры и цены"
             action={
-              <button onClick={() => update("sizes", [...form.sizes, { size: "", sleeping: "", box: "", price: "" }])}
-                className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary">
-                <Plus className="h-3 w-3" /> Строка
-              </button>
+              <div className="flex flex-wrap items-center gap-2">
+                <button onClick={loadSizesTemplate}
+                  className="inline-flex items-center gap-1 rounded-full bg-surface-muted px-3 py-1.5 text-xs font-medium text-foreground hover:bg-surface">
+                  Подгрузить шаблон
+                </button>
+                <button onClick={() => update("sizes", [...form.sizes, { size: "", sleeping: "", box: "", price: "" }])}
+                  className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary">
+                  <Plus className="h-3 w-3" /> Строка
+                </button>
+              </div>
             }
           >
-            {form.sizes.length === 0 && <p className="text-sm text-muted-foreground">Пока нет строк.</p>}
+            {form.sizes.length === 0 && (
+              <p className="text-sm text-muted-foreground">
+                Пока нет строк. Нажмите «Подгрузить шаблон», чтобы взять размеры из другого товара этой категории — останется только вписать цены.
+              </p>
+            )}
+            {form.sizes.length > 0 && (
+              <div className="grid grid-cols-12 gap-2 px-1 text-[11px] uppercase tracking-wider text-muted-foreground">
+                <div className="col-span-3">Размер</div>
+                <div className="col-span-3">Спальное место</div>
+                <div className="col-span-2 text-center">Короб</div>
+                <div className="col-span-3">Цена, ₽</div>
+                <div className="col-span-1" />
+              </div>
+            )}
             {form.sizes.map((s, i) => (
-              <div key={i} className="grid grid-cols-12 gap-2">
-                <input placeholder="Размер" value={s.size} onChange={(e) => updateRow("sizes", i, "size", e.target.value)} className={`${inputCls} col-span-3`} />
-                <input placeholder="Спальное место" value={s.sleeping} onChange={(e) => updateRow("sizes", i, "sleeping", e.target.value)} className={`${inputCls} col-span-3`} />
-                <input placeholder="Короб" value={s.box} onChange={(e) => updateRow("sizes", i, "box", e.target.value)} className={`${inputCls} col-span-2`} />
+              <div key={i} className="grid grid-cols-12 items-center gap-2">
+                <input placeholder="180×120" value={s.size} onChange={(e) => updateRow("sizes", i, "size", e.target.value)} className={`${inputCls} col-span-3`} />
+                <input placeholder="напр. 160×200" value={s.sleeping} onChange={(e) => updateRow("sizes", i, "sleeping", e.target.value)} className={`${inputCls} col-span-3`} />
+                <div className="col-span-2 flex justify-center">
+                  <input
+                    type="checkbox"
+                    checked={!!s.box && s.box !== "нет"}
+                    onChange={(e) => updateRow("sizes", i, "box", e.target.checked ? "да" : "")}
+                    className="h-5 w-5 cursor-pointer accent-primary"
+                    aria-label="Есть короб"
+                  />
+                </div>
                 <input placeholder="Цена" value={s.price} onChange={(e) => updateRow("sizes", i, "price", e.target.value)} className={`${inputCls} col-span-3`} />
                 <button onClick={() => removeRow("sizes", i)} className="col-span-1 text-red-600 hover:bg-red-50 rounded-lg"><Trash2 className="mx-auto h-4 w-4" /></button>
               </div>
