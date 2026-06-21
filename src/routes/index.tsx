@@ -294,13 +294,8 @@ function HomePage() {
             </div>
           </div>
           {(() => {
-            const imgs: string[] = Array.isArray((apt as any)?.showroom?.images) && (apt as any).showroom.images.length > 0
-              ? (apt as any).showroom.images
-              : Array.isArray((blocks as any))
-                ? []
-                : [];
-            const aboutImgs = Array.isArray(((apt as any)?.showroom?.images))
-              ? (apt as any).showroom.images
+            const aboutImgs: string[] = Array.isArray((aboutContent as any)?.showroom?.images)
+              ? (aboutContent as any).showroom.images
               : [];
             const list = aboutImgs.length > 0 ? aboutImgs : [showroomAsset.url, showroom];
             return (
