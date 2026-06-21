@@ -1,18 +1,10 @@
 import { useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { Link } from "@tanstack/react-router";
-import { ChevronLeft, ChevronRight, ArrowRight, MessageCircle, Phone } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { homeSlidesQuery, heroSliderSettingsQuery } from "@/lib/pageBlocks";
 import hero from "@/assets/hero-living.jpg";
-
-const CONTACT_LINKS: { label: string; href: string; bg: string }[] = [
-  { label: "WhatsApp", href: "https://wa.me/79180736268", bg: "bg-[#25D366]" },
-  { label: "Telegram", href: "https://t.me/+79180736268", bg: "bg-[#229ED9]" },
-  { label: "MAX", href: "https://max.ru/", bg: "bg-primary" },
-  { label: "VK", href: "https://vk.com/", bg: "bg-[#0077FF]" },
-  { label: "Позвонить", href: "tel:+79180736268", bg: "bg-foreground" },
-];
 
 export function HeroSlider({ autoplay: autoplayProp }: { autoplay?: boolean } = {}) {
   const { data: slides = [] } = useQuery(homeSlidesQuery);
@@ -120,31 +112,6 @@ export function HeroSlider({ autoplay: autoplayProp }: { autoplay?: boolean } = 
               </div>
             </>
           )}
-
-          {/* Floating "Напиши нам" button on all slides */}
-          <div className="group/contact absolute right-4 top-4 z-30">
-            <button
-              type="button"
-              className="inline-flex h-11 items-center gap-2 rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/30 transition hover:scale-[1.03]"
-            >
-              <MessageCircle className="h-4 w-4" />
-              Напиши нам
-            </button>
-            <div className="pointer-events-none absolute right-0 top-full mt-2 flex flex-col gap-2 opacity-0 translate-y-1 transition-all duration-200 group-hover/contact:pointer-events-auto group-hover/contact:opacity-100 group-hover/contact:translate-y-0">
-              {CONTACT_LINKS.map((c) => (
-                <a
-                  key={c.label}
-                  href={c.href}
-                  target={c.href.startsWith("http") ? "_blank" : undefined}
-                  rel="noreferrer"
-                  className={`${c.bg} inline-flex h-10 min-w-[160px] items-center justify-end gap-2 rounded-full px-4 text-sm font-medium text-white shadow-md hover:opacity-95`}
-                >
-                  {c.label === "Позвонить" ? <Phone className="h-4 w-4" /> : <MessageCircle className="h-4 w-4" />}
-                  {c.label}
-                </a>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
     </section>
