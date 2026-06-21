@@ -245,7 +245,7 @@ function ProductPage() {
             {/* Размеры — кнопками */}
             {hasSizes && (
               <div className="mt-6">
-                <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Размер дивана</div>
+                <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Размер</div>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {sizeKeys.map((sz) => (
                     <button
@@ -270,21 +270,44 @@ function ProductPage() {
               </div>
             )}
 
+            {hasSizes && sleepingPlace && sleepingPlace !== "—" && (
+              <div className="mt-5">
+                <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Спальное место</div>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <span className="rounded-full border border-primary bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
+                    {sleepingPlace}
+                  </span>
+                </div>
+              </div>
+            )}
+
             {hasSizes && boxesForSize.length > 0 && (
               <div className="mt-5">
-                <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Короб</div>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {boxesForSize.map((b) => (
-                    <button
-                      key={b}
-                      onClick={() => setSelBox(b)}
-                      className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
-                        effectiveBox === b ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card hover:border-primary"
-                      }`}
-                    >
-                      {b}
-                    </button>
-                  ))}
+                <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Комплектация</div>
+                <div className="mt-2 flex flex-col gap-2">
+                  {boxesForSize.map((b) => {
+                    const row = rows.find((r) => r.size === effectiveSize && (r.box ?? "").trim() === b);
+                    const priceNum = row ? Number(String(row.price ?? "").replace(/[^\d]/g, "")) : NaN;
+                    const priceText = Number.isFinite(priceNum) && priceNum > 0 ? formatPrice(priceNum + surcharge) : null;
+                    const active = effectiveBox === b;
+                    return (
+                      <button
+                        key={b}
+                        onClick={() => setSelBox(b)}
+                        className={`flex items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-left text-sm font-medium transition ${
+                          active ? "border-primary bg-primary/5" : "border-border bg-card hover:border-primary"
+                        }`}
+                      >
+                        <span className="flex items-center gap-2">
+                          <span className={`flex h-4 w-4 items-center justify-center rounded-full border-2 ${active ? "border-primary" : "border-muted-foreground/40"}`}>
+                            {active && <span className="h-2 w-2 rounded-full bg-primary" />}
+                          </span>
+                          {b}
+                        </span>
+                        {priceText && <span className="font-display text-base font-semibold">{priceText}</span>}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
