@@ -55,6 +55,15 @@ export type SpecItem = {
   sort_order: number;
 };
 
+export type SizePriceTemplate = {
+  id: string;
+  category_slug: string;
+  title: string;
+  rows: SizeRow[];
+  sort_order: number;
+};
+
+
 export const SOFA_TYPES: { slug: string; title: string }[] = [
   { slug: "straight", title: "Прямые" },
   { slug: "corner", title: "Угловые" },

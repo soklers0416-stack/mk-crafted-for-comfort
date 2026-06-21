@@ -4,7 +4,7 @@ import type {
   Category, Product, Review, Fabric, FabricCategory, ProductFabric,
   FabricCharacteristicDef, FabricColor,
   AboutContent, AboutAdvantage, AboutStat, AboutStep, CustomerPhoto, GalleryItem, Faq,
-  Partner, PartnerCategory, SpecItem,
+  Partner, PartnerCategory, SpecItem, SizePriceTemplate,
 } from "./db";
 
 
