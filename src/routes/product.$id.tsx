@@ -47,7 +47,8 @@ function ProductPage() {
   const [fabricPickerOpen, setFabricPickerOpen] = useState(false);
   const [fabricExamplesOpen, setFabricExamplesOpen] = useState(false);
   const [fabricId, setFabricId] = useState<string | null>(null);
-  const [selectedSizeIdx, setSelectedSizeIdx] = useState(0);
+  const [selSize, setSelSize] = useState<string>("");
+  const [selBox, setSelBox] = useState<string>("");
   const [mechInfoOpen, setMechInfoOpen] = useState(false);
   const [fillInfoOpen, setFillInfoOpen] = useState(false);
 
@@ -89,16 +90,29 @@ function ProductPage() {
   const currentImg = activeImg ?? gallery[0] ?? null;
   const sale = product.sale_enabled ? product : null;
   const baseProductPrice = sale?.sale_new_price ?? product.price;
-  // Если есть размеры — цена берётся от выбранного размера (s.price — строка вида "39 900")
-  const hasSizes = Array.isArray(product.sizes) && product.sizes.length > 0;
-  const sizePriceNum = hasSizes ? Number(String(product.sizes[selectedSizeIdx]?.price ?? "").replace(/[^\d]/g, "")) : NaN;
+
+  // Размеры/короб как варианты с разной ценой
+  const rows = (Array.isArray(product.sizes) ? product.sizes : []) as typeof product.sizes;
+  const hasSizes = rows.length > 0;
+  const sizeKeys = Array.from(new Set(rows.map((r) => r.size).filter(Boolean)));
+  const effectiveSize = hasSizes ? (sizeKeys.includes(selSize) ? selSize : sizeKeys[0]) : "";
+  const boxesForSize = hasSizes
+    ? Array.from(new Set(rows.filter((r) => r.size === effectiveSize).map((r) => (r.box ?? "").trim()).filter((b) => b.length > 0)))
+    : [];
+  const effectiveBox = boxesForSize.includes(selBox) ? selBox : (boxesForSize[0] ?? "");
+  const selectedRow = hasSizes
+    ? (rows.find((r) => r.size === effectiveSize && (r.box ?? "").trim() === effectiveBox) ?? rows.find((r) => r.size === effectiveSize) ?? rows[0])
+    : null;
+
+  const sizePriceNum = selectedRow ? Number(String(selectedRow.price ?? "").replace(/[^\d]/g, "")) : NaN;
   const basePrice = hasSizes && Number.isFinite(sizePriceNum) && sizePriceNum > 0 ? sizePriceNum : baseProductPrice;
   const surcharge = selectedFabric?.surcharge ?? 0;
   const displayPrice = basePrice + surcharge;
   const category = categories.find((c) => c.slug === product.category_slug);
   const similar = allProducts.filter((p) => p.category_slug === product.category_slug && p.id !== product.id).slice(0, 4);
 
-  const selectedSize = hasSizes ? product.sizes[selectedSizeIdx] : null;
+  const sleepingPlace = selectedRow?.sleeping?.trim() || product.sleeping_place || "";
+  const boxValue = selectedRow ? (selectedRow.box ?? "").trim() : "";
   const productMeta: Record<string, string> = {
     section: "Карточка товара",
     product_name: product.title,
@@ -106,10 +120,9 @@ function ProductPage() {
     product_price: `${displayPrice.toLocaleString("ru-RU")} ₽`,
     product_id: product.id,
   };
-  if (selectedSize) {
-    const sz = String((selectedSize as any).label ?? (selectedSize as any).size ?? "").trim();
-    if (sz) productMeta.product_size = sz;
-  }
+  if (effectiveSize) productMeta.product_size = effectiveSize;
+  if (sleepingPlace) productMeta.product_sleeping = sleepingPlace;
+  if (boxValue) productMeta.product_box = boxValue;
   if (selectedFabric) productMeta.product_fabric = selectedFabric.title;
   if (product.mechanism && product.mechanism !== "—") productMeta.product_mechanism = product.mechanism;
   if (product.filling && product.filling !== "—") productMeta.product_filling = product.filling;
@@ -175,45 +188,43 @@ function ProductPage() {
 
             {/* Характеристики в столбик под плашкой "В наличии" */}
             <ul className="mt-5 space-y-2 text-sm">
-              {product.sleeping_place && product.sleeping_place !== "—" && (
+              {sleepingPlace && sleepingPlace !== "—" && (
                 <li className="flex items-baseline justify-between gap-3 border-b border-dashed border-border/60 py-2">
                   <span className="text-muted-foreground">Спальное место</span>
-                  <span className="text-right font-medium">{product.sleeping_place}</span>
+                  <span className="text-right font-medium">{sleepingPlace}</span>
                 </li>
               )}
               {product.mechanism && product.mechanism !== "—" && (
                 <li className="flex items-baseline justify-between gap-3 border-b border-dashed border-border/60 py-2">
-                  <span className="flex items-center gap-1.5 text-muted-foreground">
-                    Механизм
+                  <span className="text-muted-foreground">Механизм</span>
+                  <span className="flex items-center gap-1.5 text-right font-medium">
+                    {product.mechanism}
                     <button
                       type="button"
                       onClick={() => setMechInfoOpen(true)}
-                      aria-label="Что это за механизм?"
-                      className="grid h-5 w-5 place-items-center rounded-full bg-primary/10 text-primary hover:bg-primary/20"
+                      className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary hover:bg-primary/20"
                     >
-                      <Info className="h-3 w-3" />
+                      <Info className="h-3 w-3" /> Подробнее
                     </button>
                   </span>
-                  <span className="text-right font-medium">{product.mechanism}</span>
                 </li>
               )}
               {product.filling && product.filling !== "—" && (
                 <li className="flex items-baseline justify-between gap-3 border-b border-dashed border-border/60 py-2">
-                  <span className="flex items-center gap-1.5 text-muted-foreground">
-                    Наполнение
+                  <span className="text-muted-foreground">Наполнение</span>
+                  <span className="flex items-center gap-1.5 text-right font-medium">
+                    {product.filling}
                     <button
                       type="button"
                       onClick={() => setFillInfoOpen(true)}
-                      aria-label="Что внутри?"
-                      className="grid h-5 w-5 place-items-center rounded-full bg-primary/10 text-primary hover:bg-primary/20"
+                      className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary hover:bg-primary/20"
                     >
-                      <Info className="h-3 w-3" />
+                      <Info className="h-3 w-3" /> Подробнее
                     </button>
                   </span>
-                  <span className="text-right font-medium">{product.filling}</span>
                 </li>
               )}
-              {typeof product.has_box === "boolean" && (
+              {!hasSizes && typeof product.has_box === "boolean" && (
                 <li className="flex items-baseline justify-between gap-3 border-b border-dashed border-border/60 py-2">
                   <span className="text-muted-foreground">Короб</span>
                   <span className="text-right font-medium">{product.has_box ? "Есть" : "Нет"}</span>
@@ -224,17 +235,17 @@ function ProductPage() {
             {/* Размеры — кнопками */}
             {hasSizes && (
               <div className="mt-6">
-                <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Размер</div>
+                <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Размер дивана</div>
                 <div className="mt-2 flex flex-wrap gap-2">
-                  {product.sizes.map((s, i) => (
+                  {sizeKeys.map((sz) => (
                     <button
-                      key={i}
-                      onClick={() => setSelectedSizeIdx(i)}
+                      key={sz}
+                      onClick={() => setSelSize(sz)}
                       className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
-                        selectedSizeIdx === i ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card hover:border-primary"
+                        effectiveSize === sz ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card hover:border-primary"
                       }`}
                     >
-                      {s.size}
+                      {sz}
                     </button>
                   ))}
                 </div>
@@ -248,6 +259,26 @@ function ProductPage() {
                 )}
               </div>
             )}
+
+            {hasSizes && boxesForSize.length > 0 && (
+              <div className="mt-5">
+                <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Короб</div>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {boxesForSize.map((b) => (
+                    <button
+                      key={b}
+                      onClick={() => setSelBox(b)}
+                      className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
+                        effectiveBox === b ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card hover:border-primary"
+                      }`}
+                    >
+                      {b}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {!hasSizes && product.custom_size_enabled && (
               <button
                 onClick={() => setCustomSizeOpen(true)}
