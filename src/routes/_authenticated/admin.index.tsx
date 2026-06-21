@@ -131,8 +131,8 @@ function AdminProductsList() {
                 </tr>
               );
             })}
-            {products.length === 0 && (
-              <tr><td colSpan={6} className="px-4 py-12 text-center text-muted-foreground">Пока нет товаров</td></tr>
+            {filtered.length === 0 && (
+              <tr><td colSpan={6} className="px-4 py-12 text-center text-muted-foreground">{products.length === 0 ? "Пока нет товаров" : "В этой категории пока пусто"}</td></tr>
             )}
           </tbody>
         </table>
