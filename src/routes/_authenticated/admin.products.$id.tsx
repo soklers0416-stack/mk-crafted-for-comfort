@@ -6,7 +6,7 @@ import { categoriesQuery, productQuery, fabricsQuery, productFabricsQuery, fabri
 import type { Product, SizeRow, Spec } from "@/lib/db";
 import { SOFA_TYPES } from "@/lib/db";
 import { toast } from "sonner";
-import { ArrowLeft, Upload, X, Plus, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, Upload, X, Plus, Trash2, GripVertical } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/products/$id")({
   component: EditProduct,
@@ -93,21 +93,20 @@ function EditProduct() {
     if (files.length > empty.length) toast.message(`Загружаем ${empty.length} из ${files.length} — больше нет свободных слотов`);
     setBusy(true);
     try {
-      const uploaded: { slot: 1 | 2 | 3 | 4 | 5 | 6; url: string }[] = [];
-      await Promise.all(toUpload.map(async (file, i) => {
-        const slot = empty[i];
+      // Preserve user's selection order: result[i] corresponds to toUpload[i]
+      const urls = await Promise.all(toUpload.map(async (file) => {
         const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
         const path = `${crypto.randomUUID()}.${ext}`;
         const { error } = await supabase.storage.from("product-photos").upload(path, file, { upsert: false, contentType: file.type });
         if (error) throw error;
-        uploaded.push({ slot, url: `/api/public/photo/${path}` });
+        return `/api/public/photo/${path}`;
       }));
       setForm((f) => {
         const next = { ...f } as any;
-        for (const u of uploaded) next[`photo${u.slot}`] = u.url;
+        urls.forEach((url, i) => { next[`photo${empty[i]}`] = url; });
         return next;
       });
-      toast.success(`Загружено: ${uploaded.length}`);
+      toast.success(`Загружено: ${urls.length}`);
     } catch (e: any) {
       toast.error(e.message);
     } finally {
@@ -115,13 +114,18 @@ function EditProduct() {
     }
   }
 
-  function movePhoto(slot: 1 | 2 | 3 | 4 | 5 | 6, dir: -1 | 1) {
-    const target = slot + dir;
-    if (target < 1 || target > 6) return;
+  const [dragSlot, setDragSlot] = useState<number | null>(null);
+  const [dragOverSlot, setDragOverSlot] = useState<number | null>(null);
+
+  function reorderPhotos(from: number, to: number) {
+    if (from === to) return;
     setForm((f) => {
-      const a = (f as any)[`photo${slot}`] ?? null;
-      const b = (f as any)[`photo${target}`] ?? null;
-      return { ...f, [`photo${slot}`]: b, [`photo${target}`]: a } as any;
+      const arr = [1, 2, 3, 4, 5, 6].map((n) => (f as any)[`photo${n}`] ?? null);
+      const [moved] = arr.splice(from - 1, 1);
+      arr.splice(to - 1, 0, moved);
+      const next = { ...f } as any;
+      arr.forEach((url, i) => { next[`photo${i + 1}`] = url; });
+      return next;
     });
   }
 
@@ -222,14 +226,31 @@ function EditProduct() {
               </label>
             }
           >
+            <p className="mb-2 text-xs text-muted-foreground">Перетащите фото, чтобы поменять порядок. Первое фото слева — главное в карточке.</p>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
               {photoSlots.map((n) => {
                 const url = (form as any)[`photo${n}`] as string | null;
+                const isDragOver = dragOverSlot === n && dragSlot !== null && dragSlot !== n;
                 return (
-                  <div key={n} className="relative aspect-square overflow-hidden rounded-2xl border border-dashed border-border bg-surface-muted">
+                  <div
+                    key={n}
+                    draggable={!!url}
+                    onDragStart={(e) => { if (!url) return; setDragSlot(n); e.dataTransfer.effectAllowed = "move"; }}
+                    onDragEnd={() => { setDragSlot(null); setDragOverSlot(null); }}
+                    onDragOver={(e) => { if (dragSlot === null) return; e.preventDefault(); e.dataTransfer.dropEffect = "move"; setDragOverSlot(n); }}
+                    onDragLeave={() => { if (dragOverSlot === n) setDragOverSlot(null); }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      if (dragSlot !== null && dragSlot !== n) reorderPhotos(dragSlot, n);
+                      setDragSlot(null); setDragOverSlot(null);
+                    }}
+                    className={`relative aspect-square overflow-hidden rounded-2xl border border-dashed bg-surface-muted transition ${
+                      isDragOver ? "border-primary ring-2 ring-primary/40" : "border-border"
+                    } ${dragSlot === n ? "opacity-50" : ""} ${url ? "cursor-grab active:cursor-grabbing" : ""}`}
+                  >
                     {url ? (
                       <>
-                        <img src={url} alt="" className="h-full w-full object-cover" />
+                        <img src={url} alt="" draggable={false} className="h-full w-full object-cover pointer-events-none select-none" />
                         <button
                           onClick={() => update(`photo${n}` as any, null)}
                           className="absolute right-2 top-2 grid h-7 w-7 place-items-center rounded-full bg-black/60 text-white hover:bg-black"
@@ -237,24 +258,8 @@ function EditProduct() {
                         >
                           <X className="h-3.5 w-3.5" />
                         </button>
-                        <div className="absolute inset-x-2 bottom-2 flex items-center justify-between">
-                          <button
-                            onClick={() => movePhoto(n, -1)}
-                            disabled={n === 1}
-                            className="grid h-7 w-7 place-items-center rounded-full bg-black/60 text-white hover:bg-black disabled:opacity-30 disabled:hover:bg-black/60"
-                            title="Левее"
-                          >
-                            <ChevronLeft className="h-4 w-4" />
-                          </button>
-                          <span className="rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-medium text-white">{n}</span>
-                          <button
-                            onClick={() => movePhoto(n, 1)}
-                            disabled={n === 6}
-                            className="grid h-7 w-7 place-items-center rounded-full bg-black/60 text-white hover:bg-black disabled:opacity-30 disabled:hover:bg-black/60"
-                            title="Правее"
-                          >
-                            <ChevronRight className="h-4 w-4" />
-                          </button>
+                        <div className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-medium text-white">
+                          <GripVertical className="h-3 w-3" /> {n}
                         </div>
                       </>
                     ) : (
