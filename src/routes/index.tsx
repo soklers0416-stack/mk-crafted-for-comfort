@@ -297,10 +297,11 @@ function HomePage() {
             const aboutImgs: string[] = Array.isArray((aboutContent as any)?.showroom?.images)
               ? (aboutContent as any).showroom.images
               : [];
-            const list = aboutImgs.length > 0 ? aboutImgs : [showroomAsset.url, showroom];
+            const fallback = [showroomAsset.url, showroom];
+            const list = [aboutImgs[0] ?? fallback[0], aboutImgs[1] ?? fallback[1]];
             return (
               <div className="grid grid-cols-2 gap-3">
-                {list.slice(0, 2).map((src: string, i: number) => (
+                {list.map((src: string, i: number) => (
                   <img key={i} src={src} alt="Шоурум МК Мебель" loading="lazy" className={`aspect-[3/4] w-full rounded-3xl object-cover ${i === 1 ? "mt-8" : ""}`} />
                 ))}
               </div>
