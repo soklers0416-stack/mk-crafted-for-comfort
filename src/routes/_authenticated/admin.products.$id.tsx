@@ -93,21 +93,20 @@ function EditProduct() {
     if (files.length > empty.length) toast.message(`Загружаем ${empty.length} из ${files.length} — больше нет свободных слотов`);
     setBusy(true);
     try {
-      const uploaded: { slot: 1 | 2 | 3 | 4 | 5 | 6; url: string }[] = [];
-      await Promise.all(toUpload.map(async (file, i) => {
-        const slot = empty[i];
+      // Preserve user's selection order: result[i] corresponds to toUpload[i]
+      const urls = await Promise.all(toUpload.map(async (file) => {
         const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
         const path = `${crypto.randomUUID()}.${ext}`;
         const { error } = await supabase.storage.from("product-photos").upload(path, file, { upsert: false, contentType: file.type });
         if (error) throw error;
-        uploaded.push({ slot, url: `/api/public/photo/${path}` });
+        return `/api/public/photo/${path}`;
       }));
       setForm((f) => {
         const next = { ...f } as any;
-        for (const u of uploaded) next[`photo${u.slot}`] = u.url;
+        urls.forEach((url, i) => { next[`photo${empty[i]}`] = url; });
         return next;
       });
-      toast.success(`Загружено: ${uploaded.length}`);
+      toast.success(`Загружено: ${urls.length}`);
     } catch (e: any) {
       toast.error(e.message);
     } finally {
@@ -115,13 +114,18 @@ function EditProduct() {
     }
   }
 
-  function movePhoto(slot: 1 | 2 | 3 | 4 | 5 | 6, dir: -1 | 1) {
-    const target = slot + dir;
-    if (target < 1 || target > 6) return;
+  const [dragSlot, setDragSlot] = useState<number | null>(null);
+  const [dragOverSlot, setDragOverSlot] = useState<number | null>(null);
+
+  function reorderPhotos(from: number, to: number) {
+    if (from === to) return;
     setForm((f) => {
-      const a = (f as any)[`photo${slot}`] ?? null;
-      const b = (f as any)[`photo${target}`] ?? null;
-      return { ...f, [`photo${slot}`]: b, [`photo${target}`]: a } as any;
+      const arr = [1, 2, 3, 4, 5, 6].map((n) => (f as any)[`photo${n}`] ?? null);
+      const [moved] = arr.splice(from - 1, 1);
+      arr.splice(to - 1, 0, moved);
+      const next = { ...f } as any;
+      arr.forEach((url, i) => { next[`photo${i + 1}`] = url; });
+      return next;
     });
   }
 
