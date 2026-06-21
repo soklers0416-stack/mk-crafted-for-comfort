@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { categoriesQuery, productQuery, fabricsQuery, productFabricsQuery, fabricCategoriesQuery, specMechanismsQuery, specFillingsQuery } from "@/lib/queries";
+import { categoriesQuery, productQuery, fabricsQuery, productFabricsQuery, fabricCategoriesQuery, specMechanismsQuery, specFillingsQuery, sizePriceTemplatesQuery } from "@/lib/queries";
 import type { Product, SizeRow, Spec } from "@/lib/db";
 import { SOFA_TYPES } from "@/lib/db";
 import { toast } from "sonner";
