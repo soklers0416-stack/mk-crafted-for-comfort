@@ -55,13 +55,15 @@ function ContentEditor() {
   async function uploadHero(key: string, field: string, file: File) {
     try { const url = await uploadPhoto(file); setField(key, field, url); } catch (e: any) { toast.error(e.message); }
   }
-  async function uploadShowroom(file: File) {
+  async function uploadShowroomToIndex(file: File, index: number) {
     try {
       const url = await uploadPhoto(file);
-      const arr = Array.isArray(draft.showroom?.images) ? draft.showroom.images : [];
-      setField("showroom", "images", [...arr, url]);
+      const arr = Array.isArray(draft.showroom?.images) ? [...draft.showroom.images] : [];
+      arr[index] = url;
+      setField("showroom", "images", arr);
     } catch (e: any) { toast.error(e.message); }
   }
+
 
   const BLOCKS: { key: string; title: string; fields: { name: string; label: string; type?: string }[] }[] = [
     { key: "hero", title: "Первый экран", fields: [
