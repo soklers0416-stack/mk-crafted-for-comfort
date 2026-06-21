@@ -298,7 +298,7 @@ function HomePage() {
               ? (aboutContent as any).showroom.images
               : [];
             const fallback = [showroomAsset.url, showroom];
-            const list = [aboutImgs[0] ?? fallback[0], aboutImgs[1] ?? fallback[1]];
+            const list = [aboutImgs[0] ?? fallback[0], aboutImgs[1] ?? aboutImgs[0] ?? fallback[1]];
             return (
               <div className="grid grid-cols-2 gap-3">
                 {list.map((src: string, i: number) => (
