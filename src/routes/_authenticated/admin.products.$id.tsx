@@ -233,9 +233,29 @@ function EditProduct() {
                         <button
                           onClick={() => update(`photo${n}` as any, null)}
                           className="absolute right-2 top-2 grid h-7 w-7 place-items-center rounded-full bg-black/60 text-white hover:bg-black"
+                          title="Удалить"
                         >
                           <X className="h-3.5 w-3.5" />
                         </button>
+                        <div className="absolute inset-x-2 bottom-2 flex items-center justify-between">
+                          <button
+                            onClick={() => movePhoto(n, -1)}
+                            disabled={n === 1}
+                            className="grid h-7 w-7 place-items-center rounded-full bg-black/60 text-white hover:bg-black disabled:opacity-30 disabled:hover:bg-black/60"
+                            title="Левее"
+                          >
+                            <ChevronLeft className="h-4 w-4" />
+                          </button>
+                          <span className="rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-medium text-white">{n}</span>
+                          <button
+                            onClick={() => movePhoto(n, 1)}
+                            disabled={n === 6}
+                            className="grid h-7 w-7 place-items-center rounded-full bg-black/60 text-white hover:bg-black disabled:opacity-30 disabled:hover:bg-black/60"
+                            title="Правее"
+                          >
+                            <ChevronRight className="h-4 w-4" />
+                          </button>
+                        </div>
                       </>
                     ) : (
                       <label className="flex h-full w-full cursor-pointer flex-col items-center justify-center gap-2 text-xs text-muted-foreground hover:text-primary">
