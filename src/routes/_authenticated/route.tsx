@@ -38,29 +38,74 @@ function AdminLayout() {
     );
   }
 
-  const tabs = [
-    { to: "/admin", label: "Товары" },
-    { to: "/admin/categories", label: "Категории" },
-    { to: "/admin/specs", label: "Справочник характеристик" },
-    { to: "/admin/fabrics", label: "Ткани" },
-    { to: "/admin/apartment", label: "Квартира под ключ" },
-    { to: "/admin/partners", label: "Партнёры" },
-    { to: "/admin/partners/categories", label: "Категории партнёров" },
-    { to: "/admin/partners/content", label: "Тексты «Партнёры»" },
-    { to: "/admin/about", label: "О компании" },
-    { to: "/admin/customer-photos", label: "Фото клиентов" },
-    { to: "/admin/gallery", label: "Галерея" },
-    { to: "/admin/faqs", label: "FAQ" },
-    { to: "/admin/reviews", label: "Отзывы" },
-    { to: "/admin/applications", label: "Заявки" },
-    { to: "/admin/forms", label: "Формы заявок" },
-    { to: "/admin/nav", label: "Меню (шапка)" },
-    { to: "/admin/home-blocks", label: "Блоки главной" },
-    { to: "/admin/home-slides", label: "Слайдер главной" },
-    { to: "/admin/page-blocks", label: "Конструктор страниц" },
-    { to: "/admin/product-stats", label: "Статистика товаров" },
-    { to: "/admin/integrations", label: "Интеграции" },
+  type Tab = { to: string; label: string; exact?: boolean };
+  type Group = { key: string; label: string; tabs: Tab[] };
+
+  const groups: Group[] = [
+    {
+      key: "catalog",
+      label: "Каталог",
+      tabs: [
+        { to: "/admin", label: "Товары", exact: true },
+        { to: "/admin/categories", label: "Категории" },
+        { to: "/admin/specs", label: "Справочник характеристик" },
+        { to: "/admin/apartment", label: "Квартира под ключ" },
+        { to: "/admin/product-stats", label: "Статистика" },
+      ],
+    },
+    {
+      key: "fabrics",
+      label: "Ткани",
+      tabs: [
+        { to: "/admin/fabrics", label: "Ткани", exact: true },
+        { to: "/admin/fabrics/categories", label: "Категории" },
+        { to: "/admin/fabrics/characteristics", label: "Характеристики" },
+      ],
+    },
+    {
+      key: "partners",
+      label: "Партнёры",
+      tabs: [
+        { to: "/admin/partners", label: "Партнёры", exact: true },
+        { to: "/admin/partners/categories", label: "Категории" },
+        { to: "/admin/partners/content", label: "Тексты" },
+      ],
+    },
+    {
+      key: "content",
+      label: "Контент",
+      tabs: [
+        { to: "/admin/about", label: "О компании" },
+        { to: "/admin/customer-photos", label: "Фото клиентов" },
+        { to: "/admin/gallery", label: "Галерея" },
+        { to: "/admin/faqs", label: "FAQ" },
+        { to: "/admin/reviews", label: "Отзывы" },
+      ],
+    },
+    {
+      key: "requests",
+      label: "Заявки",
+      tabs: [
+        { to: "/admin/applications", label: "Заявки" },
+        { to: "/admin/partner-applications", label: "Заявки партнёров" },
+        { to: "/admin/forms", label: "Формы заявок" },
+        { to: "/admin/integrations", label: "Интеграции" },
+      ],
+    },
+    {
+      key: "site",
+      label: "Сайт",
+      tabs: [
+        { to: "/admin/nav", label: "Меню (шапка)" },
+        { to: "/admin/home-blocks", label: "Блоки главной" },
+        { to: "/admin/home-slides", label: "Слайдер главной" },
+        { to: "/admin/page-blocks", label: "Конструктор страниц" },
+      ],
+    },
   ];
+
+  const tabActive = (t: Tab) => (t.exact ? pathname === t.to : pathname === t.to || pathname.startsWith(t.to + "/"));
+  const activeGroup = groups.find((g) => g.tabs.some(tabActive)) ?? groups[0];
 
   return (
     <div className="min-h-screen bg-background">
@@ -75,21 +120,42 @@ function AdminLayout() {
           </button>
         </div>
         <nav className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-4 md:px-8">
-          {tabs.map((t) => {
-            const active = t.to === "/admin" ? pathname === "/admin" : pathname.startsWith(t.to);
+          {groups.map((g) => {
+            const active = g.key === activeGroup.key;
+            const first = g.tabs[0];
             return (
               <Link
-                key={t.to}
-                to={t.to}
+                key={g.key}
+                to={first.to}
                 className={`whitespace-nowrap border-b-2 px-4 py-3 text-sm font-medium transition ${
                   active ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
                 }`}
               >
-                {t.label}
+                {g.label}
               </Link>
             );
           })}
         </nav>
+        {activeGroup.tabs.length > 1 && (
+          <div className="border-t border-border/60 bg-surface-muted/40">
+            <div className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-4 md:px-8">
+              {activeGroup.tabs.map((t) => {
+                const active = tabActive(t);
+                return (
+                  <Link
+                    key={t.to}
+                    to={t.to}
+                    className={`whitespace-nowrap rounded-full px-3 py-1.5 my-2 text-xs font-medium transition ${
+                      active ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-card hover:text-foreground"
+                    }`}
+                  >
+                    {t.label}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </header>
       <main className="mx-auto max-w-7xl px-4 py-8 md:px-8">
         <Outlet />
