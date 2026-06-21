@@ -198,7 +198,7 @@ function ProductPage() {
                   <span className="text-right font-medium">{effectiveSize}</span>
                 </li>
               )}
-              {sleepingPlace && sleepingPlace !== "—" && (
+              {!hasSizes && sleepingPlace && sleepingPlace !== "—" && (
                 <li className="flex items-baseline justify-between gap-3 border-b border-dashed border-border/60 py-2">
                   <span className="text-muted-foreground">Спальное место</span>
                   <span className="text-right font-medium">{sleepingPlace}</span>
