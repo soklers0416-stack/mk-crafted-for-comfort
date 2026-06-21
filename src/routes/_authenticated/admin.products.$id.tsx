@@ -326,18 +326,45 @@ function EditProduct() {
           <Section
             title="Размеры и цены"
             action={
-              <button onClick={() => update("sizes", [...form.sizes, { size: "", sleeping: "", box: "", price: "" }])}
-                className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary">
-                <Plus className="h-3 w-3" /> Строка
-              </button>
+              <div className="flex flex-wrap items-center gap-2">
+                <button onClick={loadSizesTemplate}
+                  className="inline-flex items-center gap-1 rounded-full bg-surface-muted px-3 py-1.5 text-xs font-medium text-foreground hover:bg-surface">
+                  Подгрузить шаблон
+                </button>
+                <button onClick={() => update("sizes", [...form.sizes, { size: "", sleeping: "", box: "", price: "" }])}
+                  className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary">
+                  <Plus className="h-3 w-3" /> Строка
+                </button>
+              </div>
             }
           >
-            {form.sizes.length === 0 && <p className="text-sm text-muted-foreground">Пока нет строк.</p>}
+            {form.sizes.length === 0 && (
+              <p className="text-sm text-muted-foreground">
+                Пока нет строк. Нажмите «Подгрузить шаблон», чтобы взять размеры из другого товара этой категории — останется только вписать цены.
+              </p>
+            )}
+            {form.sizes.length > 0 && (
+              <div className="grid grid-cols-12 gap-2 px-1 text-[11px] uppercase tracking-wider text-muted-foreground">
+                <div className="col-span-3">Размер</div>
+                <div className="col-span-3">Спальное место</div>
+                <div className="col-span-2 text-center">Короб</div>
+                <div className="col-span-3">Цена, ₽</div>
+                <div className="col-span-1" />
+              </div>
+            )}
             {form.sizes.map((s, i) => (
-              <div key={i} className="grid grid-cols-12 gap-2">
-                <input placeholder="Размер" value={s.size} onChange={(e) => updateRow("sizes", i, "size", e.target.value)} className={`${inputCls} col-span-3`} />
-                <input placeholder="Спальное место" value={s.sleeping} onChange={(e) => updateRow("sizes", i, "sleeping", e.target.value)} className={`${inputCls} col-span-3`} />
-                <input placeholder="Короб" value={s.box} onChange={(e) => updateRow("sizes", i, "box", e.target.value)} className={`${inputCls} col-span-2`} />
+              <div key={i} className="grid grid-cols-12 items-center gap-2">
+                <input placeholder="180×120" value={s.size} onChange={(e) => updateRow("sizes", i, "size", e.target.value)} className={`${inputCls} col-span-3`} />
+                <input placeholder="напр. 160×200" value={s.sleeping} onChange={(e) => updateRow("sizes", i, "sleeping", e.target.value)} className={`${inputCls} col-span-3`} />
+                <div className="col-span-2 flex justify-center">
+                  <input
+                    type="checkbox"
+                    checked={!!s.box && s.box !== "нет"}
+                    onChange={(e) => updateRow("sizes", i, "box", e.target.checked ? "да" : "")}
+                    className="h-5 w-5 cursor-pointer accent-primary"
+                    aria-label="Есть короб"
+                  />
+                </div>
                 <input placeholder="Цена" value={s.price} onChange={(e) => updateRow("sizes", i, "price", e.target.value)} className={`${inputCls} col-span-3`} />
                 <button onClick={() => removeRow("sizes", i)} className="col-span-1 text-red-600 hover:bg-red-50 rounded-lg"><Trash2 className="mx-auto h-4 w-4" /></button>
               </div>
