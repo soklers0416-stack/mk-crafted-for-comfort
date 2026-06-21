@@ -6,7 +6,7 @@ import { categoriesQuery, productQuery, fabricsQuery, productFabricsQuery, fabri
 import type { Product, SizeRow, Spec } from "@/lib/db";
 import { SOFA_TYPES } from "@/lib/db";
 import { toast } from "sonner";
-import { ArrowLeft, Upload, X, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Upload, X, Plus, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/products/$id")({
   component: EditProduct,
