@@ -90,16 +90,29 @@ function ProductPage() {
   const currentImg = activeImg ?? gallery[0] ?? null;
   const sale = product.sale_enabled ? product : null;
   const baseProductPrice = sale?.sale_new_price ?? product.price;
-  // Если есть размеры — цена берётся от выбранного размера (s.price — строка вида "39 900")
-  const hasSizes = Array.isArray(product.sizes) && product.sizes.length > 0;
-  const sizePriceNum = hasSizes ? Number(String(product.sizes[selectedSizeIdx]?.price ?? "").replace(/[^\d]/g, "")) : NaN;
+
+  // Размеры/короб как варианты с разной ценой
+  const rows = (Array.isArray(product.sizes) ? product.sizes : []) as typeof product.sizes;
+  const hasSizes = rows.length > 0;
+  const sizeKeys = Array.from(new Set(rows.map((r) => r.size).filter(Boolean)));
+  const effectiveSize = hasSizes ? (sizeKeys.includes(selSize) ? selSize : sizeKeys[0]) : "";
+  const boxesForSize = hasSizes
+    ? Array.from(new Set(rows.filter((r) => r.size === effectiveSize).map((r) => (r.box ?? "").trim()).filter((b) => b.length > 0)))
+    : [];
+  const effectiveBox = boxesForSize.includes(selBox) ? selBox : (boxesForSize[0] ?? "");
+  const selectedRow = hasSizes
+    ? (rows.find((r) => r.size === effectiveSize && (r.box ?? "").trim() === effectiveBox) ?? rows.find((r) => r.size === effectiveSize) ?? rows[0])
+    : null;
+
+  const sizePriceNum = selectedRow ? Number(String(selectedRow.price ?? "").replace(/[^\d]/g, "")) : NaN;
   const basePrice = hasSizes && Number.isFinite(sizePriceNum) && sizePriceNum > 0 ? sizePriceNum : baseProductPrice;
   const surcharge = selectedFabric?.surcharge ?? 0;
   const displayPrice = basePrice + surcharge;
   const category = categories.find((c) => c.slug === product.category_slug);
   const similar = allProducts.filter((p) => p.category_slug === product.category_slug && p.id !== product.id).slice(0, 4);
 
-  const selectedSize = hasSizes ? product.sizes[selectedSizeIdx] : null;
+  const sleepingPlace = selectedRow?.sleeping?.trim() || product.sleeping_place || "";
+  const boxValue = selectedRow ? (selectedRow.box ?? "").trim() : "";
   const productMeta: Record<string, string> = {
     section: "Карточка товара",
     product_name: product.title,
@@ -107,10 +120,9 @@ function ProductPage() {
     product_price: `${displayPrice.toLocaleString("ru-RU")} ₽`,
     product_id: product.id,
   };
-  if (selectedSize) {
-    const sz = String((selectedSize as any).label ?? (selectedSize as any).size ?? "").trim();
-    if (sz) productMeta.product_size = sz;
-  }
+  if (effectiveSize) productMeta.product_size = effectiveSize;
+  if (sleepingPlace) productMeta.product_sleeping = sleepingPlace;
+  if (boxValue) productMeta.product_box = boxValue;
   if (selectedFabric) productMeta.product_fabric = selectedFabric.title;
   if (product.mechanism && product.mechanism !== "—") productMeta.product_mechanism = product.mechanism;
   if (product.filling && product.filling !== "—") productMeta.product_filling = product.filling;
