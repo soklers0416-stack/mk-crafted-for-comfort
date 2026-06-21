@@ -47,7 +47,8 @@ function ProductPage() {
   const [fabricPickerOpen, setFabricPickerOpen] = useState(false);
   const [fabricExamplesOpen, setFabricExamplesOpen] = useState(false);
   const [fabricId, setFabricId] = useState<string | null>(null);
-  const [selectedSizeIdx, setSelectedSizeIdx] = useState(0);
+  const [selSize, setSelSize] = useState<string>("");
+  const [selBox, setSelBox] = useState<string>("");
   const [mechInfoOpen, setMechInfoOpen] = useState(false);
   const [fillInfoOpen, setFillInfoOpen] = useState(false);
 
