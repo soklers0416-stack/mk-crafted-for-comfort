@@ -53,6 +53,9 @@ function EditProduct() {
   const { data: pf = [] } = useQuery(productFabricsQuery);
   const { data: mechanisms = [] } = useQuery(specMechanismsQuery);
   const { data: fillings = [] } = useQuery(specFillingsQuery);
+  const { data: sizeTemplates = [] } = useQuery(sizePriceTemplatesQuery);
+
+  const [selectedSizeTemplateId, setSelectedSizeTemplateId] = useState<string>("");
 
   const [form, setForm] = useState<Omit<Product, "id">>(EMPTY);
   const [busy, setBusy] = useState(false);
