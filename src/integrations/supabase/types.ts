@@ -1102,6 +1102,44 @@ export type Database = {
         }
         Relationships: []
       }
+      size_price_templates: {
+        Row: {
+          category_slug: string
+          created_at: string
+          id: string
+          rows: Json
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category_slug: string
+          created_at?: string
+          id?: string
+          rows?: Json
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          category_slug?: string
+          created_at?: string
+          id?: string
+          rows?: Json
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "size_price_templates_category_slug_fkey"
+            columns: ["category_slug"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
       spec_fillings: {
         Row: {
           created_at: string
