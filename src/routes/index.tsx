@@ -14,7 +14,7 @@ import { apartmentContentQuery } from "@/lib/apartment";
 import { getRecentlyViewed, subscribeRecent } from "@/lib/recentlyViewed";
 import { useEffect as useEffectReact } from "react";
 import apartmentImgFallback from "@/assets/apartment.jpg";
-import factory from "@/assets/factory.jpg";
+import showroomAsset from "@/assets/mk-showroom.png.asset.json";
 import showroom from "@/assets/showroom.jpg";
 
 export const Route = createFileRoute("/")({
@@ -293,7 +293,7 @@ function HomePage() {
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <img src={factory} alt="Производство" loading="lazy" className="aspect-[3/4] w-full rounded-3xl object-cover" />
+            <img src={showroomAsset.url} alt="Шоурум МК Мебель" loading="lazy" className="aspect-[3/4] w-full rounded-3xl object-cover" />
             <img src={showroom} alt="Шоурум" loading="lazy" className="mt-8 aspect-[3/4] w-full rounded-3xl object-cover" />
           </div>
         </div>
