@@ -14,7 +14,7 @@ import { apartmentContentQuery } from "@/lib/apartment";
 import { getRecentlyViewed, subscribeRecent } from "@/lib/recentlyViewed";
 import { useEffect as useEffectReact } from "react";
 import apartmentImgFallback from "@/assets/apartment.jpg";
-import factory from "@/assets/factory.jpg";
+import showroomAsset from "@/assets/mk-showroom.png.asset.json";
 import showroom from "@/assets/showroom.jpg";
 
 export const Route = createFileRoute("/")({
