@@ -85,6 +85,46 @@ function EditProduct() {
     update(`photo${slot}` as any, `/api/public/photo/${path}`);
   }
 
+  async function uploadMultiplePhotos(files: FileList) {
+    const slots: (1 | 2 | 3 | 4 | 5 | 6)[] = [1, 2, 3, 4, 5, 6];
+    const empty = slots.filter((n) => !(form as any)[`photo${n}`]);
+    if (empty.length === 0) { toast.error("Все 6 слотов заняты"); return; }
+    const toUpload = Array.from(files).slice(0, empty.length);
+    if (files.length > empty.length) toast.message(`Загружаем ${empty.length} из ${files.length} — больше нет свободных слотов`);
+    setBusy(true);
+    try {
+      const uploaded: { slot: 1 | 2 | 3 | 4 | 5 | 6; url: string }[] = [];
+      await Promise.all(toUpload.map(async (file, i) => {
+        const slot = empty[i];
+        const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+        const path = `${crypto.randomUUID()}.${ext}`;
+        const { error } = await supabase.storage.from("product-photos").upload(path, file, { upsert: false, contentType: file.type });
+        if (error) throw error;
+        uploaded.push({ slot, url: `/api/public/photo/${path}` });
+      }));
+      setForm((f) => {
+        const next = { ...f } as any;
+        for (const u of uploaded) next[`photo${u.slot}`] = u.url;
+        return next;
+      });
+      toast.success(`Загружено: ${uploaded.length}`);
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function loadSizesTemplate() {
+    const tmpl = (qc.getQueryData(["products"]) as any[] | undefined)?.find(
+      (p: any) => p.id !== id && p.category_slug === form.category_slug && Array.isArray(p.sizes) && p.sizes.length > 0,
+    );
+    if (!tmpl) { toast.error("В этой категории ещё нет товара с размерами"); return; }
+    const rows = tmpl.sizes.map((s: any) => ({ size: s.size ?? "", sleeping: s.sleeping ?? "", box: s.box ?? "", price: "" }));
+    update("sizes", rows);
+    toast.success(`Подгружено ${rows.length} строк — впишите цены`);
+  }
+
   async function save() {
     if (!form.title.trim()) return toast.error("Введите название");
     if (!form.category_slug) return toast.error("Выберите категорию");
