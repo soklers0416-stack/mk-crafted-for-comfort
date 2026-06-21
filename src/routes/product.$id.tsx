@@ -190,7 +190,7 @@ function ProductPage() {
             <ul className="mt-5 space-y-2 text-sm">
               {hasSizes && effectiveSize && (
                 <li className="flex items-baseline justify-between gap-3 border-b border-dashed border-border/60 py-2">
-                  <span className="text-muted-foreground">Размер дивана</span>
+                  <span className="text-muted-foreground">Размер</span>
                   <span className="text-right font-medium">{effectiveSize}</span>
                 </li>
               )}
@@ -208,9 +208,11 @@ function ProductPage() {
                     <button
                       type="button"
                       onClick={() => setMechInfoOpen(true)}
-                      className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary hover:bg-primary/20"
+                      aria-label="Подробнее о механизме"
+                      title="Подробнее"
+                      className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary hover:bg-primary/20"
                     >
-                      <Info className="h-3 w-3" /> Подробнее
+                      <Info className="h-3.5 w-3.5" />
                     </button>
                   </span>
                 </li>
@@ -223,17 +225,13 @@ function ProductPage() {
                     <button
                       type="button"
                       onClick={() => setFillInfoOpen(true)}
-                      className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary hover:bg-primary/20"
+                      aria-label="Подробнее о наполнении"
+                      title="Подробнее"
+                      className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary hover:bg-primary/20"
                     >
-                      <Info className="h-3 w-3" /> Подробнее
+                      <Info className="h-3.5 w-3.5" />
                     </button>
                   </span>
-                </li>
-              )}
-              {hasSizes && boxValue && boxValue !== "—" && (
-                <li className="flex items-baseline justify-between gap-3 border-b border-dashed border-border/60 py-2">
-                  <span className="text-muted-foreground">Короб</span>
-                  <span className="text-right font-medium">{boxValue}</span>
                 </li>
               )}
               {!hasSizes && typeof product.has_box === "boolean" && (
