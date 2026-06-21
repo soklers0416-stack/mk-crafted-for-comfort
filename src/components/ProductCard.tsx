@@ -63,9 +63,21 @@ export function ProductCard({ product }: { product: Product }) {
         )}
 
         <ul className="space-y-1 text-xs text-muted-foreground">
-          {product.sleeping_place && product.sleeping_place !== "—" && (
-            <li>Спальное место: <span className="text-foreground font-medium">{product.sleeping_place}</span></li>
-          )}
+          {(() => {
+            const firstRow = Array.isArray(product.sizes) && product.sizes.length > 0 ? product.sizes[0] : null;
+            const sizeStr = firstRow?.size?.trim();
+            const sleepStr = firstRow?.sleeping?.trim() || (product.sleeping_place && product.sleeping_place !== "—" ? product.sleeping_place : "");
+            return (
+              <>
+                {sizeStr && (
+                  <li>Размер дивана: <span className="text-foreground font-medium">{sizeStr}</span></li>
+                )}
+                {sleepStr && (
+                  <li>Спальное место: <span className="text-foreground font-medium">{sleepStr}</span></li>
+                )}
+              </>
+            );
+          })()}
           {product.mechanism && product.mechanism !== "—" && (
             <li>Механизм: <span className="text-foreground font-medium">{product.mechanism}</span></li>
           )}
