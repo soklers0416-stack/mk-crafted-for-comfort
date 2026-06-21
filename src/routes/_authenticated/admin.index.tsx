@@ -45,7 +45,7 @@ function AdminProductsList() {
       <div className="flex items-center justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl font-bold">Товары</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Всего: {products.length}</p>
+          <p className="mt-1 text-sm text-muted-foreground">Всего: {filtered.length}{catFilter ? ` из ${products.length}` : ""}</p>
         </div>
         <Link
           to="/admin/products/$id" params={{ id: "new" }}
@@ -53,6 +53,29 @@ function AdminProductsList() {
         >
           <Plus className="h-4 w-4" /> Добавить товар
         </Link>
+      </div>
+
+      {/* Фильтр по категориям */}
+      <div className="mt-5 flex flex-wrap gap-2">
+        <button
+          onClick={() => setCatFilter("")}
+          className={`rounded-full border px-4 py-1.5 text-xs font-medium transition ${
+            catFilter === "" ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-muted-foreground hover:border-primary hover:text-foreground"
+          }`}
+        >
+          Все
+        </button>
+        {categories.map((c) => (
+          <button
+            key={c.slug}
+            onClick={() => setCatFilter(c.slug)}
+            className={`rounded-full border px-4 py-1.5 text-xs font-medium transition ${
+              catFilter === c.slug ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-muted-foreground hover:border-primary hover:text-foreground"
+            }`}
+          >
+            {c.title}
+          </button>
+        ))}
       </div>
 
       <div className="mt-6 overflow-hidden rounded-2xl border border-border/60 bg-card">
