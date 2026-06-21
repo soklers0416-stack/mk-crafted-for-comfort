@@ -1,10 +1,18 @@
 import { useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { Link } from "@tanstack/react-router";
-import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowRight, MessageCircle, Phone } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { homeSlidesQuery, heroSliderSettingsQuery } from "@/lib/pageBlocks";
 import hero from "@/assets/hero-living.jpg";
+
+const CONTACT_LINKS: { label: string; href: string; bg: string }[] = [
+  { label: "WhatsApp", href: "https://wa.me/79180736268", bg: "bg-[#25D366]" },
+  { label: "Telegram", href: "https://t.me/+79180736268", bg: "bg-[#229ED9]" },
+  { label: "MAX", href: "https://max.ru/", bg: "bg-primary" },
+  { label: "VK", href: "https://vk.com/", bg: "bg-[#0077FF]" },
+  { label: "Позвонить", href: "tel:+79180736268", bg: "bg-foreground" },
+];
 
 export function HeroSlider({ autoplay: autoplayProp }: { autoplay?: boolean } = {}) {
   const { data: slides = [] } = useQuery(homeSlidesQuery);
