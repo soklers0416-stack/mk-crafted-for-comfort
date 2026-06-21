@@ -284,7 +284,7 @@ function ProductPage() {
                     </span>
                   )}
                   <span className="text-sm text-muted-foreground">
-                    Короб: <span className="font-medium text-foreground">{boxAvailable ? "есть" : "нет"}</span>
+                    <span className="font-medium text-foreground">{boxAvailable ? "есть" : "нет"}</span>
                   </span>
                 </div>
               </div>
@@ -299,7 +299,7 @@ function ProductPage() {
                     const priceNum = row ? Number(String(row.price ?? "").replace(/[^\d]/g, "")) : NaN;
                     const priceText = Number.isFinite(priceNum) && priceNum > 0 ? formatPrice(priceNum + surcharge) : null;
                     const active = effectiveBox === b;
-                    const label = b.length === 0 ? "Без короба" : b;
+                    const label = b.toLowerCase() === "да" ? "С коробом для хранения" : (b.length === 0 ? "Без короба" : b);
                     return (
                       <button
                         key={b || "_empty"}
