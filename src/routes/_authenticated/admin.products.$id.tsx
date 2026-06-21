@@ -115,6 +115,16 @@ function EditProduct() {
     }
   }
 
+  function movePhoto(slot: 1 | 2 | 3 | 4 | 5 | 6, dir: -1 | 1) {
+    const target = slot + dir;
+    if (target < 1 || target > 6) return;
+    setForm((f) => {
+      const a = (f as any)[`photo${slot}`] ?? null;
+      const b = (f as any)[`photo${target}`] ?? null;
+      return { ...f, [`photo${slot}`]: b, [`photo${target}`]: a } as any;
+    });
+  }
+
   function loadSizesTemplate() {
     const tmpl = (qc.getQueryData(["products"]) as any[] | undefined)?.find(
       (p: any) => p.id !== id && p.category_slug === form.category_slug && Array.isArray(p.sizes) && p.sizes.length > 0,
