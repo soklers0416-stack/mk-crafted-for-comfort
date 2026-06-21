@@ -97,12 +97,16 @@ function ProductPage() {
   const sizeKeys = Array.from(new Set(rows.map((r) => r.size).filter(Boolean)));
   const effectiveSize = hasSizes ? (sizeKeys.includes(selSize) ? selSize : sizeKeys[0]) : "";
   const boxesForSize = hasSizes
-    ? Array.from(new Set(rows.filter((r) => r.size === effectiveSize).map((r) => (r.box ?? "").trim()).filter((b) => b.length > 0)))
+    ? Array.from(new Set(rows.filter((r) => r.size === effectiveSize).map((r) => (r.box ?? "").trim())))
     : [];
   const effectiveBox = boxesForSize.includes(selBox) ? selBox : (boxesForSize[0] ?? "");
   const selectedRow = hasSizes
     ? (rows.find((r) => r.size === effectiveSize && (r.box ?? "").trim() === effectiveBox) ?? rows.find((r) => r.size === effectiveSize) ?? rows[0])
     : null;
+  const hasBoxForSize = boxesForSize.some((b) => /короб/i.test(b) && !/без/i.test(b));
+  const boxAvailable = hasSizes
+    ? (hasBoxForSize ? true : (boxesForSize.some((b) => /без/i.test(b)) ? false : (product.has_box ?? false)))
+    : (product.has_box ?? false);
 
   const sizePriceNum = selectedRow ? Number(String(selectedRow.price ?? "").replace(/[^\d]/g, "")) : NaN;
   const basePrice = hasSizes && Number.isFinite(sizePriceNum) && sizePriceNum > 0 ? sizePriceNum : baseProductPrice;
@@ -194,7 +198,7 @@ function ProductPage() {
                   <span className="text-right font-medium">{effectiveSize}</span>
                 </li>
               )}
-              {sleepingPlace && sleepingPlace !== "—" && (
+              {!hasSizes && sleepingPlace && sleepingPlace !== "—" && (
                 <li className="flex items-baseline justify-between gap-3 border-b border-dashed border-border/60 py-2">
                   <span className="text-muted-foreground">Спальное место</span>
                   <span className="text-right font-medium">{sleepingPlace}</span>
@@ -270,18 +274,23 @@ function ProductPage() {
               </div>
             )}
 
-            {hasSizes && sleepingPlace && sleepingPlace !== "—" && (
+            {hasSizes && (sleepingPlace || true) && (
               <div className="mt-5">
                 <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Спальное место</div>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  <span className="rounded-full border border-primary bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
-                    {sleepingPlace}
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  {sleepingPlace && sleepingPlace !== "—" && (
+                    <span className="rounded-full border border-border bg-card px-4 py-2 text-sm font-medium">
+                      {sleepingPlace}
+                    </span>
+                  )}
+                  <span className="text-sm text-muted-foreground">
+                    Короб: <span className="font-medium text-foreground">{boxAvailable ? "есть" : "нет"}</span>
                   </span>
                 </div>
               </div>
             )}
 
-            {hasSizes && boxesForSize.length > 0 && (
+            {hasSizes && boxesForSize.length > 1 && (
               <div className="mt-5">
                 <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Комплектация</div>
                 <div className="mt-2 flex flex-col gap-2">
@@ -290,9 +299,10 @@ function ProductPage() {
                     const priceNum = row ? Number(String(row.price ?? "").replace(/[^\d]/g, "")) : NaN;
                     const priceText = Number.isFinite(priceNum) && priceNum > 0 ? formatPrice(priceNum + surcharge) : null;
                     const active = effectiveBox === b;
+                    const label = b.length === 0 ? "Без короба" : b;
                     return (
                       <button
-                        key={b}
+                        key={b || "_empty"}
                         onClick={() => setSelBox(b)}
                         className={`flex items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-left text-sm font-medium transition ${
                           active ? "border-primary bg-primary/5" : "border-border bg-card hover:border-primary"
@@ -302,7 +312,7 @@ function ProductPage() {
                           <span className={`flex h-4 w-4 items-center justify-center rounded-full border-2 ${active ? "border-primary" : "border-muted-foreground/40"}`}>
                             {active && <span className="h-2 w-2 rounded-full bg-primary" />}
                           </span>
-                          {b}
+                          {label}
                         </span>
                         {priceText && <span className="font-display text-base font-semibold">{priceText}</span>}
                       </button>
