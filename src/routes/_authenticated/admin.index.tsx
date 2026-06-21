@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState, useMemo } from "react";
 import { productsQuery, categoriesQuery } from "@/lib/queries";
 import { supabase } from "@/integrations/supabase/client";
 import { formatPriceRub } from "@/lib/db";
@@ -15,6 +16,11 @@ function AdminProductsList() {
   const qc = useQueryClient();
   const { data: products = [] } = useQuery(productsQuery);
   const { data: categories = [] } = useQuery(categoriesQuery);
+  const [catFilter, setCatFilter] = useState<string>("");
+  const filtered = useMemo(
+    () => (catFilter ? products.filter((p) => p.category_slug === catFilter) : products),
+    [products, catFilter],
+  );
 
   const del = useMutation({
     mutationFn: async (id: string) => {
