@@ -365,10 +365,19 @@ function EditProduct() {
             title="Размеры и цены"
             action={
               <div className="flex flex-wrap items-center gap-2">
-                <button onClick={loadSizesTemplate}
-                  className="inline-flex items-center gap-1 rounded-full bg-surface-muted px-3 py-1.5 text-xs font-medium text-foreground hover:bg-surface">
-                  Подгрузить шаблон
-                </button>
+                <select
+                  value={selectedSizeTemplateId}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    setSelectedSizeTemplateId(v);
+                    if (v) loadSizesTemplate(v);
+                  }}
+                  className="rounded-full border border-border bg-surface-muted px-3 py-1.5 text-xs font-medium text-foreground outline-none hover:bg-surface"
+                >
+                  <option value="">Выбрать шаблон</option>
+                  {availableSizeTemplates.map((t) => <option key={t.id} value={t.id}>{t.title}</option>)}
+                  {availableSizeTemplates.length === 0 && <option disabled value="">Нет шаблонов для категории</option>}
+                </select>
                 <button onClick={() => update("sizes", [...form.sizes, { size: "", sleeping: "", box: "", price: "" }])}
                   className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary">
                   <Plus className="h-3 w-3" /> Строка
