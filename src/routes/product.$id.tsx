@@ -277,9 +277,6 @@ function ProductPage() {
                       {sleepingPlace}
                     </span>
                   )}
-                  <span className="text-sm text-muted-foreground">
-                    <span className="font-medium text-foreground">{boxAvailable ? "есть" : "нет"}</span>
-                  </span>
                 </div>
               </div>
             )}
