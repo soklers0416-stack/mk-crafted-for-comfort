@@ -271,6 +271,18 @@ export const specFillingsQuery = queryOptions({
   },
 });
 
+export const sizePriceTemplatesQuery = queryOptions({
+  queryKey: ["size_price_templates"],
+  queryFn: async (): Promise<SizePriceTemplate[]> => {
+    const { data, error } = await sb.from("size_price_templates").select("*").order("sort_order");
+    if (error) throw error;
+    return ((data ?? []) as any[]).map((t) => ({
+      ...t,
+      rows: Array.isArray(t.rows) ? t.rows : [],
+    })) as SizePriceTemplate[];
+  },
+});
+
 
 export type ProductStat = { product_id: string; views: number; likes: number; cart_adds: number };
 export const productStatsQuery = queryOptions({
