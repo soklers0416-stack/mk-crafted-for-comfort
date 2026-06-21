@@ -28,7 +28,9 @@ function CatalogPage() {
   const { data: categories = [] } = useQuery(categoriesQuery);
   const { data: products = [], isLoading } = useQuery(productsQuery);
 
-  let list = category ? products.filter((p) => p.category_slug === category) : products;
+  let list = category
+    ? products.filter((p) => p.category_slug === category || (p.category_slugs ?? []).includes(category))
+    : products;
   const isSofa = category === "sofas" || category === "divany" || category === "divan";
   if (isSofa && sofa_type) list = list.filter((p) => p.sofa_type === sofa_type);
   const current = categories.find((c) => c.slug === category);
