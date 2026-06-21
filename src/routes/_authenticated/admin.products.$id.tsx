@@ -201,7 +201,17 @@ function EditProduct() {
           </Section>
 
           {/* Фото */}
-          <Section title="Фотографии (до 6)">
+          <Section
+            title="Фотографии (до 6)"
+            action={
+              <label className="inline-flex cursor-pointer items-center gap-1 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/15">
+                <Upload className="h-3 w-3" /> Загрузить несколько
+                <input type="file" accept="image/*" multiple className="hidden"
+                  onChange={(e) => { const fs = e.target.files; if (fs && fs.length) { uploadMultiplePhotos(fs); e.currentTarget.value = ""; } }}
+                />
+              </label>
+            }
+          >
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
               {photoSlots.map((n) => {
                 const url = (form as any)[`photo${n}`] as string | null;
