@@ -188,45 +188,43 @@ function ProductPage() {
 
             {/* Характеристики в столбик под плашкой "В наличии" */}
             <ul className="mt-5 space-y-2 text-sm">
-              {product.sleeping_place && product.sleeping_place !== "—" && (
+              {sleepingPlace && sleepingPlace !== "—" && (
                 <li className="flex items-baseline justify-between gap-3 border-b border-dashed border-border/60 py-2">
                   <span className="text-muted-foreground">Спальное место</span>
-                  <span className="text-right font-medium">{product.sleeping_place}</span>
+                  <span className="text-right font-medium">{sleepingPlace}</span>
                 </li>
               )}
               {product.mechanism && product.mechanism !== "—" && (
                 <li className="flex items-baseline justify-between gap-3 border-b border-dashed border-border/60 py-2">
-                  <span className="flex items-center gap-1.5 text-muted-foreground">
-                    Механизм
+                  <span className="text-muted-foreground">Механизм</span>
+                  <span className="flex items-center gap-1.5 text-right font-medium">
+                    {product.mechanism}
                     <button
                       type="button"
                       onClick={() => setMechInfoOpen(true)}
-                      aria-label="Что это за механизм?"
-                      className="grid h-5 w-5 place-items-center rounded-full bg-primary/10 text-primary hover:bg-primary/20"
+                      className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary hover:bg-primary/20"
                     >
-                      <Info className="h-3 w-3" />
+                      <Info className="h-3 w-3" /> Подробнее
                     </button>
                   </span>
-                  <span className="text-right font-medium">{product.mechanism}</span>
                 </li>
               )}
               {product.filling && product.filling !== "—" && (
                 <li className="flex items-baseline justify-between gap-3 border-b border-dashed border-border/60 py-2">
-                  <span className="flex items-center gap-1.5 text-muted-foreground">
-                    Наполнение
+                  <span className="text-muted-foreground">Наполнение</span>
+                  <span className="flex items-center gap-1.5 text-right font-medium">
+                    {product.filling}
                     <button
                       type="button"
                       onClick={() => setFillInfoOpen(true)}
-                      aria-label="Что внутри?"
-                      className="grid h-5 w-5 place-items-center rounded-full bg-primary/10 text-primary hover:bg-primary/20"
+                      className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary hover:bg-primary/20"
                     >
-                      <Info className="h-3 w-3" />
+                      <Info className="h-3 w-3" /> Подробнее
                     </button>
                   </span>
-                  <span className="text-right font-medium">{product.filling}</span>
                 </li>
               )}
-              {typeof product.has_box === "boolean" && (
+              {!hasSizes && typeof product.has_box === "boolean" && (
                 <li className="flex items-baseline justify-between gap-3 border-b border-dashed border-border/60 py-2">
                   <span className="text-muted-foreground">Короб</span>
                   <span className="text-right font-medium">{product.has_box ? "Есть" : "Нет"}</span>
@@ -237,17 +235,17 @@ function ProductPage() {
             {/* Размеры — кнопками */}
             {hasSizes && (
               <div className="mt-6">
-                <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Размер</div>
+                <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Размер дивана</div>
                 <div className="mt-2 flex flex-wrap gap-2">
-                  {product.sizes.map((s, i) => (
+                  {sizeKeys.map((sz) => (
                     <button
-                      key={i}
-                      onClick={() => setSelectedSizeIdx(i)}
+                      key={sz}
+                      onClick={() => setSelSize(sz)}
                       className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
-                        selectedSizeIdx === i ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card hover:border-primary"
+                        effectiveSize === sz ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card hover:border-primary"
                       }`}
                     >
-                      {s.size}
+                      {sz}
                     </button>
                   ))}
                 </div>
@@ -261,6 +259,26 @@ function ProductPage() {
                 )}
               </div>
             )}
+
+            {hasSizes && boxesForSize.length > 0 && (
+              <div className="mt-5">
+                <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Короб</div>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {boxesForSize.map((b) => (
+                    <button
+                      key={b}
+                      onClick={() => setSelBox(b)}
+                      className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
+                        effectiveBox === b ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card hover:border-primary"
+                      }`}
+                    >
+                      {b}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {!hasSizes && product.custom_size_enabled && (
               <button
                 onClick={() => setCustomSizeOpen(true)}
