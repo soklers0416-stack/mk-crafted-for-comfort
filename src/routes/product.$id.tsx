@@ -260,14 +260,6 @@ function ProductPage() {
               </div>
             )}
 
-            {hasSizes && product.custom_size_enabled && (
-              <button
-                onClick={() => setCustomSizeOpen(true)}
-                className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
-              >
-                Нужен другой размер?
-              </button>
-            )}
 
             {hasSizes && (() => {
               const sleepingBySize = new Map<string, string>();
