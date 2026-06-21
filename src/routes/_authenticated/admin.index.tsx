@@ -18,7 +18,7 @@ function AdminProductsList() {
   const { data: categories = [] } = useQuery(categoriesQuery);
   const [catFilter, setCatFilter] = useState<string>("");
   const filtered = useMemo(
-    () => (catFilter ? products.filter((p) => p.category_slug === catFilter) : products),
+    () => (catFilter ? products.filter((p) => p.category_slug === catFilter || (p.category_slugs ?? []).includes(catFilter)) : products),
     [products, catFilter],
   );
 
