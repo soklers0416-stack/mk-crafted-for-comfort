@@ -4,7 +4,7 @@ import type {
   Category, Product, Review, Fabric, FabricCategory, ProductFabric,
   FabricCharacteristicDef, FabricColor,
   AboutContent, AboutAdvantage, AboutStat, AboutStep, CustomerPhoto, GalleryItem, Faq,
-  Partner, PartnerCategory, SpecItem,
+  Partner, PartnerCategory, SpecItem, SizePriceTemplate,
 } from "./db";
 
 
@@ -268,6 +268,18 @@ export const specFillingsQuery = queryOptions({
     const { data, error } = await sb.from("spec_fillings").select("*").order("sort_order");
     if (error) throw error;
     return (data ?? []) as SpecItem[];
+  },
+});
+
+export const sizePriceTemplatesQuery = queryOptions({
+  queryKey: ["size_price_templates"],
+  queryFn: async (): Promise<SizePriceTemplate[]> => {
+    const { data, error } = await sb.from("size_price_templates").select("*").order("sort_order");
+    if (error) throw error;
+    return ((data ?? []) as any[]).map((t) => ({
+      ...t,
+      rows: Array.isArray(t.rows) ? t.rows : [],
+    })) as SizePriceTemplate[];
   },
 });
 

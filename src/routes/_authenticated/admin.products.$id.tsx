@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { categoriesQuery, productQuery, fabricsQuery, productFabricsQuery, fabricCategoriesQuery, specMechanismsQuery, specFillingsQuery } from "@/lib/queries";
+import { categoriesQuery, productQuery, fabricsQuery, productFabricsQuery, fabricCategoriesQuery, specMechanismsQuery, specFillingsQuery, sizePriceTemplatesQuery } from "@/lib/queries";
 import type { Product, SizeRow, Spec } from "@/lib/db";
 import { SOFA_TYPES } from "@/lib/db";
 import { toast } from "sonner";
@@ -53,6 +53,9 @@ function EditProduct() {
   const { data: pf = [] } = useQuery(productFabricsQuery);
   const { data: mechanisms = [] } = useQuery(specMechanismsQuery);
   const { data: fillings = [] } = useQuery(specFillingsQuery);
+  const { data: sizeTemplates = [] } = useQuery(sizePriceTemplatesQuery);
+
+  const [selectedSizeTemplateId, setSelectedSizeTemplateId] = useState<string>("");
 
   const [form, setForm] = useState<Omit<Product, "id">>(EMPTY);
   const [busy, setBusy] = useState(false);
@@ -129,14 +132,14 @@ function EditProduct() {
     });
   }
 
-  function loadSizesTemplate() {
-    const tmpl = (qc.getQueryData(["products"]) as any[] | undefined)?.find(
-      (p: any) => p.id !== id && p.category_slug === form.category_slug && Array.isArray(p.sizes) && p.sizes.length > 0,
-    );
-    if (!tmpl) { toast.error("В этой категории ещё нет товара с размерами"); return; }
-    const rows = tmpl.sizes.map((s: any) => ({ size: s.size ?? "", sleeping: s.sleeping ?? "", box: s.box ?? "", price: "" }));
+  const availableSizeTemplates = sizeTemplates.filter((t) => t.category_slug === form.category_slug);
+
+  function loadSizesTemplate(templateId: string) {
+    const tmpl = sizeTemplates.find((t) => t.id === templateId);
+    if (!tmpl) { toast.error("Шаблон не найден"); return; }
+    const rows = tmpl.rows.map((s) => ({ size: s.size ?? "", sleeping: s.sleeping ?? "", box: s.box ?? "", price: "" }));
     update("sizes", rows);
-    toast.success(`Подгружено ${rows.length} строк — впишите цены`);
+    toast.success(`Подгружено ${rows.length} строк из «${tmpl.title}» — впишите цены`);
   }
 
   async function save() {
@@ -362,10 +365,19 @@ function EditProduct() {
             title="Размеры и цены"
             action={
               <div className="flex flex-wrap items-center gap-2">
-                <button onClick={loadSizesTemplate}
-                  className="inline-flex items-center gap-1 rounded-full bg-surface-muted px-3 py-1.5 text-xs font-medium text-foreground hover:bg-surface">
-                  Подгрузить шаблон
-                </button>
+                <select
+                  value={selectedSizeTemplateId}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    setSelectedSizeTemplateId(v);
+                    if (v) loadSizesTemplate(v);
+                  }}
+                  className="rounded-full border border-border bg-surface-muted px-3 py-1.5 text-xs font-medium text-foreground outline-none hover:bg-surface"
+                >
+                  <option value="">Выбрать шаблон</option>
+                  {availableSizeTemplates.map((t) => <option key={t.id} value={t.id}>{t.title}</option>)}
+                  {availableSizeTemplates.length === 0 && <option disabled value="">Нет шаблонов для категории</option>}
+                </select>
                 <button onClick={() => update("sizes", [...form.sizes, { size: "", sleeping: "", box: "", price: "" }])}
                   className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary">
                   <Plus className="h-3 w-3" /> Строка
@@ -375,7 +387,7 @@ function EditProduct() {
           >
             {form.sizes.length === 0 && (
               <p className="text-sm text-muted-foreground">
-                Пока нет строк. Нажмите «Подгрузить шаблон», чтобы взять размеры из другого товара этой категории — останется только вписать цены.
+                Выберите шаблон размеров в выпадающем списке выше — строки подтянутся автоматически, останется только вписать цены.
               </p>
             )}
             {form.sizes.length > 0 && (
