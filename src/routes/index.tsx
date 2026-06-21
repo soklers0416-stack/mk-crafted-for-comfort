@@ -9,7 +9,7 @@ import { ContactDialog } from "@/components/ContactDialog";
 import { HeroSlider } from "@/components/HeroSlider";
 import { advantages, heroFeatures } from "@/lib/data";
 import { useQuery } from "@tanstack/react-query";
-import { productsQuery, reviewsQuery, productStatsQuery, homeBlocksQuery, categoriesQuery } from "@/lib/queries";
+import { productsQuery, reviewsQuery, productStatsQuery, homeBlocksQuery, categoriesQuery, aboutContentQuery } from "@/lib/queries";
 import { apartmentContentQuery } from "@/lib/apartment";
 import { getRecentlyViewed, subscribeRecent } from "@/lib/recentlyViewed";
 import { useEffect as useEffectReact } from "react";
