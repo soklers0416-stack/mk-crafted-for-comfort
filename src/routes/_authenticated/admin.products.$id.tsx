@@ -132,14 +132,14 @@ function EditProduct() {
     });
   }
 
-  function loadSizesTemplate() {
-    const tmpl = (qc.getQueryData(["products"]) as any[] | undefined)?.find(
-      (p: any) => p.id !== id && p.category_slug === form.category_slug && Array.isArray(p.sizes) && p.sizes.length > 0,
-    );
-    if (!tmpl) { toast.error("В этой категории ещё нет товара с размерами"); return; }
-    const rows = tmpl.sizes.map((s: any) => ({ size: s.size ?? "", sleeping: s.sleeping ?? "", box: s.box ?? "", price: "" }));
+  const availableSizeTemplates = sizeTemplates.filter((t) => t.category_slug === form.category_slug);
+
+  function loadSizesTemplate(templateId: string) {
+    const tmpl = sizeTemplates.find((t) => t.id === templateId);
+    if (!tmpl) { toast.error("Шаблон не найден"); return; }
+    const rows = tmpl.rows.map((s) => ({ size: s.size ?? "", sleeping: s.sleeping ?? "", box: s.box ?? "", price: "" }));
     update("sizes", rows);
-    toast.success(`Подгружено ${rows.length} строк — впишите цены`);
+    toast.success(`Подгружено ${rows.length} строк из «${tmpl.title}» — впишите цены`);
   }
 
   async function save() {
