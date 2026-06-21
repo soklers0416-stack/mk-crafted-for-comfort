@@ -226,14 +226,31 @@ function EditProduct() {
               </label>
             }
           >
+            <p className="mb-2 text-xs text-muted-foreground">Перетащите фото, чтобы поменять порядок. Первое фото слева — главное в карточке.</p>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
               {photoSlots.map((n) => {
                 const url = (form as any)[`photo${n}`] as string | null;
+                const isDragOver = dragOverSlot === n && dragSlot !== null && dragSlot !== n;
                 return (
-                  <div key={n} className="relative aspect-square overflow-hidden rounded-2xl border border-dashed border-border bg-surface-muted">
+                  <div
+                    key={n}
+                    draggable={!!url}
+                    onDragStart={(e) => { if (!url) return; setDragSlot(n); e.dataTransfer.effectAllowed = "move"; }}
+                    onDragEnd={() => { setDragSlot(null); setDragOverSlot(null); }}
+                    onDragOver={(e) => { if (dragSlot === null) return; e.preventDefault(); e.dataTransfer.dropEffect = "move"; setDragOverSlot(n); }}
+                    onDragLeave={() => { if (dragOverSlot === n) setDragOverSlot(null); }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      if (dragSlot !== null && dragSlot !== n) reorderPhotos(dragSlot, n);
+                      setDragSlot(null); setDragOverSlot(null);
+                    }}
+                    className={`relative aspect-square overflow-hidden rounded-2xl border border-dashed bg-surface-muted transition ${
+                      isDragOver ? "border-primary ring-2 ring-primary/40" : "border-border"
+                    } ${dragSlot === n ? "opacity-50" : ""} ${url ? "cursor-grab active:cursor-grabbing" : ""}`}
+                  >
                     {url ? (
                       <>
-                        <img src={url} alt="" className="h-full w-full object-cover" />
+                        <img src={url} alt="" draggable={false} className="h-full w-full object-cover pointer-events-none select-none" />
                         <button
                           onClick={() => update(`photo${n}` as any, null)}
                           className="absolute right-2 top-2 grid h-7 w-7 place-items-center rounded-full bg-black/60 text-white hover:bg-black"
@@ -241,24 +258,8 @@ function EditProduct() {
                         >
                           <X className="h-3.5 w-3.5" />
                         </button>
-                        <div className="absolute inset-x-2 bottom-2 flex items-center justify-between">
-                          <button
-                            onClick={() => movePhoto(n, -1)}
-                            disabled={n === 1}
-                            className="grid h-7 w-7 place-items-center rounded-full bg-black/60 text-white hover:bg-black disabled:opacity-30 disabled:hover:bg-black/60"
-                            title="Левее"
-                          >
-                            <ChevronLeft className="h-4 w-4" />
-                          </button>
-                          <span className="rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-medium text-white">{n}</span>
-                          <button
-                            onClick={() => movePhoto(n, 1)}
-                            disabled={n === 6}
-                            className="grid h-7 w-7 place-items-center rounded-full bg-black/60 text-white hover:bg-black disabled:opacity-30 disabled:hover:bg-black/60"
-                            title="Правее"
-                          >
-                            <ChevronRight className="h-4 w-4" />
-                          </button>
+                        <div className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-medium text-white">
+                          <GripVertical className="h-3 w-3" /> {n}
                         </div>
                       </>
                     ) : (
