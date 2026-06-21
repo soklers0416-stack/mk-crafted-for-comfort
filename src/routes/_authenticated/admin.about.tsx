@@ -128,18 +128,25 @@ function ContentEditor() {
               {b.key === "showroom" && (
                 <div>
                   <label className="mb-1 block text-xs font-medium text-muted-foreground">Фото шоурума</label>
-                  <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-                    {(Array.isArray(v.images) ? v.images : []).map((u: string, i: number) => (
-                      <div key={i} className="relative aspect-square">
-                        <img src={u} alt="" className="h-full w-full rounded-xl object-cover" />
-                        <button onClick={() => setField("showroom", "images", v.images.filter((_: any, j: number) => j !== i))} className="absolute right-1 top-1 grid h-6 w-6 place-items-center rounded-full bg-black/60 text-white"><X className="h-3 w-3" /></button>
+                  <div className="grid grid-cols-2 gap-3">
+                    {[0, 1].map((i) => (
+                      <div key={i}>
+                        <label className="mb-1 block text-xs text-muted-foreground">Фото {i + 1}</label>
+                        {v.images?.[i] ? (
+                          <div className="relative aspect-square">
+                            <img src={v.images[i]} alt="" className="h-full w-full rounded-xl object-cover" />
+                            <button onClick={() => setField("showroom", "images", (v.images || []).filter((_: any, j: number) => j !== i))} className="absolute right-1 top-1 grid h-6 w-6 place-items-center rounded-full bg-black/60 text-white"><X className="h-3 w-3" /></button>
+                          </div>
+                        ) : (
+                          <label className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border border-dashed text-xs text-muted-foreground hover:text-primary">
+                            <Upload className="h-4 w-4" /> Добавить
+                            <input type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={(e) => { const f2 = e.target.files?.[0]; if (f2) uploadShowroomToIndex(f2, i); }} />
+                          </label>
+                        )}
                       </div>
                     ))}
-                    <label className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border border-dashed text-xs text-muted-foreground hover:text-primary">
-                      <Upload className="h-4 w-4" /> Добавить
-                      <input type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={(e) => { const f2 = e.target.files?.[0]; if (f2) uploadShowroom(f2); }} />
-                    </label>
                   </div>
+                  <p className="mt-2 text-xs text-muted-foreground">На главной странице показываются первые 2 фото.</p>
                 </div>
               )}
               <button onClick={() => save.mutate(b.key)} className="rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground">Сохранить блок</button>
