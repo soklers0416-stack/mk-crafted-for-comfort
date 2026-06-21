@@ -97,12 +97,16 @@ function ProductPage() {
   const sizeKeys = Array.from(new Set(rows.map((r) => r.size).filter(Boolean)));
   const effectiveSize = hasSizes ? (sizeKeys.includes(selSize) ? selSize : sizeKeys[0]) : "";
   const boxesForSize = hasSizes
-    ? Array.from(new Set(rows.filter((r) => r.size === effectiveSize).map((r) => (r.box ?? "").trim()).filter((b) => b.length > 0)))
+    ? Array.from(new Set(rows.filter((r) => r.size === effectiveSize).map((r) => (r.box ?? "").trim())))
     : [];
   const effectiveBox = boxesForSize.includes(selBox) ? selBox : (boxesForSize[0] ?? "");
   const selectedRow = hasSizes
     ? (rows.find((r) => r.size === effectiveSize && (r.box ?? "").trim() === effectiveBox) ?? rows.find((r) => r.size === effectiveSize) ?? rows[0])
     : null;
+  const hasBoxForSize = boxesForSize.some((b) => /короб/i.test(b) && !/без/i.test(b));
+  const boxAvailable = hasSizes
+    ? (hasBoxForSize ? true : (boxesForSize.some((b) => /без/i.test(b)) ? false : (product.has_box ?? false)))
+    : (product.has_box ?? false);
 
   const sizePriceNum = selectedRow ? Number(String(selectedRow.price ?? "").replace(/[^\d]/g, "")) : NaN;
   const basePrice = hasSizes && Number.isFinite(sizePriceNum) && sizePriceNum > 0 ? sizePriceNum : baseProductPrice;
