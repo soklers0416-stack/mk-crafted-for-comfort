@@ -91,7 +91,7 @@ function AdminProductsList() {
             </tr>
           </thead>
           <tbody>
-            {products.map((p) => {
+            {filtered.map((p) => {
               const cat = categories.find((c) => c.slug === p.category_slug);
               return (
                 <tr key={p.id} className="border-t border-border/60">
