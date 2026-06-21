@@ -192,12 +192,6 @@ function ProductPage() {
 
             {/* Характеристики в столбик под плашкой "В наличии" */}
             <ul className="mt-5 space-y-2 text-sm">
-              {hasSizes && effectiveSize && (
-                <li className="flex items-baseline justify-between gap-3 border-b border-dashed border-border/60 py-2">
-                  <span className="text-muted-foreground">Размер</span>
-                  <span className="text-right font-medium">{effectiveSize}</span>
-                </li>
-              )}
               {!hasSizes && sleepingPlace && sleepingPlace !== "—" && (
                 <li className="flex items-baseline justify-between gap-3 border-b border-dashed border-border/60 py-2">
                   <span className="text-muted-foreground">Спальное место</span>
