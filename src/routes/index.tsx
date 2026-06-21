@@ -292,10 +292,24 @@ function HomePage() {
               <div><div className="font-display text-3xl font-bold text-primary">2 нед.</div><div className="mt-1 text-xs text-muted-foreground">срок</div></div>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <img src={showroomAsset.url} alt="Шоурум МК Мебель" loading="lazy" className="aspect-[3/4] w-full rounded-3xl object-cover" />
-            <img src={showroom} alt="Шоурум" loading="lazy" className="mt-8 aspect-[3/4] w-full rounded-3xl object-cover" />
-          </div>
+          {(() => {
+            const imgs: string[] = Array.isArray((apt as any)?.showroom?.images) && (apt as any).showroom.images.length > 0
+              ? (apt as any).showroom.images
+              : Array.isArray((blocks as any))
+                ? []
+                : [];
+            const aboutImgs = Array.isArray(((apt as any)?.showroom?.images))
+              ? (apt as any).showroom.images
+              : [];
+            const list = aboutImgs.length > 0 ? aboutImgs : [showroomAsset.url, showroom];
+            return (
+              <div className="grid grid-cols-2 gap-3">
+                {list.slice(0, 2).map((src: string, i: number) => (
+                  <img key={i} src={src} alt="Шоурум МК Мебель" loading="lazy" className={`aspect-[3/4] w-full rounded-3xl object-cover ${i === 1 ? "mt-8" : ""}`} />
+                ))}
+              </div>
+            );
+          })()}
         </div>
       </section>
 
