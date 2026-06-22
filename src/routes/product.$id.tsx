@@ -13,7 +13,8 @@ import { SpecInfoDialog } from "@/components/SpecInfoDialog";
 import { formatPrice, useCart } from "@/lib/cart";
 import { categoriesQuery, productsQuery, productQuery, fabricsQuery, specMechanismsQuery, specFillingsQuery } from "@/lib/queries";
 import { getGallery } from "@/lib/db";
-import { getSelectedFabric, setSelectedFabric, subscribeFabric } from "@/lib/productFabric";
+import { getSelectedFabric, setSelectedFabric, getSelectedFabricColor, subscribeFabric } from "@/lib/productFabric";
+import { fabricColorsByCollectionQuery } from "@/lib/queries";
 import { incrementStat } from "@/lib/favorites";
 import { pushRecentlyViewed, getRecentlyViewed, subscribeRecent } from "@/lib/recentlyViewed";
 import { ShareButton } from "@/components/ShareButton";
@@ -47,6 +48,7 @@ function ProductPage() {
   const [fabricPickerOpen, setFabricPickerOpen] = useState(false);
   const [fabricExamplesOpen, setFabricExamplesOpen] = useState(false);
   const [fabricId, setFabricId] = useState<string | null>(null);
+  const [fabricColorId, setFabricColorId] = useState<string | null>(null);
   const [selSize, setSelSize] = useState<string>("");
   const [selBox, setSelBox] = useState<string>("");
   const [mechInfoOpen, setMechInfoOpen] = useState(false);
@@ -54,7 +56,11 @@ function ProductPage() {
 
   useEffect(() => {
     setFabricId(getSelectedFabric(id));
-    return subscribeFabric(() => setFabricId(getSelectedFabric(id)));
+    setFabricColorId(getSelectedFabricColor(id));
+    return subscribeFabric(() => {
+      setFabricId(getSelectedFabric(id));
+      setFabricColorId(getSelectedFabricColor(id));
+    });
   }, [id]);
 
   useEffect(() => {
@@ -64,6 +70,11 @@ function ProductPage() {
 
 
   const selectedFabric = fabrics.find((f) => f.id === fabricId) ?? null;
+  const { data: selectedFabricColors = [] } = useQuery({
+    ...fabricColorsByCollectionQuery(selectedFabric?.id ?? ""),
+    enabled: !!selectedFabric?.id,
+  });
+  const selectedColor = selectedFabricColors.find((c) => c.id === fabricColorId) ?? null;
   const mechanismInfo = useMemo(() => mechanisms.find((m) => m.id === product?.mechanism_id) ?? null, [mechanisms, product?.mechanism_id]);
   const fillingInfo = useMemo(() => fillings.find((m) => m.id === product?.filling_id) ?? null, [fillings, product?.filling_id]);
 
@@ -128,6 +139,7 @@ function ProductPage() {
   if (sleepingPlace) productMeta.product_sleeping = sleepingPlace;
   if (boxValue) productMeta.product_box = boxValue;
   if (selectedFabric) productMeta.product_fabric = selectedFabric.title;
+  if (selectedColor) productMeta.product_fabric_color = `${selectedColor.name}${selectedColor.code ? ` (${selectedColor.code})` : ""}`;
   if (product.mechanism && product.mechanism !== "—") productMeta.product_mechanism = product.mechanism;
   if (product.filling && product.filling !== "—") productMeta.product_filling = product.filling;
 
@@ -376,14 +388,43 @@ function ProductPage() {
                 <div className="flex-1">
                   <div className="text-xs uppercase tracking-wider text-muted-foreground">Выбранная ткань</div>
                   {selectedFabric ? (
-                    <div className="mt-2 flex items-center gap-3">
-                      {selectedFabric.sample_photo && <img src={selectedFabric.sample_photo} alt="" className="h-12 w-12 rounded-xl object-cover" />}
-                      <div className="flex-1">
-                        <div className="font-medium">{selectedFabric.title}</div>
-                        {selectedFabric.code && <div className="text-xs text-muted-foreground">{selectedFabric.code}{selectedFabric.surcharge > 0 ? ` · +${formatPrice(selectedFabric.surcharge)}` : ""}</div>}
+                    <>
+                      <div className="mt-2 flex items-center gap-3">
+                        {selectedFabric.sample_photo && <img src={selectedFabric.sample_photo} alt="" className="h-12 w-12 rounded-xl object-cover" />}
+                        <div className="flex-1">
+                          <div className="font-medium">{selectedFabric.title}</div>
+                          {selectedFabric.code && <div className="text-xs text-muted-foreground">{selectedFabric.code}{selectedFabric.surcharge > 0 ? ` · +${formatPrice(selectedFabric.surcharge)}` : ""}</div>}
+                        </div>
+                        <button onClick={() => setFabricPickerOpen(true)} className="rounded-full border border-border px-4 py-2 text-xs font-medium hover:border-primary hover:text-primary">Изменить</button>
                       </div>
-                      <button onClick={() => setFabricPickerOpen(true)} className="rounded-full border border-border px-4 py-2 text-xs font-medium hover:border-primary hover:text-primary">Изменить ткань</button>
-                    </div>
+                      {selectedFabricColors.length > 0 && (
+                        <div className="mt-3">
+                          <div className="mb-1.5 text-xs text-muted-foreground">
+                            Цвет: <span className="text-foreground font-medium">{selectedColor ? `${selectedColor.name}${selectedColor.code ? ` (${selectedColor.code})` : ""}` : "не выбран"}</span>
+                          </div>
+                          <div className="flex flex-wrap gap-1.5">
+                            {selectedFabricColors.map((c) => {
+                              const active = selectedColor?.id === c.id;
+                              return (
+                                <button
+                                  key={c.id}
+                                  type="button"
+                                  onClick={() => setSelectedFabric(product.id, selectedFabric.id, c.id)}
+                                  title={`${c.name}${c.code ? ` · ${c.code}` : ""}`}
+                                  className={`relative h-9 w-9 overflow-hidden rounded-lg border ${active ? "border-primary ring-2 ring-primary/40" : "border-border hover:border-primary"}`}
+                                >
+                                  {c.photo ? (
+                                    <img src={c.photo} alt={c.name} className="h-full w-full object-cover" />
+                                  ) : (
+                                    <span className="grid h-full w-full place-items-center bg-surface-muted text-[9px] text-muted-foreground">{c.code || c.name.slice(0, 3)}</span>
+                                  )}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                    </>
                   ) : (
                     <>
                       <div className="mt-1 font-medium">Ткань не выбрана</div>
@@ -518,7 +559,11 @@ function ProductPage() {
         onOpenChange={setFabricPickerOpen}
         productId={product.id}
         selectedId={fabricId}
-        onSelect={(f) => { setSelectedFabric(product.id, f.id); toast.success(`Ткань выбрана: ${f.title}`); }}
+        selectedColorId={fabricColorId}
+        onSelect={(f, c) => {
+          setSelectedFabric(product.id, f.id, c?.id ?? null);
+          toast.success(c ? `Ткань: ${f.title} · ${c.name}` : `Ткань выбрана: ${f.title}`);
+        }}
       />
     </div>
   );
