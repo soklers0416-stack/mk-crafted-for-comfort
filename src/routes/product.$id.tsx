@@ -244,7 +244,7 @@ function ProductPage() {
                   </span>
                 </li>
               )}
-              {!hasSizes && typeof product.has_box === "boolean" && (
+              {typeof product.has_box === "boolean" && (
                 <li className="flex items-baseline justify-between gap-3 border-b border-dashed border-border/60 py-2">
                   <span className="text-muted-foreground">Короб</span>
                   <span className="text-right font-medium">{product.has_box ? "Есть" : "Нет"}</span>
