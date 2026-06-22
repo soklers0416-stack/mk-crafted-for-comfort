@@ -48,6 +48,7 @@ function ProductPage() {
   const [fabricPickerOpen, setFabricPickerOpen] = useState(false);
   const [fabricExamplesOpen, setFabricExamplesOpen] = useState(false);
   const [fabricId, setFabricId] = useState<string | null>(null);
+  const [fabricColorId, setFabricColorId] = useState<string | null>(null);
   const [selSize, setSelSize] = useState<string>("");
   const [selBox, setSelBox] = useState<string>("");
   const [mechInfoOpen, setMechInfoOpen] = useState(false);
@@ -55,7 +56,11 @@ function ProductPage() {
 
   useEffect(() => {
     setFabricId(getSelectedFabric(id));
-    return subscribeFabric(() => setFabricId(getSelectedFabric(id)));
+    setFabricColorId(getSelectedFabricColor(id));
+    return subscribeFabric(() => {
+      setFabricId(getSelectedFabric(id));
+      setFabricColorId(getSelectedFabricColor(id));
+    });
   }, [id]);
 
   useEffect(() => {
