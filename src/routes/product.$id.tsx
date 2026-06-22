@@ -559,7 +559,11 @@ function ProductPage() {
         onOpenChange={setFabricPickerOpen}
         productId={product.id}
         selectedId={fabricId}
-        onSelect={(f) => { setSelectedFabric(product.id, f.id); toast.success(`Ткань выбрана: ${f.title}`); }}
+        selectedColorId={fabricColorId}
+        onSelect={(f, c) => {
+          setSelectedFabric(product.id, f.id, c?.id ?? null);
+          toast.success(c ? `Ткань: ${f.title} · ${c.name}` : `Ткань выбрана: ${f.title}`);
+        }}
       />
     </div>
   );
