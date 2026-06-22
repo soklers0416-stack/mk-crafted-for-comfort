@@ -70,6 +70,11 @@ function ProductPage() {
 
 
   const selectedFabric = fabrics.find((f) => f.id === fabricId) ?? null;
+  const { data: selectedFabricColors = [] } = useQuery({
+    ...fabricColorsByCollectionQuery(selectedFabric?.id ?? ""),
+    enabled: !!selectedFabric?.id,
+  });
+  const selectedColor = selectedFabricColors.find((c) => c.id === fabricColorId) ?? null;
   const mechanismInfo = useMemo(() => mechanisms.find((m) => m.id === product?.mechanism_id) ?? null, [mechanisms, product?.mechanism_id]);
   const fillingInfo = useMemo(() => fillings.find((m) => m.id === product?.filling_id) ?? null, [fillings, product?.filling_id]);
 
