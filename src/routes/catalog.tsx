@@ -6,6 +6,7 @@ import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
 import { categoriesQuery, productsQuery } from "@/lib/queries";
 import { SOFA_TYPES } from "@/lib/db";
+import { SiteBanner } from "@/components/SiteBanner";
 
 const search = z.object({ category: z.string().optional(), sofa_type: z.string().optional() });
 
