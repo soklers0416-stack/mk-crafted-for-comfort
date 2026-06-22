@@ -1,19 +1,20 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Search, X, Check } from "lucide-react";
+import { Search, Check } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
-import { fabricsQuery, fabricCategoriesQuery, productFabricsQuery } from "@/lib/queries";
+import { fabricsQuery, fabricCategoriesQuery, productFabricsQuery, fabricColorsByCollectionQuery } from "@/lib/queries";
 import { formatPrice } from "@/lib/cart";
-import type { Fabric } from "@/lib/db";
+import type { Fabric, FabricColor } from "@/lib/db";
 
 export function FabricPicker({
-  open, onOpenChange, productId, selectedId, onSelect,
+  open, onOpenChange, productId, selectedId, selectedColorId, onSelect,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   productId: string;
   selectedId: string | null;
-  onSelect: (fabric: Fabric) => void;
+  selectedColorId?: string | null;
+  onSelect: (fabric: Fabric, color: FabricColor | null) => void;
 }) {
   const { data: fabrics = [] } = useQuery(fabricsQuery);
   const { data: cats = [] } = useQuery(fabricCategoriesQuery);
@@ -21,8 +22,19 @@ export function FabricPicker({
   const [cat, setCat] = useState<string>("");
   const [q, setQ] = useState("");
   const [view, setView] = useState<Fabric | null>(null);
+  const [colorId, setColorId] = useState<string | null>(null);
 
-  useEffect(() => { if (!open) { setView(null); setQ(""); } }, [open]);
+  const { data: viewColors = [] } = useQuery({
+    ...fabricColorsByCollectionQuery(view?.id ?? ""),
+    enabled: !!view?.id,
+  });
+
+  useEffect(() => { if (!open) { setView(null); setQ(""); setColorId(null); } }, [open]);
+  useEffect(() => {
+    // При открытии деталки уже выбранной ткани — подставим текущий цвет
+    if (view && selectedId === view.id) setColorId(selectedColorId ?? null);
+    else setColorId(null);
+  }, [view, selectedId, selectedColorId]);
 
   const allowedIds = new Set(pf.filter((r) => r.product_id === productId).map((r) => r.fabric_id));
   const available = allowedIds.size > 0 ? fabrics.filter((f) => allowedIds.has(f.id)) : fabrics;
@@ -30,25 +42,33 @@ export function FabricPicker({
     .filter((f) => !cat || f.category_slug === cat)
     .filter((f) => !q || f.title.toLowerCase().includes(q.toLowerCase()) || f.code.toLowerCase().includes(q.toLowerCase()));
 
+  const hasColors = viewColors.length > 0;
+  const chosenColor = viewColors.find((c) => c.id === colorId) ?? null;
+  const canConfirm = !!view && (!hasColors || !!chosenColor);
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full overflow-y-auto p-0 sm:max-w-xl">
         <div className="sticky top-0 z-10 border-b border-border bg-background p-5">
           <SheetHeader className="space-y-1">
             <SheetTitle className="font-display text-2xl">Выбор ткани</SheetTitle>
-            <SheetDescription>Выберите ткань для вашего товара</SheetDescription>
+            <SheetDescription>Выберите ткань и цвет для вашего товара</SheetDescription>
           </SheetHeader>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <button onClick={() => setCat("")} className={`rounded-full px-3 py-1.5 text-xs font-medium ${!cat ? "bg-primary text-primary-foreground" : "bg-surface-muted"}`}>Все</button>
-            {cats.map((c) => (
-              <button key={c.slug} onClick={() => setCat(c.slug)} className={`rounded-full px-3 py-1.5 text-xs font-medium ${cat === c.slug ? "bg-primary text-primary-foreground" : "bg-surface-muted"}`}>{c.title}</button>
-            ))}
-          </div>
-          <div className="relative mt-3">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Поиск по названию или коду"
-              className="w-full rounded-full border border-border bg-background py-2 pl-9 pr-3 text-sm outline-none focus:border-primary" />
-          </div>
+          {!view && (
+            <>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <button onClick={() => setCat("")} className={`rounded-full px-3 py-1.5 text-xs font-medium ${!cat ? "bg-primary text-primary-foreground" : "bg-surface-muted"}`}>Все</button>
+                {cats.map((c) => (
+                  <button key={c.slug} onClick={() => setCat(c.slug)} className={`rounded-full px-3 py-1.5 text-xs font-medium ${cat === c.slug ? "bg-primary text-primary-foreground" : "bg-surface-muted"}`}>{c.title}</button>
+                ))}
+              </div>
+              <div className="relative mt-3">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Поиск по названию или коду"
+                  className="w-full rounded-full border border-border bg-background py-2 pl-9 pr-3 text-sm outline-none focus:border-primary" />
+              </div>
+            </>
+          )}
         </div>
 
         {view ? (
@@ -72,10 +92,44 @@ export function FabricPicker({
                 ))}
             </dl>
 
+            {hasColors && (
+              <div className="mt-5">
+                <div className="mb-2 flex items-baseline justify-between">
+                  <div className="text-sm font-medium">Цвет {chosenColor ? <span className="text-muted-foreground font-normal">· {chosenColor.name}{chosenColor.code ? ` (${chosenColor.code})` : ""}</span> : <span className="text-muted-foreground font-normal">— выберите вариант</span>}</div>
+                </div>
+                <div className="grid grid-cols-4 gap-2 sm:grid-cols-5">
+                  {viewColors.map((c) => {
+                    const active = colorId === c.id;
+                    return (
+                      <button key={c.id} type="button" onClick={() => setColorId(c.id)}
+                        title={`${c.name}${c.code ? ` · ${c.code}` : ""}`}
+                        className={`group relative overflow-hidden rounded-xl border bg-surface-muted text-left transition ${active ? "border-primary ring-2 ring-primary/40" : "border-border hover:border-primary"}`}>
+                        <div className="aspect-square">
+                          {c.photo ? (
+                            <img src={c.photo} alt={c.name} className="h-full w-full object-cover" />
+                          ) : (
+                            <div className="grid h-full w-full place-items-center text-[10px] text-muted-foreground">{c.code || c.name}</div>
+                          )}
+                        </div>
+                        {active && (
+                          <div className="absolute right-1.5 top-1.5 grid h-5 w-5 place-items-center rounded-full bg-primary text-primary-foreground">
+                            <Check className="h-3 w-3" />
+                          </div>
+                        )}
+                        <div className="px-1.5 py-1 text-[10px] line-clamp-1">{c.name}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             {view.surcharge > 0 && <p className="mt-3 text-sm font-medium text-primary">Доплата: {formatPrice(view.surcharge)}</p>}
-            <button onClick={() => { onSelect(view); onOpenChange(false); }}
-              className="mt-6 w-full rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90">
-              Выбрать эту ткань
+            <button
+              onClick={() => { if (!canConfirm || !view) return; onSelect(view, chosenColor); onOpenChange(false); }}
+              disabled={!canConfirm}
+              className="mt-6 w-full rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50">
+              {hasColors ? (chosenColor ? "Выбрать ткань и цвет" : "Выберите цвет") : "Выбрать эту ткань"}
             </button>
           </div>
         ) : (
