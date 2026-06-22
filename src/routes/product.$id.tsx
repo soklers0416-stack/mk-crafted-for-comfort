@@ -388,14 +388,43 @@ function ProductPage() {
                 <div className="flex-1">
                   <div className="text-xs uppercase tracking-wider text-muted-foreground">Выбранная ткань</div>
                   {selectedFabric ? (
-                    <div className="mt-2 flex items-center gap-3">
-                      {selectedFabric.sample_photo && <img src={selectedFabric.sample_photo} alt="" className="h-12 w-12 rounded-xl object-cover" />}
-                      <div className="flex-1">
-                        <div className="font-medium">{selectedFabric.title}</div>
-                        {selectedFabric.code && <div className="text-xs text-muted-foreground">{selectedFabric.code}{selectedFabric.surcharge > 0 ? ` · +${formatPrice(selectedFabric.surcharge)}` : ""}</div>}
+                    <>
+                      <div className="mt-2 flex items-center gap-3">
+                        {selectedFabric.sample_photo && <img src={selectedFabric.sample_photo} alt="" className="h-12 w-12 rounded-xl object-cover" />}
+                        <div className="flex-1">
+                          <div className="font-medium">{selectedFabric.title}</div>
+                          {selectedFabric.code && <div className="text-xs text-muted-foreground">{selectedFabric.code}{selectedFabric.surcharge > 0 ? ` · +${formatPrice(selectedFabric.surcharge)}` : ""}</div>}
+                        </div>
+                        <button onClick={() => setFabricPickerOpen(true)} className="rounded-full border border-border px-4 py-2 text-xs font-medium hover:border-primary hover:text-primary">Изменить</button>
                       </div>
-                      <button onClick={() => setFabricPickerOpen(true)} className="rounded-full border border-border px-4 py-2 text-xs font-medium hover:border-primary hover:text-primary">Изменить ткань</button>
-                    </div>
+                      {selectedFabricColors.length > 0 && (
+                        <div className="mt-3">
+                          <div className="mb-1.5 text-xs text-muted-foreground">
+                            Цвет: <span className="text-foreground font-medium">{selectedColor ? `${selectedColor.name}${selectedColor.code ? ` (${selectedColor.code})` : ""}` : "не выбран"}</span>
+                          </div>
+                          <div className="flex flex-wrap gap-1.5">
+                            {selectedFabricColors.map((c) => {
+                              const active = selectedColor?.id === c.id;
+                              return (
+                                <button
+                                  key={c.id}
+                                  type="button"
+                                  onClick={() => setSelectedFabric(product.id, selectedFabric.id, c.id)}
+                                  title={`${c.name}${c.code ? ` · ${c.code}` : ""}`}
+                                  className={`relative h-9 w-9 overflow-hidden rounded-lg border ${active ? "border-primary ring-2 ring-primary/40" : "border-border hover:border-primary"}`}
+                                >
+                                  {c.photo ? (
+                                    <img src={c.photo} alt={c.name} className="h-full w-full object-cover" />
+                                  ) : (
+                                    <span className="grid h-full w-full place-items-center bg-surface-muted text-[9px] text-muted-foreground">{c.code || c.name.slice(0, 3)}</span>
+                                  )}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                    </>
                   ) : (
                     <>
                       <div className="mt-1 font-medium">Ткань не выбрана</div>
