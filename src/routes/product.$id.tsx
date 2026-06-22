@@ -139,6 +139,7 @@ function ProductPage() {
   if (sleepingPlace) productMeta.product_sleeping = sleepingPlace;
   if (boxValue) productMeta.product_box = boxValue;
   if (selectedFabric) productMeta.product_fabric = selectedFabric.title;
+  if (selectedColor) productMeta.product_fabric_color = `${selectedColor.name}${selectedColor.code ? ` (${selectedColor.code})` : ""}`;
   if (product.mechanism && product.mechanism !== "—") productMeta.product_mechanism = product.mechanism;
   if (product.filling && product.filling !== "—") productMeta.product_filling = product.filling;
 
