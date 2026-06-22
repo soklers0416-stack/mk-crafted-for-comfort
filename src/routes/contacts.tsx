@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { MapPin, Phone, Clock, MessageCircle } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { SiteBanner } from "@/components/SiteBanner";
 
 export const Route = createFileRoute("/contacts")({
   head: () => ({
@@ -19,11 +20,9 @@ function ContactsPage() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
+      <SiteBanner id="contacts:hero" />
       <div className="mx-auto max-w-7xl px-4 py-12 md:px-8 md:py-16">
-        <p className="text-sm font-medium uppercase tracking-wider text-primary">Контакты</p>
-        <h1 className="mt-2 font-display text-4xl font-bold tracking-tight md:text-5xl">Свяжитесь с нами</h1>
 
-        <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_1.2fr]">
           <div className="space-y-5">
             <div className="rounded-3xl border border-border/60 bg-card p-6">
               <span className="grid h-11 w-11 place-items-center rounded-2xl bg-primary/10 text-primary"><MapPin className="h-5 w-5" /></span>
