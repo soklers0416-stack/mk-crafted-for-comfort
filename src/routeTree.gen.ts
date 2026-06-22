@@ -41,6 +41,7 @@ import { Route as AuthenticatedAdminFormsRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminFaqsRouteImport } from './routes/_authenticated/admin.faqs'
 import { Route as AuthenticatedAdminCustomerPhotosRouteImport } from './routes/_authenticated/admin.customer-photos'
 import { Route as AuthenticatedAdminCategoriesRouteImport } from './routes/_authenticated/admin.categories'
+import { Route as AuthenticatedAdminBannersRouteImport } from './routes/_authenticated/admin.banners'
 import { Route as AuthenticatedAdminApplicationsRouteImport } from './routes/_authenticated/admin.applications'
 import { Route as AuthenticatedAdminApartmentRouteImport } from './routes/_authenticated/admin.apartment'
 import { Route as AuthenticatedAdminAboutRouteImport } from './routes/_authenticated/admin.about'
@@ -230,6 +231,12 @@ const AuthenticatedAdminCategoriesRoute =
     path: '/admin/categories',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminBannersRoute =
+  AuthenticatedAdminBannersRouteImport.update({
+    id: '/admin/banners',
+    path: '/admin/banners',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminApplicationsRoute =
   AuthenticatedAdminApplicationsRouteImport.update({
     id: '/admin/applications',
@@ -363,6 +370,7 @@ export interface FileRoutesByFullPath {
   '/admin/about': typeof AuthenticatedAdminAboutRoute
   '/admin/apartment': typeof AuthenticatedAdminApartmentRouteWithChildren
   '/admin/applications': typeof AuthenticatedAdminApplicationsRoute
+  '/admin/banners': typeof AuthenticatedAdminBannersRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/admin/customer-photos': typeof AuthenticatedAdminCustomerPhotosRoute
   '/admin/faqs': typeof AuthenticatedAdminFaqsRoute
@@ -414,6 +422,7 @@ export interface FileRoutesByTo {
   '/product/$id': typeof ProductIdRoute
   '/admin/about': typeof AuthenticatedAdminAboutRoute
   '/admin/applications': typeof AuthenticatedAdminApplicationsRoute
+  '/admin/banners': typeof AuthenticatedAdminBannersRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/admin/customer-photos': typeof AuthenticatedAdminCustomerPhotosRoute
   '/admin/faqs': typeof AuthenticatedAdminFaqsRoute
@@ -468,6 +477,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/about': typeof AuthenticatedAdminAboutRoute
   '/_authenticated/admin/apartment': typeof AuthenticatedAdminApartmentRouteWithChildren
   '/_authenticated/admin/applications': typeof AuthenticatedAdminApplicationsRoute
+  '/_authenticated/admin/banners': typeof AuthenticatedAdminBannersRoute
   '/_authenticated/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/_authenticated/admin/customer-photos': typeof AuthenticatedAdminCustomerPhotosRoute
   '/_authenticated/admin/faqs': typeof AuthenticatedAdminFaqsRoute
@@ -522,6 +532,7 @@ export interface FileRouteTypes {
     | '/admin/about'
     | '/admin/apartment'
     | '/admin/applications'
+    | '/admin/banners'
     | '/admin/categories'
     | '/admin/customer-photos'
     | '/admin/faqs'
@@ -573,6 +584,7 @@ export interface FileRouteTypes {
     | '/product/$id'
     | '/admin/about'
     | '/admin/applications'
+    | '/admin/banners'
     | '/admin/categories'
     | '/admin/customer-photos'
     | '/admin/faqs'
@@ -626,6 +638,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/about'
     | '/_authenticated/admin/apartment'
     | '/_authenticated/admin/applications'
+    | '/_authenticated/admin/banners'
     | '/_authenticated/admin/categories'
     | '/_authenticated/admin/customer-photos'
     | '/_authenticated/admin/faqs'
@@ -904,6 +917,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCategoriesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/banners': {
+      id: '/_authenticated/admin/banners'
+      path: '/admin/banners'
+      fullPath: '/admin/banners'
+      preLoaderRoute: typeof AuthenticatedAdminBannersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/applications': {
       id: '/_authenticated/admin/applications'
       path: '/admin/applications'
@@ -1068,6 +1088,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminAboutRoute: typeof AuthenticatedAdminAboutRoute
   AuthenticatedAdminApartmentRoute: typeof AuthenticatedAdminApartmentRouteWithChildren
   AuthenticatedAdminApplicationsRoute: typeof AuthenticatedAdminApplicationsRoute
+  AuthenticatedAdminBannersRoute: typeof AuthenticatedAdminBannersRoute
   AuthenticatedAdminCategoriesRoute: typeof AuthenticatedAdminCategoriesRoute
   AuthenticatedAdminCustomerPhotosRoute: typeof AuthenticatedAdminCustomerPhotosRoute
   AuthenticatedAdminFaqsRoute: typeof AuthenticatedAdminFaqsRoute
@@ -1101,6 +1122,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminApartmentRoute:
     AuthenticatedAdminApartmentRouteWithChildren,
   AuthenticatedAdminApplicationsRoute: AuthenticatedAdminApplicationsRoute,
+  AuthenticatedAdminBannersRoute: AuthenticatedAdminBannersRoute,
   AuthenticatedAdminCategoriesRoute: AuthenticatedAdminCategoriesRoute,
   AuthenticatedAdminCustomerPhotosRoute: AuthenticatedAdminCustomerPhotosRoute,
   AuthenticatedAdminFaqsRoute: AuthenticatedAdminFaqsRoute,
