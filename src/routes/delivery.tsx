@@ -3,6 +3,7 @@ import { Truck, Wrench, CreditCard, MapPin, Map, Building2 } from "lucide-react"
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { deliveryPoints } from "@/lib/data";
+import { SiteBanner } from "@/components/SiteBanner";
 
 const icons = [MapPin, Map, Building2, Wrench, CreditCard, CreditCard];
 
@@ -22,14 +23,9 @@ function DeliveryPage() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
+      <SiteBanner id="delivery:hero" />
       <div className="mx-auto max-w-7xl px-4 py-12 md:px-8 md:py-16">
-        <p className="text-sm font-medium uppercase tracking-wider text-primary">Сервис</p>
-        <h1 className="mt-2 font-display text-4xl font-bold tracking-tight md:text-5xl">Доставка и оплата</h1>
-        <p className="mt-4 max-w-2xl text-muted-foreground">
-          Привезём, занесём и соберём. Удобная оплата и рассрочка без переплат.
-        </p>
-
-        <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {deliveryPoints.map((p, i) => {
             const Icon = icons[i] || Truck;
             return (

@@ -5,6 +5,8 @@ import { ArrowRight } from "lucide-react";
 import { pageBlocksQuery, type PageBlock } from "@/lib/pageBlocks";
 import { useReveal } from "@/hooks/useReveal";
 import { SiteLightbox } from "@/components/SiteLightbox";
+import { SiteBanner } from "@/components/SiteBanner";
+import { BANNER_REGISTRY } from "@/lib/siteBanners";
 
 /** Системные секции страницы могут быть скрыты через админку. */
 export function useSystemBlockVisible(pageKey: string, ref: string) {
@@ -13,47 +15,11 @@ export function useSystemBlockVisible(pageKey: string, ref: string) {
   return b ? b.is_visible : true;
 }
 
-/** Верхний баннер (kind=hero-banner) для страницы. */
-export function PageBanner({ pageKey, fallbackImage }: { pageKey: string; fallbackImage?: string }) {
-  const { data: blocks = [] } = useQuery(pageBlocksQuery(pageKey));
-  const banner = blocks.find((b) => b.kind === "hero-banner" && b.is_visible);
-  if (!banner) return null;
-  const img = banner.image_url || fallbackImage;
-  return (
-    <section className="mx-auto max-w-7xl px-4 pt-6 md:px-8 md:pt-10">
-      <div className="relative overflow-hidden rounded-[24px] md:rounded-[32px] bg-surface-muted">
-        <div className="relative grid grid-cols-1 md:grid-cols-2">
-          <div className="z-10 flex items-center px-6 py-10 md:px-12 md:py-16">
-            <div className="max-w-xl animate-fade-in">
-              {banner.subtitle && (
-                <p className="text-sm font-medium uppercase tracking-wider text-primary">{banner.subtitle}</p>
-              )}
-              <h1 className="mt-2 font-display text-3xl font-bold tracking-tight md:text-5xl">
-                {banner.title}
-              </h1>
-              {banner.body && (
-                <p className="mt-4 max-w-lg text-base text-muted-foreground md:text-lg">{banner.body}</p>
-              )}
-              {banner.button_text && banner.button_link && (
-                <Link
-                  to={banner.button_link}
-                  className="mt-6 inline-flex h-11 items-center gap-2 rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground transition-transform hover:scale-[1.02]"
-                >
-                  {banner.button_text}
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              )}
-            </div>
-          </div>
-          {img && (
-            <div className="relative h-56 md:h-auto">
-              <img src={img} alt={banner.title || ""} className="absolute inset-0 h-full w-full object-cover" />
-            </div>
-          )}
-        </div>
-      </div>
-    </section>
-  );
+/** Верхний баннер страницы. Делегирует в универсальный SiteBanner — управляется через «Баннеры сайта». */
+export function PageBanner({ pageKey }: { pageKey: string; fallbackImage?: string }) {
+  const placement = BANNER_REGISTRY.find((p) => p.page_key === pageKey && p.ref === "hero");
+  if (!placement) return null;
+  return <SiteBanner id={placement.id} />;
 }
 
 function CustomBlock({ block }: { block: PageBlock }) {
