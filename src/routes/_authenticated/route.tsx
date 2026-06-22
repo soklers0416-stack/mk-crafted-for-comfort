@@ -99,6 +99,7 @@ function AdminLayout() {
         { to: "/admin/nav", label: "Меню (шапка)" },
         { to: "/admin/home-blocks", label: "Блоки главной" },
         { to: "/admin/home-slides", label: "Слайдер главной" },
+        { to: "/admin/banners", label: "Баннеры сайта" },
         { to: "/admin/page-blocks", label: "Конструктор страниц" },
       ],
     },
