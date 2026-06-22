@@ -22,6 +22,8 @@ function ContactsPage() {
       <Header />
       <SiteBanner id="contacts:hero" />
       <div className="mx-auto max-w-7xl px-4 py-12 md:px-8 md:py-16">
+        <div className="grid gap-8 lg:grid-cols-[1fr_1.2fr]">
+
 
           <div className="space-y-5">
             <div className="rounded-3xl border border-border/60 bg-card p-6">
