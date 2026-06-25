@@ -1,32 +1,41 @@
-       # Production Dockerfile for TanStack Start app (self-hosted on TimeWeb)
-       # Builds with Nitro node-server preset and runs on Node 20.
+# Production Dockerfile for TanStack Start app (self-hosted)
+# Builds with Nitro node_server preset and runs on Node 20.
 
-       FROM node:20-alpine AS builder
-       WORKDIR /app
+FROM node:20-alpine AS builder
+WORKDIR /app
 
-       # Install bun (used by Lovable template) — falls back to npm if not needed
-       RUN apk add --no-cache bash curl unzip libstdc++ \
-         && curl -fsSL https://bun.sh/install | bash \
-         && ln -s /root/.bun/bin/bun /usr/local/bin/bun
+RUN apk add --no-cache bash curl unzip libstdc++ \
+  && curl -fsSL https://bun.sh/install | bash \
+  && ln -s /root/.bun/bin/bun /usr/local/bin/bun
 
-       COPY package.json bun.lockb* package-lock.json* ./
-       RUN if [ -f bun.lockb ]; then bun install --frozen-lockfile; \
-           else npm install --legacy-peer-deps; fi
+# Copy BOTH old and new bun lock formats + npm lock if present
+COPY package.json bun.lock* bun.lockb* package-lock.json* ./
 
-       COPY . .
+RUN if [ -f bun.lock ] || [ -f bun.lockb ]; then \
+      bun install --frozen-lockfile; \
+    elif [ -f package-lock.json ]; then \
+      npm ci --legacy-peer-deps; \
+    else \
+      npm install --legacy-peer-deps; \
+    fi
 
-       # Build with Node server preset so output runs on a normal Node process
-       ENV NITRO_PRESET=node_server
-       RUN if [ -f bun.lockb ]; then bun run build; else npm run build; fi
+COPY . .
 
-       # ---------- Runtime image ----------
-       FROM node:20-alpine AS runner
-       WORKDIR /app
-       ENV NODE_ENV=production
-       ENV PORT=3000
-       ENV HOST=0.0.0.0
+ENV NITRO_PRESET=node_server
+RUN if [ -f bun.lock ] || [ -f bun.lockb ]; then bun run build; else npm run build; fi
 
-       COPY --from=builder /app/.output ./.output
+# ---------- Runtime image ----------
+FROM node:20-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+ENV PORT=3000
+ENV HOST=0.0.0.0
 
-       EXPOSE 3000
-       CMD ["node", ".output/server/index.mjs"]
+# Copy Nitro build output. .output/server/package.json lists every external
+# dep (including the h3-v2 npm-alias) — install them here for runtime.
+COPY --from=builder /app/.output ./.output
+
+RUN cd .output/server && npm install --omit=dev --no-audit --no-fund --legacy-peer-deps
+
+EXPOSE 3000
+CMD ["node", ".output/server/index.mjs"]
