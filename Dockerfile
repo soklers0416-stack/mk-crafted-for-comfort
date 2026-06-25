@@ -31,11 +31,13 @@ ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOST=0.0.0.0
 
-# Copy Nitro build output. .output/server/package.json lists every external
-# dep (including the h3-v2 npm-alias) — install them here for runtime.
+# The compiled server imports TanStack's h3 alias (`h3-v2`). Nitro's generated
+# .output/server/package.json can omit that npm-alias, so installing only from
+# .output/server is not reliable. Copy the exact dependency tree produced from
+# bun.lock instead; Node will resolve runtime imports from /app/node_modules.
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.output ./.output
-
-RUN cd .output/server && npm install --omit=dev --no-audit --no-fund --legacy-peer-deps
 
 EXPOSE 3000
 CMD ["node", ".output/server/index.mjs"]
