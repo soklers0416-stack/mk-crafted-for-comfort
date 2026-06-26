@@ -6,6 +6,7 @@ import { specMechanismsQuery, specFillingsQuery, sizePriceTemplatesQuery, catego
 import type { SpecItem, SizeRow, SizePriceTemplate, Category } from "@/lib/db";
 import { Plus, Trash2, Upload, X } from "lucide-react";
 import { toast } from "sonner";
+import { uuid } from "@/lib/uuid";
 
 export const Route = createFileRoute("/_authenticated/admin/specs")({
   component: AdminSpecs,
