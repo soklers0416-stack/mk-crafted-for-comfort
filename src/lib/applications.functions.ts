@@ -209,8 +209,8 @@ export const submitApplication = createServerFn({ method: "POST" })
     }
 
     const flat = flattenForSheets({
-      id: inserted?.id,
-      created_at: inserted?.created_at,
+      id: traceId,
+      created_at: new Date().toISOString(),
       form_key: data.formKey,
       title: data.title || data.formKey,
       data: data.data as Record<string, any>,
