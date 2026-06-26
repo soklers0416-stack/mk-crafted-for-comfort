@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Plus, Trash2, Upload, X } from "lucide-react";
+import { normalizePhotoUrl } from "@/lib/photoUrls";
 
 export const Route = createFileRoute("/_authenticated/admin/categories")({
   component: AdminCategories,
@@ -49,7 +50,7 @@ function AdminCategories() {
     const path = `category-${catId}-${Date.now()}.${ext}`;
     const { error } = await supabase.storage.from("product-photos").upload(path, file, { contentType: file.type });
     if (error) return toast.error(error.message);
-    update.mutate({ id: catId, patch: { image_url: `/api/public/photo/${path}` } });
+    update.mutate({ id: catId, patch: { image_url: normalizePhotoUrl(path) } });
   }
 
   return (
