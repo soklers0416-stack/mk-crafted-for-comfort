@@ -1,15 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import * as Icons from "lucide-react";
 import { ArrowRight } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { supabase } from "@/integrations/supabase/client";
 import {
   aboutContentQuery, aboutAdvantagesQuery, aboutStatsQuery, aboutStepsQuery,
   customerPhotosQuery, galleryItemsQuery, faqsQuery,
 } from "@/lib/queries";
+import { submitApplication } from "@/lib/applications.functions";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { toast } from "sonner";
 import { useReveal } from "@/hooks/useReveal";
@@ -59,6 +60,7 @@ function AboutPage() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [sent, setSent] = useState(false);
+  const submitFn = useServerFn(submitApplication);
 
   const hero = content.hero ?? {};
   const whyCheaper = content.why_cheaper ?? {};
@@ -68,17 +70,26 @@ function AboutPage() {
 
   const submit = useMutation({
     mutationFn: async () => {
+      console.log("[MK_REQUEST][client][about-consult][mutation_start]", { hasName: !!name.trim(), hasPhone: !!phone.trim() });
       if (!name.trim() || !phone.trim()) throw new Error("Заполните имя и телефон");
-      const { error } = await (supabase as any).from("requests").insert({
-        source: "about-consult",
-        title: "Консультация со страницы «О компании»",
-        data: { name, phone },
-        status: "new",
+      console.log("[MK_REQUEST][client][about-consult][before_submitApplication]", { payloadKeys: ["name", "phone", "section", "button", "page_url"] });
+      const result = await submitFn({
+        data: {
+          formKey: "about-consult",
+          title: "Консультация со страницы «О компании»",
+          data: {
+            name,
+            phone,
+            section: "О компании",
+            button: consult.button_text ?? "Получить консультацию",
+            page_url: typeof window !== "undefined" ? window.location.href : "",
+          },
+        },
       });
-      if (error) throw error;
+      console.log("[MK_REQUEST][client][about-consult][after_submitApplication]", result);
     },
-    onSuccess: () => setSent(true),
-    onError: (e: any) => toast.error(e.message),
+    onSuccess: () => { console.log("[MK_REQUEST][client][about-consult][success]"); setSent(true); },
+    onError: (e: any) => { console.log("[MK_REQUEST][client][about-consult][catch]", { message: e.message, name: e.name, stack: e.stack }); toast.error(e.message); },
   });
 
   return (

@@ -168,11 +168,10 @@ export const submitApplication = createServerFn({ method: "POST" })
 
     // 1) Сохраняем заявку (RLS: insert разрешён роли anon)
     console.log("[MK_REQUEST][server][submitApplication][before_db_insert]", { traceId, formKey: data.formKey });
-    const { data: inserted, error } = await (supabasePublic as any)
+    const { error } = await (supabasePublic as any)
       .from("requests")
       .insert({ source: data.formKey, title: data.title || data.formKey, data: data.data, status: "new" })
-      .select("id, created_at")
-      .single();
+      .throwOnError();
     if (error) {
       console.error("[MK_REQUEST][server][submitApplication][db_insert_error]", {
         traceId,
@@ -183,7 +182,7 @@ export const submitApplication = createServerFn({ method: "POST" })
       });
       throw new Error(error.message);
     }
-    console.log("[MK_REQUEST][server][submitApplication][after_db_insert]", { traceId, id: inserted?.id });
+    console.log("[MK_REQUEST][server][submitApplication][after_db_insert]", { traceId });
 
     // 2) Получаем настройки интеграции (best-effort; если RLS не пускает — пропускаем webhook)
     console.log("[MK_REQUEST][server][submitApplication][before_integration_read]", { traceId });
@@ -269,8 +268,8 @@ export const submitApplication = createServerFn({ method: "POST" })
       });
     }
 
-    console.log("[MK_REQUEST][server][submitApplication][return_success]", { traceId, id: inserted?.id });
-    return { ok: true, id: inserted?.id, traceId };
+    console.log("[MK_REQUEST][server][submitApplication][return_success]", { traceId });
+    return { ok: true, traceId };
   });
 
 // Проверка подключения (только админ).
