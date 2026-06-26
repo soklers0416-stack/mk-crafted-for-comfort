@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { uuid } from "@/lib/uuid";
 
 const ALLOWED = ["jpg", "jpeg", "png", "webp"];
 
@@ -7,7 +8,7 @@ export async function uploadPhoto(file: File): Promise<string> {
   if (!ALLOWED.includes(ext)) {
     throw new Error(`Поддерживаются: ${ALLOWED.join(", ")}`);
   }
-  const path = `${crypto.randomUUID()}.${ext}`;
+  const path = `${uuid()}.${ext}`;
   const { error } = await supabase.storage
     .from("product-photos")
     .upload(path, file, { upsert: false, contentType: file.type });
