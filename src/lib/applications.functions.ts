@@ -45,6 +45,81 @@ function safeUrlLabel(url: string) {
   }
 }
 
+function wait(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function postToIntegrationUrl({
+  url,
+  payload,
+  traceId,
+}: {
+  url: string;
+  payload: Record<string, unknown>;
+  traceId: string;
+}) {
+  const target = safeUrlLabel(url);
+  let lastStatus = 0;
+  let lastBody = "";
+  let lastError = "";
+
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    try {
+      console.log("[MK_REQUEST][server][submitApplication][external_fetch_start]", {
+        traceId,
+        target,
+        attempt,
+      });
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const responseText = await response.clone().text().catch(() => "");
+      lastStatus = response.status;
+      lastBody = responseText;
+      console.log("[MK_REQUEST][server][submitApplication][external_fetch_response]", {
+        traceId,
+        target,
+        attempt,
+        status: response.status,
+        ok: response.ok,
+        body: responseText.slice(0, 2000),
+      });
+      if (response.ok) {
+        return { ok: true, status: response.status, body: responseText, target, attempt };
+      }
+    } catch (error: any) {
+      lastError = error?.message ?? String(error);
+      console.error("[MK_REQUEST][server][submitApplication][external_fetch_catch]", {
+        traceId,
+        target,
+        attempt,
+        message: error?.message,
+        name: error?.name,
+      });
+    }
+
+    if (attempt < 3) {
+      console.log("[MK_REQUEST][server][submitApplication][external_fetch_retry_wait]", {
+        traceId,
+        target,
+        nextAttempt: attempt + 1,
+      });
+      await wait(700 * attempt);
+    }
+  }
+
+  return {
+    ok: false,
+    status: lastStatus,
+    body: lastBody,
+    error: lastError,
+    target,
+    attempt: 3,
+  };
+}
+
 // Карта типов заявок в человеческие названия (зеркалит FORM_TYPE_LABELS на клиенте).
 const TYPE_LABELS: Record<string, string> = {
   callback: "Обратный звонок",
@@ -231,36 +306,25 @@ export const submitApplication = createServerFn({ method: "POST" })
         traceId,
         targets: urls.map(safeUrlLabel),
       });
-      await Promise.allSettled(
-        urls.map(async (url) => {
-          const target = safeUrlLabel(url);
-          try {
-            console.log("[MK_REQUEST][server][submitApplication][external_fetch_start]", { traceId, target });
-            const response = await fetch(url, {
-              method: "POST",
-              headers: { "content-type": "application/json" },
-              body: JSON.stringify(payload),
-            });
-            const responseText = await response.clone().text().catch(() => "");
-            console.log("[MK_REQUEST][server][submitApplication][external_fetch_response]", {
-              traceId,
-              target,
-              status: response.status,
-              ok: response.ok,
-              body: responseText.slice(0, 300),
-            });
-            return response.ok;
-          } catch (error: any) {
-            console.error("[MK_REQUEST][server][submitApplication][external_fetch_catch]", {
-              traceId,
-              target,
-              message: error?.message,
-              name: error?.name,
-            });
-            return false;
-          }
-        }),
-      );
+      const externalResults = await Promise.all(urls.map((url) => postToIntegrationUrl({ url, payload, traceId })));
+      console.log("[MK_REQUEST][server][submitApplication][after_external_fetches]", {
+        traceId,
+        results: externalResults.map((r) => ({ target: r.target, ok: r.ok, status: r.status, attempt: r.attempt })),
+      });
+      if (urls.length > 0 && !externalResults.some((r) => r.ok)) {
+        const first = externalResults[0];
+        console.error("[MK_REQUEST][server][submitApplication][external_fetch_failed_all]", {
+          traceId,
+          status: first?.status,
+          error: first?.error,
+          body: first?.body?.slice(0, 2000),
+        });
+        throw new Error(
+          first?.status
+            ? `Google Sheets не принял заявку: HTTP ${first.status}`
+            : `Google Sheets не принял заявку: ${first?.error || "ошибка fetch"}`,
+        );
+      }
     } else {
       console.log("[MK_REQUEST][server][submitApplication][external_fetch_skipped]", {
         traceId,
