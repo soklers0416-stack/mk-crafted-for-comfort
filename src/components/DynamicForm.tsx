@@ -63,6 +63,10 @@ export function DynamicForm({
   const [sent, setSent] = useState(false);
   const submit = useServerFn(submitApplication);
 
+  function logStage(stage: string, details?: Record<string, unknown>) {
+    console.log(`[MK_REQUEST][client][${formKey}][${stage}]`, details ?? {});
+  }
+
   if (isLoading) {
     return <div className="py-8 text-center text-sm text-muted-foreground">Загрузка…</div>;
   }
@@ -81,30 +85,47 @@ export function DynamicForm({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    logStage("handleSubmit", {
+      fields: fields.map((f) => f.name),
+      valueKeys: Object.keys(values),
+      hasExtraData: !!extraData,
+    });
     for (const f of fields) {
       if (f.required && !values[f.name]) {
+        logStage("validation_stop", { field: f.name, label: f.label });
         toast.error(`Заполните: ${f.label}`);
         return;
       }
     }
     setBusy(true);
     try {
+      logStage("before_payload", { valueKeys: Object.keys(values) });
       // Если есть File — загружаем
       const data: Record<string, unknown> = { ...values };
       for (const f of fields) {
         const v = values[f.name];
         if (v instanceof File) {
+          logStage("before_file_upload", { field: f.name, fileName: v.name, fileSize: v.size });
           data[f.name] = await uploadFile(v);
+          logStage("after_file_upload", { field: f.name, uploaded: typeof data[f.name] === "string" });
         }
       }
       const page_url = typeof window !== "undefined" ? window.location.href : "";
       const payload = { ...data, ...(extraData ?? {}), page_url };
-      await submit({ data: { formKey, title: config.title, data: payload } });
+      logStage("before_submitApplication", {
+        title: config.title,
+        payloadKeys: Object.keys(payload),
+        page_url,
+      });
+      const result = await submit({ data: { formKey, title: config.title, data: payload } });
+      logStage("after_submitApplication", result as Record<string, unknown>);
       setSent(true);
       onSent?.();
     } catch (err: any) {
+      logStage("catch", { message: err?.message, name: err?.name, stack: err?.stack });
       toast.error(err?.message ?? "Не удалось отправить");
     } finally {
+      logStage("finally", { busy: false });
       setBusy(false);
     }
   }

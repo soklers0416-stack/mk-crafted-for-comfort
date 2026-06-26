@@ -28,6 +28,23 @@ function createPublicServerClient() {
   });
 }
 
+function createTraceId() {
+  try {
+    return crypto.randomUUID();
+  } catch {
+    return `trace-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  }
+}
+
+function safeUrlLabel(url: string) {
+  try {
+    const parsed = new URL(url);
+    return `${parsed.origin}${parsed.pathname}`;
+  } catch {
+    return "invalid-url";
+  }
+}
+
 // Карта типов заявок в человеческие названия (зеркалит FORM_TYPE_LABELS на клиенте).
 const TYPE_LABELS: Record<string, string> = {
   callback: "Обратный звонок",
@@ -131,22 +148,66 @@ export const submitApplication = createServerFn({ method: "POST" })
     };
   })
   .handler(async ({ data }) => {
+    const traceId = createTraceId();
+    console.log("[MK_REQUEST][server][submitApplication][start]", {
+      traceId,
+      formKey: data.formKey,
+      title: data.title,
+      dataKeys: Object.keys(data.data ?? {}),
+      hasSupabaseUrl: !!(process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || (import.meta as any).env?.VITE_SUPABASE_URL),
+      hasPublicKey: !!(
+        process.env.SUPABASE_PUBLISHABLE_KEY ||
+        process.env.SUPABASE_ANON_KEY ||
+        process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+        process.env.VITE_SUPABASE_ANON_KEY ||
+        (import.meta as any).env?.VITE_SUPABASE_PUBLISHABLE_KEY ||
+        (import.meta as any).env?.VITE_SUPABASE_ANON_KEY
+      ),
+    });
     const supabasePublic = createPublicServerClient();
 
     // 1) Сохраняем заявку (RLS: insert разрешён роли anon)
+    console.log("[MK_REQUEST][server][submitApplication][before_db_insert]", { traceId, formKey: data.formKey });
     const { data: inserted, error } = await (supabasePublic as any)
       .from("requests")
       .insert({ source: data.formKey, title: data.title || data.formKey, data: data.data, status: "new" })
       .select("id, created_at")
       .single();
-    if (error) throw new Error(error.message);
+    if (error) {
+      console.error("[MK_REQUEST][server][submitApplication][db_insert_error]", {
+        traceId,
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint,
+      });
+      throw new Error(error.message);
+    }
+    console.log("[MK_REQUEST][server][submitApplication][after_db_insert]", { traceId, id: inserted?.id });
 
     // 2) Получаем настройки интеграции (best-effort; если RLS не пускает — пропускаем webhook)
-    const { data: integ } = await (supabasePublic as any)
+    console.log("[MK_REQUEST][server][submitApplication][before_integration_read]", { traceId });
+    const { data: integ, error: integError } = await (supabasePublic as any)
       .from("integrations")
       .select("apps_script_url, webhook_url, enabled")
       .eq("id", 1)
       .maybeSingle();
+    if (integError) {
+      console.error("[MK_REQUEST][server][submitApplication][integration_read_error]", {
+        traceId,
+        message: integError.message,
+        code: integError.code,
+        details: integError.details,
+        hint: integError.hint,
+      });
+    } else {
+      console.log("[MK_REQUEST][server][submitApplication][after_integration_read]", {
+        traceId,
+        enabled: !!integ?.enabled,
+        hasAppsScriptUrl: !!integ?.apps_script_url,
+        hasWebhookUrl: !!integ?.webhook_url,
+      });
+    }
 
     const flat = flattenForSheets({
       id: inserted?.id,
@@ -167,18 +228,49 @@ export const submitApplication = createServerFn({ method: "POST" })
     // 3) Отправляем в Apps Script / webhook (best-effort, не блокируем ответ при ошибке)
     if (integ?.enabled) {
       const urls = [integ.apps_script_url, integ.webhook_url].filter(Boolean) as string[];
+      console.log("[MK_REQUEST][server][submitApplication][before_external_fetches]", {
+        traceId,
+        targets: urls.map(safeUrlLabel),
+      });
       await Promise.allSettled(
-        urls.map((url) =>
-          fetch(url, {
-            method: "POST",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify(payload),
-          }).catch(() => null),
-        ),
+        urls.map(async (url) => {
+          const target = safeUrlLabel(url);
+          try {
+            console.log("[MK_REQUEST][server][submitApplication][external_fetch_start]", { traceId, target });
+            const response = await fetch(url, {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+            const responseText = await response.clone().text().catch(() => "");
+            console.log("[MK_REQUEST][server][submitApplication][external_fetch_response]", {
+              traceId,
+              target,
+              status: response.status,
+              ok: response.ok,
+              body: responseText.slice(0, 300),
+            });
+            return response.ok;
+          } catch (error: any) {
+            console.error("[MK_REQUEST][server][submitApplication][external_fetch_catch]", {
+              traceId,
+              target,
+              message: error?.message,
+              name: error?.name,
+            });
+            return false;
+          }
+        }),
       );
+    } else {
+      console.log("[MK_REQUEST][server][submitApplication][external_fetch_skipped]", {
+        traceId,
+        reason: integ?.enabled ? "no_urls" : "integration_disabled_or_missing",
+      });
     }
 
-    return { ok: true, id: inserted?.id };
+    console.log("[MK_REQUEST][server][submitApplication][return_success]", { traceId, id: inserted?.id });
+    return { ok: true, id: inserted?.id, traceId };
   });
 
 // Проверка подключения (только админ).

@@ -49,6 +49,12 @@ function CartPage() {
   const submitFn = useServerFn(submitApplication);
   const submitOrder = useMutation({
     mutationFn: async () => {
+      console.log("[MK_REQUEST][client][cart][mutation_start]", {
+        hasName: !!name.trim(),
+        hasPhone: !!phone.trim(),
+        itemsCount: detailed.length,
+        total,
+      });
       if (!name.trim() || !phone.trim()) throw new Error("Укажите имя и телефон");
       // Подробный состав корзины — текстом, без ID товаров.
       const itemsList = detailed.map((x) => {
@@ -64,27 +70,34 @@ function CartPage() {
         return parts.join("\n");
       }).join("\n\n");
       const itemsSummary = `${itemsList}\n\nИтого: ${formatPrice(total)}`;
-      await submitFn({
+      const payload = {
+        formKey: "cart",
+        title: "Заказ из корзины",
         data: {
-          formKey: "cart",
-          title: "Заказ из корзины",
-          data: {
-            name,
-            phone,
-            comment,
-            items: itemsSummary,
-            total: formatPrice(total),
-            button: "Оформить заказ",
-            section: "Корзина",
-          },
+          name,
+          phone,
+          comment,
+          items: itemsSummary,
+          total: formatPrice(total),
+          button: "Оформить заказ",
+          section: "Корзина",
+        },
+      };
+      console.log("[MK_REQUEST][client][cart][before_submitApplication]", {
+        payloadKeys: Object.keys(payload.data),
+      });
+      const result = await submitFn({
+        data: {
+          ...payload,
         },
       });
+      console.log("[MK_REQUEST][client][cart][after_submitApplication]", result);
     },
-    onSuccess: () => { setSent(true); clear(); },
-    onError: (e: any) => toast.error(e.message),
+    onSuccess: () => { console.log("[MK_REQUEST][client][cart][success]"); setSent(true); clear(); },
+    onError: (e: any) => { console.log("[MK_REQUEST][client][cart][catch]", { message: e.message, name: e.name, stack: e.stack }); toast.error(e.message); },
   });
 
-  const submit = (e: React.FormEvent) => { e.preventDefault(); submitOrder.mutate(); };
+  const submit = (e: React.FormEvent) => { e.preventDefault(); console.log("[MK_REQUEST][client][cart][handleSubmit]"); submitOrder.mutate(); };
 
   if (sent) {
     return (
