@@ -8,7 +8,6 @@ RUN apk add --no-cache bash curl unzip libstdc++ \
   && curl -fsSL https://bun.sh/install | bash \
   && ln -s /root/.bun/bin/bun /usr/local/bin/bun
 
-# Copy BOTH old and new bun lock formats + npm lock if present
 COPY package.json bun.lock* bun.lockb* package-lock.json* ./
 
 RUN if [ -f bun.lock ] || [ -f bun.lockb ]; then \
@@ -21,6 +20,19 @@ RUN if [ -f bun.lock ] || [ -f bun.lockb ]; then \
 
 COPY . .
 
+# Build-time args for Vite client bundle (VITE_* must be present at build time,
+# not runtime — Vite inlines import.meta.env.VITE_* into the client JS).
+ARG VITE_SUPABASE_URL
+ARG VITE_SUPABASE_PUBLISHABLE_KEY
+ARG VITE_SUPABASE_PROJECT_ID
+ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL
+ENV VITE_SUPABASE_PUBLISHABLE_KEY=$VITE_SUPABASE_PUBLISHABLE_KEY
+ENV VITE_SUPABASE_PROJECT_ID=$VITE_SUPABASE_PROJECT_ID
+
+# Fallback: if .env.production is present in build context, copy it to .env so
+# Vite picks it up automatically during build.
+RUN if [ -f .env.production ] && [ ! -f .env ]; then cp .env.production .env; fi
+
 ENV NITRO_PRESET=node_server
 RUN if [ -f bun.lock ] || [ -f bun.lockb ]; then bun run build; else npm run build; fi
 
@@ -31,10 +43,6 @@ ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOST=0.0.0.0
 
-# The compiled server imports TanStack's h3 alias (`h3-v2`). Nitro's generated
-# .output/server/package.json can omit that npm-alias, so installing only from
-# .output/server is not reliable. Copy the exact dependency tree produced from
-# bun.lock instead; Node will resolve runtime imports from /app/node_modules.
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.output ./.output
