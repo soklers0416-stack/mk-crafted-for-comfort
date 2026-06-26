@@ -157,7 +157,13 @@ export const aboutContentQuery = queryOptions({
     const { data, error } = await sb.from("about_content").select("key,value");
     if (error) throw error;
     const map: Record<string, any> = {};
-    for (const r of (data ?? []) as AboutContent[]) map[r.key] = r.value ?? {};
+    for (const r of (data ?? []) as AboutContent[]) {
+      const value = { ...(r.value ?? {}) };
+      for (const key of ["factory_photo", "showroom_photo", "reviews_photo", "gallery_photo", "image_url", "photo"]) {
+        if (value[key]) value[key] = normalizePhotoUrl(value[key]) ?? value[key];
+      }
+      map[r.key] = value;
+    }
     return map;
   },
 });
@@ -191,7 +197,7 @@ export const customerPhotosQuery = queryOptions({
   queryFn: async (): Promise<CustomerPhoto[]> => {
     const { data, error } = await sb.from("customer_photos").select("*").order("sort_order");
     if (error) throw error;
-    return (data ?? []) as CustomerPhoto[];
+    return ((data ?? []) as any[]).map((r) => ({ ...r, photo: normalizePhotoUrl(r.photo) })) as CustomerPhoto[];
   },
 });
 export const galleryItemsQuery = queryOptions({
@@ -199,7 +205,7 @@ export const galleryItemsQuery = queryOptions({
   queryFn: async (): Promise<GalleryItem[]> => {
     const { data, error } = await sb.from("gallery_items").select("*").order("sort_order");
     if (error) throw error;
-    return (data ?? []) as GalleryItem[];
+    return ((data ?? []) as any[]).map((r) => ({ ...r, photo: normalizePhotoUrl(r.photo) })) as GalleryItem[];
   },
 });
 export const faqsQuery = queryOptions({
@@ -225,7 +231,9 @@ function normalizePartner(p: any): Partner {
     ...p,
     advantages: Array.isArray(p.advantages) ? p.advantages : [],
     socials: Array.isArray(p.socials) ? p.socials : [],
-    gallery: Array.isArray(p.gallery) ? p.gallery : [],
+    logo: normalizePhotoUrl(p.logo),
+    main_photo: normalizePhotoUrl(p.main_photo),
+    gallery: Array.isArray(p.gallery) ? p.gallery.map((x: string) => normalizePhotoUrl(x) ?? x) : [],
     recommended_for: Array.isArray(p.recommended_for) ? p.recommended_for : [],
   };
 }
@@ -284,7 +292,7 @@ export const specMechanismsQuery = queryOptions({
   queryFn: async (): Promise<SpecItem[]> => {
     const { data, error } = await sb.from("spec_mechanisms").select("*").order("sort_order");
     if (error) throw error;
-    return (data ?? []) as SpecItem[];
+    return ((data ?? []) as any[]).map(normalizeSpecItem);
   },
 });
 
@@ -293,7 +301,7 @@ export const specFillingsQuery = queryOptions({
   queryFn: async (): Promise<SpecItem[]> => {
     const { data, error } = await sb.from("spec_fillings").select("*").order("sort_order");
     if (error) throw error;
-    return (data ?? []) as SpecItem[];
+    return ((data ?? []) as any[]).map(normalizeSpecItem);
   },
 });
 
