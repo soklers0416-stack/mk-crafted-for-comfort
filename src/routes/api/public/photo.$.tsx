@@ -30,21 +30,30 @@ export const Route = createFileRoute("/api/public/photo/$")({
           return new Response("Bad path", { status: 400 });
         }
         const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-        const key = process.env.SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+        const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+        const publishableKey = process.env.SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+        const key = serviceKey || publishableKey;
         if (!url || !key) {
           return new Response("Storage env not configured", { status: 500 });
         }
 
         try {
-          // Private buckets cannot be used directly in <img>. Proxy through the
-          // app and authenticate this storage request with the publishable key.
+          // Private bucket: authenticate via service role (preferred) or publishable key.
           const storageUrl = `${url.replace(/\/$/, "")}/storage/v1/object/product-photos/${encodeStoragePath(path)}`;
-          const storageResponse = await fetch(storageUrl, {
-            headers: {
-              apikey: key,
-              Authorization: `Bearer ${key}`,
-            },
-          });
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 15000);
+          let storageResponse: Response;
+          try {
+            storageResponse = await fetch(storageUrl, {
+              headers: {
+                apikey: key,
+                Authorization: `Bearer ${key}`,
+              },
+              signal: controller.signal,
+            });
+          } finally {
+            clearTimeout(timeout);
+          }
 
           if (!storageResponse.ok) {
             const message = storageResponse.status === 404 ? "Not found" : `Storage error ${storageResponse.status}`;
