@@ -88,7 +88,7 @@ function EditProduct() {
     const path = `${uuid()}.${ext}`;
     const { error } = await supabase.storage.from("product-photos").upload(path, file, { upsert: false, contentType: file.type });
     if (error) { toast.error(error.message); return; }
-    update(`photo${slot}` as any, normalizePhotoUrl(path));
+    update(`photo${slot}` as any, normalizePhotoUrl(path)!);
   }
 
   async function uploadMultiplePhotos(files: FileList) {
