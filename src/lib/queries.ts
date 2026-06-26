@@ -6,17 +6,51 @@ import type {
   AboutContent, AboutAdvantage, AboutStat, AboutStep, CustomerPhoto, GalleryItem, Faq,
   Partner, PartnerCategory, SpecItem, SizePriceTemplate,
 } from "./db";
+import { normalizePhotoUrl } from "@/lib/photoUrls";
 
 
 
 const sb = supabase as any;
+
+function normalizeCategory(c: any): Category {
+  return { ...c, image_url: normalizePhotoUrl(c.image_url) } as Category;
+}
+
+function normalizeProduct(p: any): Product {
+  return {
+    ...p,
+    photo1: normalizePhotoUrl(p.photo1),
+    photo2: normalizePhotoUrl(p.photo2),
+    photo3: normalizePhotoUrl(p.photo3),
+    photo4: normalizePhotoUrl(p.photo4),
+    photo5: normalizePhotoUrl(p.photo5),
+    photo6: normalizePhotoUrl(p.photo6),
+  } as Product;
+}
+
+function normalizeFabric(f: any): Fabric {
+  return {
+    ...f,
+    sample_photo: normalizePhotoUrl(f.sample_photo),
+    characteristics: f.characteristics ?? {},
+    furniture_photos: Array.isArray(f.furniture_photos) ? f.furniture_photos.map((x: string) => normalizePhotoUrl(x) ?? x) : [],
+  } as Fabric;
+}
+
+function normalizeFabricColor(c: any): FabricColor {
+  return { ...c, photo: normalizePhotoUrl(c.photo) } as FabricColor;
+}
+
+function normalizeSpecItem(s: any): SpecItem {
+  return { ...s, photo: normalizePhotoUrl(s.photo) } as SpecItem;
+}
 
 export const categoriesQuery = queryOptions({
   queryKey: ["categories"],
   queryFn: async (): Promise<Category[]> => {
     const { data, error } = await sb.from("categories").select("*").order("sort_order", { ascending: true });
     if (error) throw error;
-    return (data ?? []) as Category[];
+    return ((data ?? []) as any[]).map(normalizeCategory);
   },
 });
 
@@ -25,7 +59,7 @@ export const productsQuery = queryOptions({
   queryFn: async (): Promise<Product[]> => {
     const { data, error } = await sb.from("products").select("*").order("sort_order", { ascending: true });
     if (error) throw error;
-    return (data ?? []) as Product[];
+    return ((data ?? []) as any[]).map(normalizeProduct);
   },
 });
 
@@ -44,7 +78,7 @@ export function productQuery(id: string) {
     queryFn: async (): Promise<Product | null> => {
       const { data, error } = await sb.from("products").select("*").eq("id", id).maybeSingle();
       if (error) throw error;
-      return data as Product | null;
+      return data ? normalizeProduct(data) : null;
     },
   });
 }
@@ -63,11 +97,7 @@ export const fabricsQuery = queryOptions({
   queryFn: async (): Promise<Fabric[]> => {
     const { data, error } = await sb.from("fabrics").select("*").order("sort_order");
     if (error) throw error;
-    return (data ?? []).map((f: any) => ({
-      ...f,
-      characteristics: f.characteristics ?? {},
-      furniture_photos: Array.isArray(f.furniture_photos) ? f.furniture_photos : [],
-    })) as Fabric[];
+    return ((data ?? []) as any[]).map(normalizeFabric);
   },
 });
 
@@ -78,11 +108,7 @@ export function fabricQuery(id: string) {
       const { data, error } = await sb.from("fabrics").select("*").eq("id", id).maybeSingle();
       if (error) throw error;
       if (!data) return null;
-      return {
-        ...data,
-        characteristics: data.characteristics ?? {},
-        furniture_photos: Array.isArray(data.furniture_photos) ? data.furniture_photos : [],
-      } as Fabric;
+      return normalizeFabric(data);
     },
   });
 }
@@ -101,7 +127,7 @@ export const fabricColorsQuery = queryOptions({
   queryFn: async (): Promise<FabricColor[]> => {
     const { data, error } = await sb.from("fabric_colors").select("*").order("sort_order");
     if (error) throw error;
-    return (data ?? []) as FabricColor[];
+    return ((data ?? []) as any[]).map(normalizeFabricColor);
   },
 });
 
@@ -111,7 +137,7 @@ export function fabricColorsByCollectionQuery(fabricId: string) {
     queryFn: async (): Promise<FabricColor[]> => {
       const { data, error } = await sb.from("fabric_colors").select("*").eq("fabric_id", fabricId).order("sort_order");
       if (error) throw error;
-      return (data ?? []) as FabricColor[];
+      return ((data ?? []) as any[]).map(normalizeFabricColor);
     },
   });
 }
