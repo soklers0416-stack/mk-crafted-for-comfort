@@ -84,7 +84,7 @@ function EditProduct() {
 
   async function uploadPhoto(slot: 1 | 2 | 3 | 4 | 5 | 6, file: File) {
     const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
-    const path = `${crypto.randomUUID()}.${ext}`;
+    const path = `${uuid()}.${ext}`;
     const { error } = await supabase.storage.from("product-photos").upload(path, file, { upsert: false, contentType: file.type });
     if (error) { toast.error(error.message); return; }
     update(`photo${slot}` as any, `/api/public/photo/${path}`);
@@ -101,7 +101,7 @@ function EditProduct() {
       // Preserve user's selection order: result[i] corresponds to toUpload[i]
       const urls = await Promise.all(toUpload.map(async (file) => {
         const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
-        const path = `${crypto.randomUUID()}.${ext}`;
+        const path = `${uuid()}.${ext}`;
         const { error } = await supabase.storage.from("product-photos").upload(path, file, { upsert: false, contentType: file.type });
         if (error) throw error;
         return `/api/public/photo/${path}`;
