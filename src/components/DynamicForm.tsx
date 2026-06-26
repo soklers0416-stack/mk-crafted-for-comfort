@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { submitApplication } from "@/lib/applications.functions";
 import type { FormConfig, FormField } from "@/lib/forms";
 import { uuid } from "@/lib/uuid";
+import { normalizePhotoUrl } from "@/lib/photoUrls";
 
 async function uploadFile(file: File): Promise<string> {
   const ext = file.name.split(".").pop() || "bin";
@@ -15,8 +16,7 @@ async function uploadFile(file: File): Promise<string> {
     upsert: false,
   });
   if (error) throw error;
-  const { data } = (supabase.storage.from("product-photos") as any).getPublicUrl(path);
-  return data.publicUrl as string;
+  return normalizePhotoUrl(path)!;
 }
 
 export function useFormConfig(key: string) {
