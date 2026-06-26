@@ -1,5 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { normalizePhotoUrl } from "@/lib/photoUrls";
 
 export type PageBlockKind = "hero-banner" | "text-image" | "gallery" | "cta" | "system";
 
@@ -38,9 +39,14 @@ const sb = supabase as any;
 function normalize(row: any): PageBlock {
   return {
     ...row,
-    gallery: Array.isArray(row.gallery) ? row.gallery : [],
+    image_url: normalizePhotoUrl(row.image_url),
+    gallery: Array.isArray(row.gallery) ? row.gallery.map((x: string) => normalizePhotoUrl(x) ?? x) : [],
     settings: row.settings ?? {},
   };
+}
+
+function normalizeSlide(row: any): HomeSlide {
+  return { ...row, image_url: normalizePhotoUrl(row.image_url) } as HomeSlide;
 }
 
 export function pageBlocksQuery(pageKey: string) {
@@ -72,7 +78,7 @@ export const homeSlidesQuery = queryOptions({
   queryFn: async (): Promise<HomeSlide[]> => {
     const { data, error } = await sb.from("home_slides").select("*").order("sort_order");
     if (error) throw error;
-    return (data ?? []) as HomeSlide[];
+      return ((data ?? []) as any[]).map(normalizeSlide);
   },
 });
 
