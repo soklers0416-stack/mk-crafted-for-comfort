@@ -28,6 +28,98 @@ function createPublicServerClient() {
   });
 }
 
+function createTraceId() {
+  try {
+    return crypto.randomUUID();
+  } catch {
+    return `trace-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  }
+}
+
+function safeUrlLabel(url: string) {
+  try {
+    const parsed = new URL(url);
+    return `${parsed.origin}${parsed.pathname}`;
+  } catch {
+    return "invalid-url";
+  }
+}
+
+function wait(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function postToIntegrationUrl({
+  url,
+  payload,
+  traceId,
+}: {
+  url: string;
+  payload: Record<string, unknown>;
+  traceId: string;
+}) {
+  const target = safeUrlLabel(url);
+  let lastStatus = 0;
+  let lastBody = "";
+  let lastError = "";
+
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    try {
+      console.log("[MK_REQUEST][server][submitApplication][external_fetch_start]", {
+        traceId,
+        target,
+        attempt,
+      });
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const responseText = await response.clone().text().catch(() => "");
+      lastStatus = response.status;
+      lastBody = responseText;
+      console.log("[MK_REQUEST][server][submitApplication][external_fetch_response]", {
+        traceId,
+        target,
+        attempt,
+        status: response.status,
+        ok: response.ok,
+        body: responseText.slice(0, 2000),
+      });
+      if (response.ok) {
+        return { ok: true, status: response.status, body: responseText, target, attempt };
+      }
+    } catch (error: any) {
+      lastError = error?.message ?? String(error);
+      console.error("[MK_REQUEST][server][submitApplication][external_fetch_catch]", {
+        traceId,
+        target,
+        attempt,
+        message: error?.message,
+        name: error?.name,
+      });
+    }
+
+    if (attempt < 3) {
+      console.log("[MK_REQUEST][server][submitApplication][external_fetch_retry_wait]", {
+        traceId,
+        target,
+        nextAttempt: attempt + 1,
+      });
+      await wait(700 * attempt);
+    }
+  }
+
+  return {
+    ok: false,
+    status: lastStatus,
+    body: lastBody,
+    error: lastError,
+    target,
+    attempt: 3,
+  };
+}
+
 // Карта типов заявок в человеческие названия (зеркалит FORM_TYPE_LABELS на клиенте).
 const TYPE_LABELS: Record<string, string> = {
   callback: "Обратный звонок",
@@ -131,26 +223,69 @@ export const submitApplication = createServerFn({ method: "POST" })
     };
   })
   .handler(async ({ data }) => {
+    const traceId = createTraceId();
+    console.log("[MK_REQUEST][server][submitApplication][start]", {
+      traceId,
+      formKey: data.formKey,
+      title: data.title,
+      dataKeys: Object.keys(data.data ?? {}),
+      hasSupabaseUrl: !!(process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || (import.meta as any).env?.VITE_SUPABASE_URL),
+      hasPublicKey: !!(
+        process.env.SUPABASE_PUBLISHABLE_KEY ||
+        process.env.SUPABASE_ANON_KEY ||
+        process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+        process.env.VITE_SUPABASE_ANON_KEY ||
+        (import.meta as any).env?.VITE_SUPABASE_PUBLISHABLE_KEY ||
+        (import.meta as any).env?.VITE_SUPABASE_ANON_KEY
+      ),
+    });
     const supabasePublic = createPublicServerClient();
 
     // 1) Сохраняем заявку (RLS: insert разрешён роли anon)
-    const { data: inserted, error } = await (supabasePublic as any)
+    console.log("[MK_REQUEST][server][submitApplication][before_db_insert]", { traceId, formKey: data.formKey });
+    const { error } = await (supabasePublic as any)
       .from("requests")
       .insert({ source: data.formKey, title: data.title || data.formKey, data: data.data, status: "new" })
-      .select("id, created_at")
-      .single();
-    if (error) throw new Error(error.message);
+      .throwOnError();
+    if (error) {
+      console.error("[MK_REQUEST][server][submitApplication][db_insert_error]", {
+        traceId,
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint,
+      });
+      throw new Error(error.message);
+    }
+    console.log("[MK_REQUEST][server][submitApplication][after_db_insert]", { traceId });
 
     // 2) Получаем настройки интеграции (best-effort; если RLS не пускает — пропускаем webhook)
-    const { data: integ } = await (supabasePublic as any)
+    console.log("[MK_REQUEST][server][submitApplication][before_integration_read]", { traceId });
+    const { data: integ, error: integError } = await (supabasePublic as any)
       .from("integrations")
       .select("apps_script_url, webhook_url, enabled")
       .eq("id", 1)
       .maybeSingle();
+    if (integError) {
+      console.error("[MK_REQUEST][server][submitApplication][integration_read_error]", {
+        traceId,
+        message: integError.message,
+        code: integError.code,
+        details: integError.details,
+        hint: integError.hint,
+      });
+    } else {
+      console.log("[MK_REQUEST][server][submitApplication][after_integration_read]", {
+        traceId,
+        enabled: !!integ?.enabled,
+        hasAppsScriptUrl: !!integ?.apps_script_url,
+        hasWebhookUrl: !!integ?.webhook_url,
+      });
+    }
 
     const flat = flattenForSheets({
-      id: inserted?.id,
-      created_at: inserted?.created_at,
+      id: traceId,
+      created_at: new Date().toISOString(),
       form_key: data.formKey,
       title: data.title || data.formKey,
       data: data.data as Record<string, any>,
@@ -167,18 +302,38 @@ export const submitApplication = createServerFn({ method: "POST" })
     // 3) Отправляем в Apps Script / webhook (best-effort, не блокируем ответ при ошибке)
     if (integ?.enabled) {
       const urls = [integ.apps_script_url, integ.webhook_url].filter(Boolean) as string[];
-      await Promise.allSettled(
-        urls.map((url) =>
-          fetch(url, {
-            method: "POST",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify(payload),
-          }).catch(() => null),
-        ),
-      );
+      console.log("[MK_REQUEST][server][submitApplication][before_external_fetches]", {
+        traceId,
+        targets: urls.map(safeUrlLabel),
+      });
+      const externalResults = await Promise.all(urls.map((url) => postToIntegrationUrl({ url, payload, traceId })));
+      console.log("[MK_REQUEST][server][submitApplication][after_external_fetches]", {
+        traceId,
+        results: externalResults.map((r) => ({ target: r.target, ok: r.ok, status: r.status, attempt: r.attempt })),
+      });
+      if (urls.length > 0 && !externalResults.some((r) => r.ok)) {
+        const first = externalResults[0];
+        console.error("[MK_REQUEST][server][submitApplication][external_fetch_failed_all]", {
+          traceId,
+          status: first?.status,
+          error: first?.error,
+          body: first?.body?.slice(0, 2000),
+        });
+        throw new Error(
+          first?.status
+            ? `Google Sheets не принял заявку: HTTP ${first.status}`
+            : `Google Sheets не принял заявку: ${first?.error || "ошибка fetch"}`,
+        );
+      }
+    } else {
+      console.log("[MK_REQUEST][server][submitApplication][external_fetch_skipped]", {
+        traceId,
+        reason: integ?.enabled ? "no_urls" : "integration_disabled_or_missing",
+      });
     }
 
-    return { ok: true, id: inserted?.id };
+    console.log("[MK_REQUEST][server][submitApplication][return_success]", { traceId });
+    return { ok: true, traceId };
   });
 
 // Проверка подключения (только админ).
