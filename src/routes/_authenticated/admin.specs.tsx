@@ -104,7 +104,7 @@ function SpecRow({ item, onSave, onDelete }: { item: SpecItem; onSave: (v: Parti
     setBusy(true);
     try {
       const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
-      const path = `specs/${crypto.randomUUID()}.${ext}`;
+      const path = `specs/${uuid()}.${ext}`;
       const { error } = await supabase.storage.from("product-photos").upload(path, file, { upsert: false, contentType: file.type });
       if (error) throw error;
       setForm((f) => ({ ...f, photo: `/api/public/photo/${path}` }));
