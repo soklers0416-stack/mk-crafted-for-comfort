@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { uuid } from "@/lib/uuid";
+import { normalizePhotoUrl } from "@/lib/photoUrls";
 
 const ALLOWED = ["jpg", "jpeg", "png", "webp"];
 
@@ -13,5 +14,5 @@ export async function uploadPhoto(file: File): Promise<string> {
     .from("product-photos")
     .upload(path, file, { upsert: false, contentType: file.type });
   if (error) throw error;
-  return `/api/public/photo/${path}`;
+  return normalizePhotoUrl(path)!;
 }
