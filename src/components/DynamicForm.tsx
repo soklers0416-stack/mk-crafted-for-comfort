@@ -134,7 +134,6 @@ export function DynamicForm({
     <form onSubmit={handleSubmit} className={className ?? "space-y-3"}>
       {fields.map((f: FormField) => {
         const common = {
-          key: f.name,
           required: f.required,
           placeholder: f.placeholder || f.label,
           className: "w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary",
@@ -142,6 +141,7 @@ export function DynamicForm({
         if (f.type === "textarea") {
           return (
             <textarea
+              key={f.name}
               {...common} rows={3}
               value={values[f.name] ?? ""}
               onChange={(e) => setValues((v) => ({ ...v, [f.name]: e.target.value }))}
@@ -150,7 +150,7 @@ export function DynamicForm({
         }
         if (f.type === "select") {
           return (
-            <select {...common}
+            <select key={f.name} {...common}
               value={values[f.name] ?? ""}
               onChange={(e) => setValues((v) => ({ ...v, [f.name]: e.target.value }))}
             >
@@ -175,6 +175,7 @@ export function DynamicForm({
         }
         return (
           <input
+            key={f.name}
             {...common}
             type={f.type === "email" ? "email" : f.type === "tel" ? "tel" : "text"}
             value={values[f.name] ?? ""}
