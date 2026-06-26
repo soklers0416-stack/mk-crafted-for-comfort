@@ -7,6 +7,7 @@ import type { Product, SizeRow, Spec } from "@/lib/db";
 import { SOFA_TYPES } from "@/lib/db";
 import { toast } from "sonner";
 import { ArrowLeft, Upload, X, Plus, Trash2, GripVertical } from "lucide-react";
+import { uuid } from "@/lib/uuid";
 
 export const Route = createFileRoute("/_authenticated/admin/products/$id")({
   component: EditProduct,
