@@ -21,6 +21,29 @@ function encodeStoragePath(path: string) {
   return path.split("/").map(encodeURIComponent).join("/");
 }
 
+function unique<T>(items: Array<T | null | undefined | false>): T[] {
+  return Array.from(new Set(items.filter(Boolean) as T[]));
+}
+
+function getStorageTargets() {
+  // In production the browser uses VITE_* values baked into the client bundle.
+  // The server route must try the same pair first; otherwise a stale/mismatched
+  // non-VITE SUPABASE_* value on the VPS makes Storage answer 400 and all images
+  // look broken even though upload and DB writes succeeded.
+  const urls = unique([
+    process.env.VITE_SUPABASE_URL,
+    process.env.SUPABASE_URL,
+  ]).map((url) => url.replace(/\/$/, ""));
+
+  const keys = unique([
+    process.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+    process.env.SUPABASE_PUBLISHABLE_KEY,
+    process.env.SUPABASE_SERVICE_ROLE_KEY,
+  ]);
+
+  return urls.flatMap((url) => keys.map((key) => ({ url, key })));
+}
+
 export const Route = createFileRoute("/api/public/photo/$")({
   server: {
     handlers: {
@@ -29,26 +52,18 @@ export const Route = createFileRoute("/api/public/photo/$")({
         if (!path) {
           return new Response("Bad path", { status: 400 });
         }
-        const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-        const publishableKey = process.env.SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-        const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-        const keys = [
-          publishableKey,
-          // Some self-hosted setups use new non-JWT service keys. Storage's
-          // object endpoint rejects those as Bearer tokens with HTTP 400, so
-          // only use a service key here when it is an old JWT-shaped key.
-          serviceKey && serviceKey.split(".").length === 3 ? serviceKey : null,
-        ].filter((key): key is string => Boolean(key));
-        if (!url || keys.length === 0) {
+        const targets = getStorageTargets();
+        if (targets.length === 0) {
           return new Response("Storage env not configured", { status: 500 });
         }
 
         try {
-          const storageUrl = `${url.replace(/\/$/, "")}/storage/v1/object/product-photos/${encodeStoragePath(path)}`;
+          const encodedPath = encodeStoragePath(path);
           let lastStatus = 502;
           let lastBody = "Storage request failed";
 
-          for (const key of keys) {
+          for (const { url, key } of targets) {
+            const storageUrl = `${url}/storage/v1/object/product-photos/${encodedPath}`;
             const controller = new AbortController();
             const timeout = setTimeout(() => controller.abort(), 15000);
             let storageResponse: Response;
@@ -66,7 +81,14 @@ export const Route = createFileRoute("/api/public/photo/$")({
 
             if (!storageResponse.ok) {
               lastStatus = storageResponse.status;
+              const details = await storageResponse.text().catch(() => "");
               lastBody = storageResponse.status === 404 ? "Not found" : `Storage error ${storageResponse.status}`;
+              console.warn("Product photo storage read failed", {
+                status: storageResponse.status,
+                supabaseHost: (() => { try { return new URL(url).host; } catch { return "invalid-url"; } })(),
+                path,
+                details: details.slice(0, 300),
+              });
               continue;
             }
 
