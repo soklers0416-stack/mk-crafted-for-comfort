@@ -131,18 +131,18 @@ export const submitApplication = createServerFn({ method: "POST" })
     };
   })
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const supabasePublic = createPublicServerClient();
 
-    // 1) Сохраняем заявку
-    const { data: inserted, error } = await (supabaseAdmin as any)
+    // 1) Сохраняем заявку (RLS: insert разрешён роли anon)
+    const { data: inserted, error } = await (supabasePublic as any)
       .from("requests")
       .insert({ source: data.formKey, title: data.title || data.formKey, data: data.data, status: "new" })
       .select("id, created_at")
       .single();
     if (error) throw new Error(error.message);
 
-    // 2) Получаем настройки интеграции
-    const { data: integ } = await supabaseAdmin
+    // 2) Получаем настройки интеграции (best-effort; если RLS не пускает — пропускаем webhook)
+    const { data: integ } = await (supabasePublic as any)
       .from("integrations")
       .select("apps_script_url, webhook_url, enabled")
       .eq("id", 1)
