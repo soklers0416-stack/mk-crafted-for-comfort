@@ -26,18 +26,26 @@ function unique<T>(items: Array<T | null | undefined | false>): T[] {
 }
 
 function getStorageTargets() {
-  // In production the browser uses VITE_* values baked into the client bundle.
-  // The server route must try the same pair first; otherwise a stale/mismatched
-  // non-VITE SUPABASE_* value on the VPS makes Storage answer 400 and all images
-  // look broken even though upload and DB writes succeeded.
+  // In production the browser uploads with VITE_* values baked into the client
+  // bundle. The photo proxy is a server route, so process.env.VITE_* can be
+  // missing in the final Docker runtime image. Read import.meta.env first so the
+  // server bundle uses the exact same Supabase project/key pair as the browser.
+  // Otherwise upload succeeds, the path is saved in products, but the proxy reads
+  // from a different Supabase project and Storage returns 400 (usually bucket not
+  // found), making every old and new product image look broken.
   const urls = unique([
+    import.meta.env.VITE_SUPABASE_URL,
     process.env.VITE_SUPABASE_URL,
     process.env.SUPABASE_URL,
   ]).map((url) => url.replace(/\/$/, ""));
 
   const keys = unique([
+    import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+    import.meta.env.VITE_SUPABASE_ANON_KEY,
     process.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+    process.env.VITE_SUPABASE_ANON_KEY,
     process.env.SUPABASE_PUBLISHABLE_KEY,
+    process.env.SUPABASE_ANON_KEY,
     process.env.SUPABASE_SERVICE_ROLE_KEY,
   ]);
 
