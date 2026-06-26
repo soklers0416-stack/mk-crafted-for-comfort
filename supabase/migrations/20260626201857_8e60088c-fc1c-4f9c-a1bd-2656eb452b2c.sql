@@ -1,0 +1,1 @@
+DELETE FROM public.requests WHERE source='callback' AND title='test';
