@@ -8,8 +8,18 @@ export const Route = createFileRoute("/api/public/photo/$")({
         if (!path || path.includes("..")) {
           return new Response("Bad path", { status: 400 });
         }
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { data, error } = await supabaseAdmin.storage
+        // Use publishable key client — bucket has an anon SELECT policy,
+        // so service role is not required (and may be unavailable on VPS).
+        const { createClient } = await import("@supabase/supabase-js");
+        const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+        const key = process.env.SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+        if (!url || !key) {
+          return new Response("Supabase env not configured", { status: 500 });
+        }
+        const client = createClient(url, key, {
+          auth: { persistSession: false, autoRefreshToken: false, storage: undefined },
+        });
+        const { data, error } = await client.storage
           .from("product-photos")
           .download(path);
         if (error || !data) {
