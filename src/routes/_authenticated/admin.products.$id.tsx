@@ -8,6 +8,7 @@ import { SOFA_TYPES } from "@/lib/db";
 import { toast } from "sonner";
 import { ArrowLeft, Upload, X, Plus, Trash2, GripVertical } from "lucide-react";
 import { uuid } from "@/lib/uuid";
+import { normalizePhotoUrl } from "@/lib/photoUrls";
 
 export const Route = createFileRoute("/_authenticated/admin/products/$id")({
   component: EditProduct,
@@ -87,7 +88,7 @@ function EditProduct() {
     const path = `${uuid()}.${ext}`;
     const { error } = await supabase.storage.from("product-photos").upload(path, file, { upsert: false, contentType: file.type });
     if (error) { toast.error(error.message); return; }
-    update(`photo${slot}` as any, `/api/public/photo/${path}`);
+    update(`photo${slot}` as any, normalizePhotoUrl(path)!);
   }
 
   async function uploadMultiplePhotos(files: FileList) {
@@ -104,7 +105,7 @@ function EditProduct() {
         const path = `${uuid()}.${ext}`;
         const { error } = await supabase.storage.from("product-photos").upload(path, file, { upsert: false, contentType: file.type });
         if (error) throw error;
-        return `/api/public/photo/${path}`;
+        return normalizePhotoUrl(path)!;
       }));
       setForm((f) => {
         const next = { ...f } as any;

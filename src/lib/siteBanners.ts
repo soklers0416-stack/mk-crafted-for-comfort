@@ -1,5 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { normalizePhotoUrl } from "@/lib/photoUrls";
 
 const sb = supabase as any;
 
@@ -184,6 +185,7 @@ export const siteBannersQuery = queryOptions({
     if (error) throw error;
     return ((data ?? []) as any[]).map((r) => ({
       ...r,
+      image_url: normalizePhotoUrl(r.image_url),
       settings: (r.settings ?? {}) as BannerSettings,
     }));
   },

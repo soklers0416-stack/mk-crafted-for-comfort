@@ -1,5 +1,7 @@
 // Типы данных для каталога. Соответствуют структуре таблиц в Lovable Cloud.
 
+import { normalizePhotoUrl } from "@/lib/photoUrls";
+
 export type Category = {
   id: string;
   slug: string;
@@ -181,7 +183,7 @@ export type PartnerApplication = {
 export function getGallery(p: Product): string[] {
   return [p.photo1, p.photo2, p.photo3, p.photo4, p.photo5, p.photo6].filter(
     (x): x is string => Boolean(x),
-  );
+  ).map((x) => normalizePhotoUrl(x) ?? x);
 }
 
 export function formatPriceRub(n: number): string {
