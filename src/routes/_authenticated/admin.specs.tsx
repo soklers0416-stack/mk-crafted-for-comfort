@@ -6,6 +6,7 @@ import { specMechanismsQuery, specFillingsQuery, sizePriceTemplatesQuery, catego
 import type { SpecItem, SizeRow, SizePriceTemplate, Category } from "@/lib/db";
 import { Plus, Trash2, Upload, X } from "lucide-react";
 import { toast } from "sonner";
+import { uuid } from "@/lib/uuid";
 
 export const Route = createFileRoute("/_authenticated/admin/specs")({
   component: AdminSpecs,
@@ -103,7 +104,7 @@ function SpecRow({ item, onSave, onDelete }: { item: SpecItem; onSave: (v: Parti
     setBusy(true);
     try {
       const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
-      const path = `specs/${crypto.randomUUID()}.${ext}`;
+      const path = `specs/${uuid()}.${ext}`;
       const { error } = await supabase.storage.from("product-photos").upload(path, file, { upsert: false, contentType: file.type });
       if (error) throw error;
       setForm((f) => ({ ...f, photo: `/api/public/photo/${path}` }));

@@ -5,10 +5,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { submitApplication } from "@/lib/applications.functions";
 import type { FormConfig, FormField } from "@/lib/forms";
+import { uuid } from "@/lib/uuid";
 
 async function uploadFile(file: File): Promise<string> {
   const ext = file.name.split(".").pop() || "bin";
-  const path = `applications/${crypto.randomUUID()}.${ext}`;
+  const path = `applications/${uuid()}.${ext}`;
   const { error } = await (supabase.storage.from("product-photos") as any).upload(path, file, {
     cacheControl: "3600",
     upsert: false,
