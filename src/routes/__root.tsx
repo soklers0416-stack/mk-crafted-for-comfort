@@ -72,6 +72,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { httpEquiv: "Cache-Control", content: "no-cache, no-store, must-revalidate" } as any,
+      { httpEquiv: "Pragma", content: "no-cache" } as any,
+      { httpEquiv: "Expires", content: "0" } as any,
       { title: "МК Мебель — мебель из Краснодара" },
       { name: "description", content: "Собственное производство мебели в Краснодаре. Диваны, кровати, шкафы, столы. Рассрочка, доставка, сборка." },
       { property: "og:title", content: "МК Мебель — мебель из Краснодара" },
