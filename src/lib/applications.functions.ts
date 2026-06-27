@@ -224,62 +224,79 @@ export const submitApplication = createServerFn({ method: "POST" })
   })
   .handler(async ({ data }) => {
     const traceId = createTraceId();
-    console.log("[MK_REQUEST][server][submitApplication][start]", {
+    const t0 = Date.now();
+    console.log("[MK_REQUEST][server][submitApplication][STEP_1_start]", {
       traceId,
       formKey: data.formKey,
       title: data.title,
       dataKeys: Object.keys(data.data ?? {}),
-      hasSupabaseUrl: !!(process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || (import.meta as any).env?.VITE_SUPABASE_URL),
+      hasSupabaseUrl: !!(process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL),
       hasPublicKey: !!(
         process.env.SUPABASE_PUBLISHABLE_KEY ||
         process.env.SUPABASE_ANON_KEY ||
         process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
-        process.env.VITE_SUPABASE_ANON_KEY ||
-        (import.meta as any).env?.VITE_SUPABASE_PUBLISHABLE_KEY ||
-        (import.meta as any).env?.VITE_SUPABASE_ANON_KEY
+        process.env.VITE_SUPABASE_ANON_KEY
       ),
     });
-    const supabasePublic = createPublicServerClient();
+
+    let supabasePublic;
+    try {
+      supabasePublic = createPublicServerClient();
+      console.log("[MK_REQUEST][server][submitApplication][STEP_2_client_ready]", { traceId });
+    } catch (err: any) {
+      console.error("[MK_REQUEST][server][submitApplication][STEP_2_client_error]", {
+        traceId, message: err?.message, name: err?.name, stack: err?.stack,
+      });
+      throw err;
+    }
 
     // 1) Сохраняем заявку (RLS: insert разрешён роли anon)
-    console.log("[MK_REQUEST][server][submitApplication][before_db_insert]", { traceId, formKey: data.formKey });
-    const { error } = await (supabasePublic as any)
-      .from("requests")
-      .insert({ source: data.formKey, title: data.title || data.formKey, data: data.data, status: "new" })
-      .throwOnError();
-    if (error) {
-      console.error("[MK_REQUEST][server][submitApplication][db_insert_error]", {
+    console.log("[MK_REQUEST][server][submitApplication][STEP_3_before_db_insert]", { traceId });
+    try {
+      const insertRes: any = await (supabasePublic as any)
+        .from("requests")
+        .insert({ source: data.formKey, title: data.title || data.formKey, data: data.data, status: "new" });
+      console.log("[MK_REQUEST][server][submitApplication][STEP_4_db_insert_result]", {
         traceId,
-        message: error.message,
-        code: error.code,
-        details: error.details,
-        hint: error.hint,
+        status: insertRes?.status,
+        statusText: insertRes?.statusText,
+        hasError: !!insertRes?.error,
+        errorMessage: insertRes?.error?.message,
+        errorCode: insertRes?.error?.code,
+        errorDetails: insertRes?.error?.details,
+        errorHint: insertRes?.error?.hint,
       });
-      throw new Error(error.message);
+      if (insertRes?.error) {
+        throw new Error(insertRes.error.message || "DB insert failed");
+      }
+    } catch (err: any) {
+      console.error("[MK_REQUEST][server][submitApplication][STEP_4_db_insert_catch]", {
+        traceId, message: err?.message, name: err?.name, stack: err?.stack,
+      });
+      throw err;
     }
-    console.log("[MK_REQUEST][server][submitApplication][after_db_insert]", { traceId });
 
-    // 2) Получаем настройки интеграции (best-effort; если RLS не пускает — пропускаем webhook)
-    console.log("[MK_REQUEST][server][submitApplication][before_integration_read]", { traceId });
-    const { data: integ, error: integError } = await (supabasePublic as any)
-      .from("integrations")
-      .select("apps_script_url, webhook_url, enabled")
-      .eq("id", 1)
-      .maybeSingle();
-    if (integError) {
-      console.error("[MK_REQUEST][server][submitApplication][integration_read_error]", {
-        traceId,
-        message: integError.message,
-        code: integError.code,
-        details: integError.details,
-        hint: integError.hint,
-      });
-    } else {
-      console.log("[MK_REQUEST][server][submitApplication][after_integration_read]", {
+    // 2) Получаем настройки интеграции
+    console.log("[MK_REQUEST][server][submitApplication][STEP_5_before_integration_read]", { traceId });
+    let integ: any = null;
+    try {
+      const { data: integData, error: integError } = await (supabasePublic as any)
+        .from("integrations")
+        .select("apps_script_url, webhook_url, enabled")
+        .eq("id", 1)
+        .maybeSingle();
+      integ = integData;
+      console.log("[MK_REQUEST][server][submitApplication][STEP_6_integration_result]", {
         traceId,
         enabled: !!integ?.enabled,
         hasAppsScriptUrl: !!integ?.apps_script_url,
         hasWebhookUrl: !!integ?.webhook_url,
+        errorMessage: integError?.message,
+        errorCode: integError?.code,
+      });
+    } catch (err: any) {
+      console.error("[MK_REQUEST][server][submitApplication][STEP_6_integration_catch]", {
+        traceId, message: err?.message, name: err?.name, stack: err?.stack,
       });
     }
 
@@ -291,47 +308,45 @@ export const submitApplication = createServerFn({ method: "POST" })
       data: data.data as Record<string, any>,
     });
 
-    // Совместимость: оставляем «сырые» поля рядом с плоскими колонками,
-    // чтобы старые Apps Script продолжали работать.
-    const payload = {
-      ...flat,
-      form_key: data.formKey,
-      data: data.data,
-    };
+    const payload = { ...flat, form_key: data.formKey, data: data.data };
 
-    // 3) Отправляем в Apps Script / webhook (best-effort, не блокируем ответ при ошибке)
+    // 3) Отправляем в Apps Script / webhook
+    let sheetsOk = true;
     if (integ?.enabled) {
       const urls = [integ.apps_script_url, integ.webhook_url].filter(Boolean) as string[];
-      console.log("[MK_REQUEST][server][submitApplication][before_external_fetches]", {
-        traceId,
-        targets: urls.map(safeUrlLabel),
+      console.log("[MK_REQUEST][server][submitApplication][STEP_7_before_external]", {
+        traceId, targets: urls.map(safeUrlLabel),
       });
-      const externalResults = await Promise.all(urls.map((url) => postToIntegrationUrl({ url, payload, traceId })));
-      console.log("[MK_REQUEST][server][submitApplication][after_external_fetches]", {
-        traceId,
-        results: externalResults.map((r) => ({ target: r.target, ok: r.ok, status: r.status, attempt: r.attempt })),
-      });
-      if (urls.length > 0 && !externalResults.some((r) => r.ok)) {
-        const first = externalResults[0];
-        // Заявка уже сохранена в БД — НЕ бросаем ошибку, чтобы пользователь
-        // не видел красное сообщение. Логируем для администратора.
-        console.error("[MK_REQUEST][server][submitApplication][external_fetch_failed_all]", {
+      try {
+        const externalResults = await Promise.all(urls.map((url) => postToIntegrationUrl({ url, payload, traceId })));
+        console.log("[MK_REQUEST][server][submitApplication][STEP_8_external_results]", {
           traceId,
-          status: first?.status,
-          error: first?.error,
-          body: first?.body?.slice(0, 2000),
+          results: externalResults.map((r) => ({ target: r.target, ok: r.ok, status: r.status, attempt: r.attempt })),
         });
-        return { ok: true, traceId, sheetsOk: false };
+        if (urls.length > 0 && !externalResults.some((r) => r.ok)) {
+          sheetsOk = false;
+          const first = externalResults[0];
+          console.error("[MK_REQUEST][server][submitApplication][STEP_8_external_failed_all]", {
+            traceId, status: first?.status, error: first?.error, body: first?.body?.slice(0, 2000),
+          });
+        }
+      } catch (err: any) {
+        sheetsOk = false;
+        console.error("[MK_REQUEST][server][submitApplication][STEP_8_external_catch]", {
+          traceId, message: err?.message, name: err?.name, stack: err?.stack,
+        });
       }
     } else {
-      console.log("[MK_REQUEST][server][submitApplication][external_fetch_skipped]", {
-        traceId,
-        reason: integ?.enabled ? "no_urls" : "integration_disabled_or_missing",
+      console.log("[MK_REQUEST][server][submitApplication][STEP_7_external_skipped]", {
+        traceId, reason: integ?.enabled ? "no_urls" : "integration_disabled_or_missing",
       });
     }
 
-    console.log("[MK_REQUEST][server][submitApplication][return_success]", { traceId });
-    return { ok: true, traceId };
+    const result = { ok: true as const, traceId, sheetsOk };
+    console.log("[MK_REQUEST][server][submitApplication][STEP_9_return_response]", {
+      traceId, durationMs: Date.now() - t0, result,
+    });
+    return result;
   });
 
 // Проверка подключения (только админ).
