@@ -1,9 +1,8 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { DynamicForm, useFormConfig } from "@/components/DynamicForm";
+import { toast } from "sonner";
 
 // Универсальный диалог заявки. Настройки берутся из таблицы form_configs по `source` (formKey).
-// Параметры title/description/fields оставлены для обратной совместимости — если переданы, они переопределяют тексты,
-// но поля формы теперь всегда из админки.
 export function RequestDialog({
   open, onOpenChange, source, title, description, extraData,
 }: {
@@ -26,7 +25,14 @@ export function RequestDialog({
             <DialogDescription>{description ?? config?.description}</DialogDescription>
           )}
         </DialogHeader>
-        <DynamicForm formKey={source} extraData={extraData} />
+        <DynamicForm
+          formKey={source}
+          extraData={extraData}
+          onSent={() => {
+            toast.success("Заявка отправлена. Мы скоро свяжемся с вами.");
+            setTimeout(() => onOpenChange(false), 1800);
+          }}
+        />
       </DialogContent>
     </Dialog>
   );
