@@ -313,17 +313,15 @@ export const submitApplication = createServerFn({ method: "POST" })
       });
       if (urls.length > 0 && !externalResults.some((r) => r.ok)) {
         const first = externalResults[0];
+        // Заявка уже сохранена в БД — НЕ бросаем ошибку, чтобы пользователь
+        // не видел красное сообщение. Логируем для администратора.
         console.error("[MK_REQUEST][server][submitApplication][external_fetch_failed_all]", {
           traceId,
           status: first?.status,
           error: first?.error,
           body: first?.body?.slice(0, 2000),
         });
-        throw new Error(
-          first?.status
-            ? `Google Sheets не принял заявку: HTTP ${first.status}`
-            : `Google Sheets не принял заявку: ${first?.error || "ошибка fetch"}`,
-        );
+        return { ok: true, traceId, sheetsOk: false };
       }
     } else {
       console.log("[MK_REQUEST][server][submitApplication][external_fetch_skipped]", {
