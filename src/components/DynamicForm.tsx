@@ -122,7 +122,13 @@ export function DynamicForm({
       setSent(true);
       onSent?.();
     } catch (err: any) {
-      logStage("catch", { message: err?.message, name: err?.name, stack: err?.stack });
+      logStage("catch_toast_error", {
+        message: err?.message,
+        name: err?.name,
+        stack: err?.stack,
+        cause: err?.cause ? String(err.cause) : undefined,
+        toString: String(err),
+      });
       toast.error(err?.message ?? "Не удалось отправить");
     } finally {
       logStage("finally", { busy: false });
