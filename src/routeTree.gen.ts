@@ -27,6 +27,7 @@ import { Route as ProductIdRouteImport } from './routes/product.$id'
 import { Route as PartnersIdRouteImport } from './routes/partners.$id'
 import { Route as FabricsIdRouteImport } from './routes/fabrics.$id'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as ApiPublicBackendInfoRouteImport } from './routes/api/public/backend-info'
 import { Route as AuthenticatedAdminSpecsRouteImport } from './routes/_authenticated/admin.specs'
 import { Route as AuthenticatedAdminReviewsRouteImport } from './routes/_authenticated/admin.reviews'
 import { Route as AuthenticatedAdminRequestsRouteImport } from './routes/_authenticated/admin.requests'
@@ -150,6 +151,11 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const ApiPublicBackendInfoRoute = ApiPublicBackendInfoRouteImport.update({
+  id: '/api/public/backend-info',
+  path: '/api/public/backend-info',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminSpecsRoute = AuthenticatedAdminSpecsRouteImport.update({
   id: '/admin/specs',
@@ -385,6 +391,7 @@ export interface FileRoutesByFullPath {
   '/admin/requests': typeof AuthenticatedAdminRequestsRoute
   '/admin/reviews': typeof AuthenticatedAdminReviewsRoute
   '/admin/specs': typeof AuthenticatedAdminSpecsRoute
+  '/api/public/backend-info': typeof ApiPublicBackendInfoRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/admin/apartment/analytics': typeof AuthenticatedAdminApartmentAnalyticsRoute
   '/admin/apartment/categories': typeof AuthenticatedAdminApartmentCategoriesRoute
@@ -437,6 +444,7 @@ export interface FileRoutesByTo {
   '/admin/requests': typeof AuthenticatedAdminRequestsRoute
   '/admin/reviews': typeof AuthenticatedAdminReviewsRoute
   '/admin/specs': typeof AuthenticatedAdminSpecsRoute
+  '/api/public/backend-info': typeof ApiPublicBackendInfoRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/admin/apartment/analytics': typeof AuthenticatedAdminApartmentAnalyticsRoute
   '/admin/apartment/categories': typeof AuthenticatedAdminApartmentCategoriesRoute
@@ -492,6 +500,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/requests': typeof AuthenticatedAdminRequestsRoute
   '/_authenticated/admin/reviews': typeof AuthenticatedAdminReviewsRoute
   '/_authenticated/admin/specs': typeof AuthenticatedAdminSpecsRoute
+  '/api/public/backend-info': typeof ApiPublicBackendInfoRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/admin/apartment/analytics': typeof AuthenticatedAdminApartmentAnalyticsRoute
   '/_authenticated/admin/apartment/categories': typeof AuthenticatedAdminApartmentCategoriesRoute
@@ -547,6 +556,7 @@ export interface FileRouteTypes {
     | '/admin/requests'
     | '/admin/reviews'
     | '/admin/specs'
+    | '/api/public/backend-info'
     | '/admin/'
     | '/admin/apartment/analytics'
     | '/admin/apartment/categories'
@@ -599,6 +609,7 @@ export interface FileRouteTypes {
     | '/admin/requests'
     | '/admin/reviews'
     | '/admin/specs'
+    | '/api/public/backend-info'
     | '/admin'
     | '/admin/apartment/analytics'
     | '/admin/apartment/categories'
@@ -653,6 +664,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/requests'
     | '/_authenticated/admin/reviews'
     | '/_authenticated/admin/specs'
+    | '/api/public/backend-info'
     | '/_authenticated/admin/'
     | '/_authenticated/admin/apartment/analytics'
     | '/_authenticated/admin/apartment/categories'
@@ -688,6 +700,7 @@ export interface RootRouteChildren {
   PromotionsRoute: typeof PromotionsRoute
   ReviewsRoute: typeof ReviewsRoute
   ProductIdRoute: typeof ProductIdRoute
+  ApiPublicBackendInfoRoute: typeof ApiPublicBackendInfoRoute
   ApiPublicPhotoSplatRoute: typeof ApiPublicPhotoSplatRoute
 }
 
@@ -818,6 +831,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/public/backend-info': {
+      id: '/api/public/backend-info'
+      path: '/api/public/backend-info'
+      fullPath: '/api/public/backend-info'
+      preLoaderRoute: typeof ApiPublicBackendInfoRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/specs': {
       id: '/_authenticated/admin/specs'
@@ -1200,6 +1220,7 @@ const rootRouteChildren: RootRouteChildren = {
   PromotionsRoute: PromotionsRoute,
   ReviewsRoute: ReviewsRoute,
   ProductIdRoute: ProductIdRoute,
+  ApiPublicBackendInfoRoute: ApiPublicBackendInfoRoute,
   ApiPublicPhotoSplatRoute: ApiPublicPhotoSplatRoute,
 }
 export const routeTree = rootRouteImport
