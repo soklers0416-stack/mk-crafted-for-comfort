@@ -1,12 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
-import { createClient } from "@supabase/supabase-js";
-import type { Database } from "@/integrations/supabase/types";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-// Публичный серверный клиент с publishable/anon ключом — НЕ требует
-// SUPABASE_SERVICE_ROLE_KEY. Используется для приёма заявок из всех форм
-// (insert в public.requests разрешён политикой RLS для роли anon).
-function createPublicServerClient() {
+// Публичный доступ к REST API backend без @supabase/supabase-js.
+// Важно: на сервере supabase-js поднимает RealtimeClient, из-за чего на Node 20
+// появляется ошибка про WebSocket после успешной отправки заявки. Для форм
+// Realtime не нужен, поэтому используем обычный fetch.
+function getPublicBackendEnv() {
   const url =
     process.env.SUPABASE_URL ||
     process.env.VITE_SUPABASE_URL ||
@@ -23,9 +22,47 @@ function createPublicServerClient() {
       "Missing Supabase env: SUPABASE_URL/SUPABASE_PUBLISHABLE_KEY (or VITE_* equivalents)",
     );
   }
-  return createClient<Database>(url, key, {
-    auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+  return { url: url.replace(/\/$/, ""), key };
+}
+
+async function backendRest<T = any>({
+  path,
+  method = "GET",
+  body,
+  query,
+}: {
+  path: string;
+  method?: "GET" | "POST";
+  body?: unknown;
+  query?: string;
+}): Promise<{ data: T | null; error: any; status: number; statusText: string }> {
+  const { url, key } = getPublicBackendEnv();
+  const target = `${url}/rest/v1/${path}${query ? `?${query}` : ""}`;
+  const response = await fetch(target, {
+    method,
+    headers: {
+      apikey: key,
+      authorization: `Bearer ${key}`,
+      "content-type": "application/json",
+      ...(method === "POST" ? { prefer: "return=minimal" } : {}),
+    },
+    body: body === undefined ? undefined : JSON.stringify(body),
   });
+  const text = await response.text().catch(() => "");
+  let parsed: any = null;
+  if (text) {
+    try {
+      parsed = JSON.parse(text);
+    } catch {
+      parsed = text;
+    }
+  }
+  return {
+    data: response.ok ? parsed : null,
+    error: response.ok ? null : parsed || { message: response.statusText },
+    status: response.status,
+    statusText: response.statusText,
+  };
 }
 
 function createTraceId() {
@@ -239,12 +276,11 @@ export const submitApplication = createServerFn({ method: "POST" })
       ),
     });
 
-    let supabasePublic;
     try {
-      supabasePublic = createPublicServerClient();
-      console.log("[MK_REQUEST][server][submitApplication][STEP_2_client_ready]", { traceId });
+      getPublicBackendEnv();
+      console.log("[MK_REQUEST][server][submitApplication][STEP_2_rest_ready]", { traceId });
     } catch (err: any) {
-      console.error("[MK_REQUEST][server][submitApplication][STEP_2_client_error]", {
+      console.error("[MK_REQUEST][server][submitApplication][STEP_2_rest_error]", {
         traceId, message: err?.message, name: err?.name, stack: err?.stack,
       });
       throw err;
@@ -253,9 +289,11 @@ export const submitApplication = createServerFn({ method: "POST" })
     // 1) Сохраняем заявку (RLS: insert разрешён роли anon)
     console.log("[MK_REQUEST][server][submitApplication][STEP_3_before_db_insert]", { traceId });
     try {
-      const insertRes: any = await (supabasePublic as any)
-        .from("requests")
-        .insert({ source: data.formKey, title: data.title || data.formKey, data: data.data, status: "new" });
+      const insertRes = await backendRest({
+        path: "requests",
+        method: "POST",
+        body: { source: data.formKey, title: data.title || data.formKey, data: data.data, status: "new" },
+      });
       console.log("[MK_REQUEST][server][submitApplication][STEP_4_db_insert_result]", {
         traceId,
         status: insertRes?.status,
@@ -280,12 +318,12 @@ export const submitApplication = createServerFn({ method: "POST" })
     console.log("[MK_REQUEST][server][submitApplication][STEP_5_before_integration_read]", { traceId });
     let integ: any = null;
     try {
-      const { data: integData, error: integError } = await (supabasePublic as any)
-        .from("integrations")
-        .select("apps_script_url, webhook_url, enabled")
-        .eq("id", 1)
-        .maybeSingle();
-      integ = integData;
+      const integRes = await backendRest<any[]>({
+        path: "integrations",
+        query: "select=apps_script_url,webhook_url,enabled&id=eq.1&limit=1",
+      });
+      const integError = integRes.error;
+      integ = Array.isArray(integRes.data) ? integRes.data[0] ?? null : integRes.data;
       console.log("[MK_REQUEST][server][submitApplication][STEP_6_integration_result]", {
         traceId,
         enabled: !!integ?.enabled,
