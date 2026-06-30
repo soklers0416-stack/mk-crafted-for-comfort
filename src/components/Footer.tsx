@@ -7,7 +7,7 @@ export function Footer() {
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 md:grid-cols-4 md:px-8">
         <div>
           <div className="flex items-center gap-2">
-            <img src={logoAsset.url} alt="МК" className="h-9 w-9 rounded-xl object-cover" />
+            <img src={logoAsset.url} alt="МК" className="h-16 w-16 rounded-xl object-cover" />
             <span className="font-display text-lg font-semibold">{"\n"}</span>
           </div>
           <p className="mt-4 text-sm text-muted-foreground">
