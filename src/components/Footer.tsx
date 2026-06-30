@@ -8,7 +8,7 @@ export function Footer() {
         <div>
           <div className="flex items-center gap-2">
             <img src={logoAsset.url} alt="МК" className="h-9 w-9 rounded-xl object-cover" />
-            <span className="font-display text-lg font-semibold">МК Мебель</span>
+            <span className="font-display text-lg font-semibold">{"\n"}</span>
           </div>
           <p className="mt-4 text-sm text-muted-foreground">
             Собственное производство мебели в Краснодаре. Стильно, качественно, без переплат.

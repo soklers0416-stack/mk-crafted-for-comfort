@@ -35,7 +35,7 @@ export function Header() {
         <Link to="/" className="flex items-center gap-2 group">
           <img src={logoAsset.url} alt="МК" className="h-9 w-9 rounded-xl object-cover" />
           <span className="hidden sm:block font-display text-lg font-semibold tracking-tight">
-            МК Мебель
+            {"\n"}
           </span>
         </Link>
 
