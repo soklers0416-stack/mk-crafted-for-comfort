@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import logoAsset from "@/assets/mk-logo.jfif.asset.json";
 
 export function Footer() {
   return (
