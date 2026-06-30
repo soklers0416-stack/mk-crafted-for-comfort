@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import logoAsset from "@/assets/mk-logo.jfif.asset.json";
 
 export function Footer() {
   return (
@@ -6,9 +7,7 @@ export function Footer() {
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 md:grid-cols-4 md:px-8">
         <div>
           <div className="flex items-center gap-2">
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary text-primary-foreground font-display font-bold">
-              МК
-            </span>
+            <img src={logoAsset.url} alt="МК" className="h-9 w-9 rounded-xl object-cover" />
             <span className="font-display text-lg font-semibold">МК Мебель</span>
           </div>
           <p className="mt-4 text-sm text-muted-foreground">
