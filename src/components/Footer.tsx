@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import logoAsset from "@/assets/mk-logo.jfif.asset.json";
+const logoAsset = { url: "/mk-logo.jpg" };
 
 export function Footer() {
   return (
