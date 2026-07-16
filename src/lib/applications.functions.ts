@@ -406,6 +406,53 @@ export const submitApplication = createServerFn({ method: "POST" })
       });
     }
 
+    // 4) Дублируем заявку на почту через Resend
+    try {
+      const resendKey = process.env.RESEND_API_KEY;
+      if (resendKey) {
+        const to = "mkmebel.krasnodar@mail.ru";
+        const rowsHtml = Object.entries(data.data as Record<string, any>)
+          .filter(([, v]) => v != null && v !== "")
+          .map(([k, v]) => {
+            const val = typeof v === "object" ? JSON.stringify(v) : String(v);
+            const safe = val.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br/>");
+            return `<tr><td style="padding:6px 10px;border:1px solid #eee;vertical-align:top;color:#666;font-size:13px"><b>${k}</b></td><td style="padding:6px 10px;border:1px solid #eee;font-size:13px">${safe}</td></tr>`;
+          })
+          .join("");
+        const subject = `Новая заявка с сайта: ${data.title || typeLabel(data.formKey)}`;
+        const html = `
+          <div style="font-family:Arial,sans-serif;color:#111">
+            <h2 style="margin:0 0 12px">${subject}</h2>
+            <p style="color:#666;margin:0 0 12px">Тип: ${typeLabel(data.formKey)}</p>
+            <table style="border-collapse:collapse;border:1px solid #eee;min-width:400px">${rowsHtml}</table>
+            <p style="color:#999;font-size:12px;margin-top:16px">Отправлено автоматически с сайта МК Мебель.</p>
+          </div>`;
+        const resp = await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            authorization: `Bearer ${resendKey}`,
+          },
+          body: JSON.stringify({
+            from: "МК Мебель <onboarding@resend.dev>",
+            to: [to],
+            subject,
+            html,
+          }),
+        });
+        const body = await resp.text().catch(() => "");
+        console.log("[MK_REQUEST][server][submitApplication][STEP_email_resend]", {
+          traceId, status: resp.status, ok: resp.ok, body: body.slice(0, 500),
+        });
+      } else {
+        console.log("[MK_REQUEST][server][submitApplication][STEP_email_skipped]", { traceId, reason: "no_RESEND_API_KEY" });
+      }
+    } catch (err: any) {
+      console.error("[MK_REQUEST][server][submitApplication][STEP_email_catch]", {
+        traceId, message: err?.message, name: err?.name,
+      });
+    }
+
     const result = { ok: true as const, traceId, sheetsOk };
     console.log("[MK_REQUEST][server][submitApplication][STEP_9_return_response]", {
       traceId, durationMs: Date.now() - t0, result,
