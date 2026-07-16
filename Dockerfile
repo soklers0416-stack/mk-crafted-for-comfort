@@ -20,19 +20,9 @@ RUN if [ -f bun.lock ] || [ -f bun.lockb ]; then \
 
 COPY . .
 
-# Build-time args for Vite client bundle (VITE_* must be present at build time,
-# not runtime — Vite inlines import.meta.env.VITE_* into the client JS).
-ARG VITE_SUPABASE_URL
-ARG VITE_SUPABASE_PUBLISHABLE_KEY
-ARG VITE_SUPABASE_ANON_KEY
-ARG VITE_SUPABASE_PROJECT_ID
-ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL
-ENV VITE_SUPABASE_PUBLISHABLE_KEY=$VITE_SUPABASE_PUBLISHABLE_KEY
-ENV VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY
-ENV VITE_SUPABASE_PROJECT_ID=$VITE_SUPABASE_PROJECT_ID
-
-# Fallback: if .env.production is present in build context, copy it to .env so
-# Vite picks it up automatically during build.
+# The self-hosted server keeps production values in .env.production.
+# Copy it to .env during the image build so Vite inlines the same values that
+# the running container receives through docker compose env_file.
 RUN if [ -f .env.production ] && [ ! -f .env ]; then cp .env.production .env; fi
 
 ENV NITRO_PRESET=node_server
@@ -44,18 +34,6 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOST=0.0.0.0
-
-# Keep the same VITE Supabase values available to server routes at runtime too.
-# The client bundle already has them baked in at build time, but the image proxy
-# runs on the server and must read from the same Supabase project.
-ARG VITE_SUPABASE_URL
-ARG VITE_SUPABASE_PUBLISHABLE_KEY
-ARG VITE_SUPABASE_ANON_KEY
-ARG VITE_SUPABASE_PROJECT_ID
-ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL
-ENV VITE_SUPABASE_PUBLISHABLE_KEY=$VITE_SUPABASE_PUBLISHABLE_KEY
-ENV VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY
-ENV VITE_SUPABASE_PROJECT_ID=$VITE_SUPABASE_PROJECT_ID
 
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/node_modules ./node_modules
