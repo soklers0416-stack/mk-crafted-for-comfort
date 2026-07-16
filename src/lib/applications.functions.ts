@@ -5,24 +5,39 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 // Важно: на сервере supabase-js поднимает RealtimeClient, из-за чего на Node 20
 // появляется ошибка про WebSocket после успешной отправки заявки. Для форм
 // Realtime не нужен, поэтому используем обычный fetch.
+function cleanEnvValue(value: unknown) {
+  return String(value ?? "")
+    .trim()
+    .replace(/^['"]|['"]$/g, "")
+    .trim();
+}
+
 function getPublicBackendEnv() {
-  const url =
-    process.env.SUPABASE_URL ||
+  const url = cleanEnvValue(
     process.env.VITE_SUPABASE_URL ||
-    (import.meta as any).env?.VITE_SUPABASE_URL;
-  const key =
-    process.env.SUPABASE_PUBLISHABLE_KEY ||
-    process.env.SUPABASE_ANON_KEY ||
-    process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
-    process.env.VITE_SUPABASE_ANON_KEY ||
-    (import.meta as any).env?.VITE_SUPABASE_PUBLISHABLE_KEY ||
-    (import.meta as any).env?.VITE_SUPABASE_ANON_KEY;
-  if (!url || !key) {
+      process.env.SUPABASE_URL ||
+      (import.meta as any).env?.VITE_SUPABASE_URL,
+  );
+  const keys = Array.from(
+    new Set(
+      [
+        process.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        process.env.VITE_SUPABASE_ANON_KEY,
+        process.env.SUPABASE_PUBLISHABLE_KEY,
+        process.env.SUPABASE_ANON_KEY,
+        (import.meta as any).env?.VITE_SUPABASE_PUBLISHABLE_KEY,
+        (import.meta as any).env?.VITE_SUPABASE_ANON_KEY,
+      ]
+        .map(cleanEnvValue)
+        .filter(Boolean),
+    ),
+  );
+  if (!url || keys.length === 0) {
     throw new Error(
       "Missing Supabase env: SUPABASE_URL/SUPABASE_PUBLISHABLE_KEY (or VITE_* equivalents)",
     );
   }
-  return { url: url.replace(/\/$/, ""), key };
+  return { url: url.replace(/\/$/, ""), keys };
 }
 
 async function backendRest<T = any>({
@@ -36,33 +51,44 @@ async function backendRest<T = any>({
   body?: unknown;
   query?: string;
 }): Promise<{ data: T | null; error: any; status: number; statusText: string }> {
-  const { url, key } = getPublicBackendEnv();
+  const { url, keys } = getPublicBackendEnv();
   const target = `${url}/rest/v1/${path}${query ? `?${query}` : ""}`;
-  const response = await fetch(target, {
-    method,
-    headers: {
-      apikey: key,
-      authorization: `Bearer ${key}`,
-      "content-type": "application/json",
-      ...(method === "POST" ? { prefer: "return=minimal" } : {}),
-    },
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
-  const text = await response.text().catch(() => "");
-  let parsed: any = null;
-  if (text) {
-    try {
-      parsed = JSON.parse(text);
-    } catch {
-      parsed = text;
+
+  let lastResult: { data: T | null; error: any; status: number; statusText: string } | null = null;
+  for (const key of keys) {
+    const response = await fetch(target, {
+      method,
+      headers: {
+        apikey: key,
+        authorization: `Bearer ${key}`,
+        "content-type": "application/json",
+        ...(method === "POST" ? { prefer: "return=minimal" } : {}),
+      },
+      body: body === undefined ? undefined : JSON.stringify(body),
+    });
+    const text = await response.text().catch(() => "");
+    let parsed: any = null;
+    if (text) {
+      try {
+        parsed = JSON.parse(text);
+      } catch {
+        parsed = text;
+      }
+    }
+
+    lastResult = {
+      data: response.ok ? parsed : null,
+      error: response.ok ? null : parsed || { message: response.statusText },
+      status: response.status,
+      statusText: response.statusText,
+    };
+
+    if (response.ok || !/invalid api key/i.test(String(lastResult.error?.message ?? lastResult.error ?? ""))) {
+      return lastResult;
     }
   }
-  return {
-    data: response.ok ? parsed : null,
-    error: response.ok ? null : parsed || { message: response.statusText },
-    status: response.status,
-    statusText: response.statusText,
-  };
+
+  return lastResult ?? { data: null, error: { message: "Invalid API key" }, status: 401, statusText: "Unauthorized" };
 }
 
 function createTraceId() {
