@@ -26,12 +26,23 @@ cp .env.production.example .env.production
 nano .env.production
 ```
 
-Скопируй значения из Lovable: открой в редакторе `.env` (там есть `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `VITE_SUPABASE_PROJECT_ID`) и перенеси их в `.env.production` на сервере.
+Скопируй значения из Lovable: открой в редакторе `.env` и перенеси их в `.env.production` на сервере. Для заявок должны быть заполнены обе пары:
+
+```bash
+VITE_SUPABASE_URL=...
+VITE_SUPABASE_PUBLISHABLE_KEY=...
+VITE_SUPABASE_PROJECT_ID=...
+SUPABASE_URL=...
+SUPABASE_PUBLISHABLE_KEY=...
+```
+
+`SUPABASE_URL` обычно равен `VITE_SUPABASE_URL`, а `SUPABASE_PUBLISHABLE_KEY` — `VITE_SUPABASE_PUBLISHABLE_KEY`.
 
 ## 4. Сборка и запуск
 
 ```bash
-docker compose up -d --build
+docker compose build --no-cache
+docker compose up -d
 ```
 
 Сайт поднимется на 80 порту. Проверь:
@@ -50,7 +61,8 @@ docker compose logs -f web
 ```bash
 cd /opt/mk-site
 git pull
-docker compose up -d --build
+docker compose build --no-cache
+docker compose up -d
 ```
 
 Можно автоматизировать через GitHub webhook + скрипт, но это позже.
